@@ -1,29 +1,29 @@
 TAG009 2020/12/26
- IDE��������
- compiler:PCMPACK�^�O�̒ǉ�
+ IDE向け調整
+ compiler:PCMPACKタグの追加
 
 TAG008 2020/12/19
- compiler:xml�ŏo�͂ł���悤�ɏC��
- driver:xml�����t�ł���悤�ɏC��
- �ЂƂ܂������Ƃ���...
+ compiler:xmlで出力できるように修正
+ driver:xmlを演奏できるように修正
+ ひとまず完成とする...
 
 TAG007 2020/12/18
- compiler:pcm�T�C�Y���̎Z�o�̃o�O���C��(��݂���񂳂�܂�x3���肪�Ƃ��������܂��I)
+ compiler:pcmサイズ情報の算出のバグを修正(ゆみちゃんさんまたx3ありがとうございます！)
 
 TAG006 2020/12/17
- compiler:softenv�����̃o�O���C��(��݂���񂳂�܂��܂����肪�Ƃ��������܂��I)
+ compiler:softenv処理のバグを修正(ゆみちゃんさんまたまたありがとうございます！)
 
 TAG005 2020/12/16 3rd
- compiler:���l�̂܂�߂ɃI���W�i���ƈႢ���ł邽��,�ł��邾�����m�Ɍv�Z����悤�ɏC���B
+ compiler:数値のまるめにオリジナルと違いがでるため,できるだけ正確に計算するように修正。
 
 TAG004 2020/12/16 2nd
- compiler:_AUTO_BANKSWITCH�̎���(��݂���񂳂񂠂肪�Ƃ��������܂��I)
+ compiler:_AUTO_BANKSWITCHの実装(ゆみちゃんさんありがとうございます！)
 
 TAG003 2020/12/16
- compiler:�K�v�����Ȃ͈̂�ʂ��������
+ compiler:必要そうなのは一通り実装完了
 
 TAG002 2020/12/07
- �Ȃ�Ƃ���f���ȃR���p�C���\
+ なるとさんデモ曲コンパイル可能
 
 TAG001 2020/12/06
  first rel
