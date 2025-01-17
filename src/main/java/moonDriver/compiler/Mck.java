@@ -7,17 +7,18 @@ import java.lang.System.Logger;
 import java.lang.System.Logger.Level;
 
 import dotnet4j.io.Path;
+import musicDriverInterface.CompilerInfo;
 
 import static java.lang.System.getLogger;
 
 
-public class mck {
+public class Mck {
 
-    private static final Logger logger = getLogger(mck.class.getName());
+    private static final Logger logger = getLogger(Mck.class.getName());
 
     private Compiler compiler = null;
-    private work wk = null;
-    private datamake datamake = null;
+    private Work wk = null;
+    private DataMaker datamake = null;
 
     //extern void splitPath( final char* ptr, char* path, char* name, char* ext );
     //extern void makePath(char* ptr, final char* path, final char* name, final char* ext );
@@ -82,7 +83,7 @@ public class mck {
      Output:
         0:正常終了 0:以外以上終了
     --------------------------------------------------------------*/
-    public MmlDatum[] main(Compiler compiler, String[] mckArgs, work work, String[] env) {
+    public MmlDatum2[] main(Compiler compiler, String[] mckArgs, Work work, String[] env) {
         this.compiler = compiler;
         wk = work;
 
@@ -97,11 +98,11 @@ public class mck {
                 (work.VersionNo / 100), (work.VersionNo % 100)));
 
         // サブタイトル表示
-        logger.log(Level.INFO, String.format("%d", version.moon_verstr));
+        logger.log(Level.INFO, String.format("%d", Version.moon_verstr));
         //printf("patches by [OK] and 2ch mck thread people\n");
         logger.log(Level.INFO, String.format("DATE: %d", "2020/11/27"));// __DATE__);
-        logger.log(Level.INFO, String.format("%d", version.patchstr));
-        logger.log(Level.INFO, String.format("%d", version.hogereleasestr));
+        logger.log(Level.INFO, String.format("%d", Version.patchstr));
+        logger.log(Level.INFO, String.format("%d", Version.hogereleasestr));
 
         // コマンドライン解析
         if (mckArgs == null || mckArgs.length < 1) {
@@ -124,12 +125,12 @@ public class mck {
                         wk.include_flag = 1;
                         break;
                     case 'M':
-                        int res;
+                        int res = 0;
                         try {
-                            res = Integer.parseInt(mckArgs[i]);
-                        } catch (NumberFormatException e) {
+                            res = Integer.parseInt(mckArgs[i].substring(2));
+                            wk.message_flag = res;
+                        } catch (NumberFormatException ignore) {
                         }
-                        if (res.substring(2)) wk.message_flag = res;
                         if (wk.message_flag > 1) {
                             dispHelpMessage();
                             return null;
@@ -139,7 +140,7 @@ public class mck {
                         //obsolete
                         break;
                     case 'O':
-                        wk.ef_name = mckArgs[i].Substring(2).Trim();
+                        wk.ef_name = mckArgs[i].substring(2).trim();
                         break;
                     case 'W':
                         wk.warning_flag = 0;
@@ -207,7 +208,7 @@ public class mck {
         logger.log(Level.INFO, String.format("%d -> %d", wk.mml_names[i], wk.out_name));
 
         // コンバート
-        datamake = new datamake(compiler, wk);
+        datamake = new DataMaker(compiler, wk);
         int ret = datamake.data_make();
         // 終了
 

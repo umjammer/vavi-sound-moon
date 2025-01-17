@@ -16,24 +16,21 @@ import dotnet4j.io.SeekOrigin;
 import dotnet4j.io.Stream;
 import dotnet4j.io.StreamReader;
 import dotnet4j.util.compat.Tuple;
-import moonDriver.common.iEncoding;
-import moonDriver.common.myEncoding;
+import moonDriver.common.IEncoding;
+import moonDriver.common.MyEncoding;
 import musicDriverInterface.CompilerInfo;
 import musicDriverInterface.GD3Tag;
+import musicDriverInterface.ICompiler;
 import musicDriverInterface.MmlDatum;
 
 
-public class Compiler implements iCompiler {
+public class Compiler implements ICompiler {
 
-    public iEncoding enc = null;
+    public IEncoding enc = null;
     public String[] args = null;
-    public String[] env
-
-    {
-        get;
-        set;
-    }
-
+    public String[] env;
+    private String[] getEnv() { return env; }
+    private void setEnv(String[] value) { env = value; }
     public boolean isSrc = false;
     public boolean doPackPCM = false;
     public String pcmFileName = "";
@@ -44,22 +41,25 @@ public class Compiler implements iCompiler {
     private boolean isIDE = false;
     private Point skipPoint = new Point(0, 0);
     private Function<String, Stream> appendFileReaderCallback;
-    public work work = new work();
-    public mck mck = null;
+    public Work work = new Work();
+    public Mck mck = null;
 
-
-    public Compiler(iEncoding enc /* = null */) {
-        this.enc = enc ? ? myEncoding.Default;
+    public Compiler() {
+        this(null);
     }
 
-    public void Init() {
+    public Compiler(IEncoding enc /* = null */) {
+        this.enc = enc == null ? MyEncoding.Default() : enc;
+    }
+
+    public void init() {
         this.isIDE = false;
         this.skipPoint = new Point(0, 0);
         this.args = null;
     }
 
-    public MmlDatum[] Compile(Stream sourceMML, Function<String, Stream> appendFileReaderCallback) {
-        try (var ms = ReadAllBytesToMemoryStream(sourceMML)) {
+    public MmlDatum[] compile(Stream sourceMML, Function<String, Stream> appendFileReaderCallback) {
+        try (var ms = readAllBytesToMemoryStream(sourceMML)) {
             ms.seek(0, SeekOrigin.Begin);
             int c = 0;
             int offset = 0;
@@ -79,32 +79,31 @@ public class Compiler implements iCompiler {
             }
         }
 
-        //Console.WriteLine(srcBuf);
+        //logger.log(Level.DEBUG, srcBuf);
 
         this.appendFileReaderCallback = appendFileReaderCallback;
 
         work.srcBuf = srcBuf;
 
-        mck = new mck();
+        mck = new Mck();
         List<MmlDatum> ret = new ArrayList<>();
 
-        //if (isIDE)
-        //{
-        //    args = new String[] { "-i", "dummy.mdl" };
-        //}
+//        if (isIDE) {
+//            args = new String[] {"-i", "dummy.mdl"};
+//        }
 
         MmlDatum2[] dest = mck.main(this, args, work, env);
         if (dest == null || dest.length < 1) return null;
-        //ほしいのはmmlDatumnなのでキャスト(?)して作り直す
+        // ほしいのは mmlDatumn なのでキャスト(?)して作り直す
         for (MmlDatum2 md2 : dest) {
             ret.add(md2 == null ? null : md2.ToMmlDatumn());
         }
 
-        return ret.toArray();
+        return ret.toArray(MmlDatum[]::new);
     }
 
-    public boolean Compile(FileStream sourceMML, Stream destCompiledBin, Function<String, Stream> appendFileReaderCallback) {
-        var dat = Compile(sourceMML, appendFileReaderCallback);
+    public boolean compile(FileStream sourceMML, Stream destCompiledBin, Function<String, Stream> appendFileReaderCallback) {
+        var dat = compile(sourceMML, appendFileReaderCallback);
         if (dat == null) {
             return false;
         }
@@ -118,16 +117,16 @@ public class Compiler implements iCompiler {
         return true;
     }
 
-    public CompilerInfo GetCompilerInfo() {
+    public CompilerInfo getCompilerInfo() {
         if (mck == null) return null;
         return mck.GetCompilerInfo();
     }
 
-    public GD3Tag GetGD3TagInfo(byte[] srcBuf) {
+    public GD3Tag getGD3TagInfo(byte[] srcBuf) {
         return null;
     }
 
-    public void SetCompileSwitch(Object... param) {
+    public void setCompileSwitch(Object... param) {
         if (param == null) return;
 
         for (Object prm : param) {
@@ -143,42 +142,40 @@ public class Compiler implements iCompiler {
                 this.isSrc = true;
             }
 
-            //PCMPACK指定の場合は単独で指定する必要あり
+            // PCMPACK指定の場合は単独で指定する必要あり
             if (((String) prm).equals("PCMPACK")) {
                 this.doPackPCM = true;
                 this.pcmFileName = (String) param[1];
                 return;
             }
 
-            //IDEフラグオン
-            if ((String) prm == "IDE") {
+            // IDEフラグオン
+            if (((String) prm).equals("IDE")) {
                 this.isIDE = true;
             }
 
-            //スキップ再生指定
+            // スキップ再生指定
             if (((String) prm).indexOf("SkipPoint=") == 0) {
                 try {
                     String[] p = ((String) prm).split("=")[1].split(":");
                     int r = Integer.parseInt(p[0].substring(1));
                     int c = Integer.parseInt(p[1].substring(1));
                     this.skipPoint = new Point(c, r);
-                } catch
-                {
+                } catch (Exception e) {
                     continue;
                 }
             }
 
-            //オリジナルファイルの所在
+            // オリジナルファイルの所在
             if (((String) prm).indexOf("ORIGPATH=") == 0) {
                 try {
                     this.origpath = ((String) prm).split("=")[1];
-                } catch
-                {
+                } catch (Exception e) {
                     continue;
                 }
             }
 
-            //MoonDriver自体のオプション
+            // MoonDriver自体のオプション
             if (((String) prm).indexOf("MoonDriverOption=") == 0) {
                 try {
                     String p = ((String) prm).split("=")[1];
@@ -194,15 +191,14 @@ public class Compiler implements iCompiler {
                     continue;
                 }
             }
-
         }
     }
 
-    public Tuple<String, String>[] GetTags(String srcText, Function<String, Stream> appendFileReaderCallback) {
+    public Tuple<String, String>[] getTags(String srcText, Function<String, Stream> appendFileReaderCallback) {
         return null;
     }
 
-    private MemoryStream ReadAllBytesToMemoryStream(Stream stream) {
+    private MemoryStream readAllBytesToMemoryStream(Stream stream) {
         if (stream == null) return null;
 
         var buf = new byte[8192];

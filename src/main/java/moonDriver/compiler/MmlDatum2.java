@@ -9,6 +9,7 @@ import java.util.List;
 
 import dotnet4j.util.compat.StringUtilities;
 import musicDriverInterface.LinePos;
+import musicDriverInterface.MMLType;
 import musicDriverInterface.MmlDatum;
 
 
@@ -25,12 +26,12 @@ public class MmlDatum2 extends MmlDatum implements Serializable {
         this.code = code;
     }
 
-    public MmlDatum2(String code, enmMMLType type, List<Object> args, LinePos linePos, int dat) {
+    public MmlDatum2(String code, MMLType type, List<Object> args, LinePos linePos, int dat) {
         super(type, args, linePos, dat);
         this.code = code;
     }
 
-    public MmlDatum2(String code, int dat, enmMMLType type, LinePos linePos, Object... args) {
+    public MmlDatum2(String code, int dat, MMLType type, LinePos linePos, Object... args) {
         super(dat, type, linePos, args);
         this.code = code;
     }
@@ -50,7 +51,7 @@ public class MmlDatum2 extends MmlDatum implements Serializable {
     /// -7:/* ref */ macro
     /// </param>
     public MmlDatum2(String code, Object... args) {
-        super(-1, enmMMLType.unknown, null, args);
+        super(-1, MMLType.unknown, null, args);
         this.code = code;
     }
 
@@ -58,7 +59,7 @@ public class MmlDatum2 extends MmlDatum implements Serializable {
     public String toString() {
         String c = StringUtilities.isNullOrEmpty(code) ? "" : code;
         String d = "";
-        while (c.length() > 0 && c[c.length() - 1] == '\n') {
+        while (c.length() > 0 && c.charAt(c.length() - 1) == '\n') {
             c = c.substring(0, c.length() - 1);
             d += "\n";
         }

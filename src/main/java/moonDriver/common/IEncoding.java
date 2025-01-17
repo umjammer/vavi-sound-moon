@@ -1,6 +1,6 @@
 package moonDriver.common;
 
-public interface iEncoding {
+public interface IEncoding {
 
     String GetStringFromSjisArray(byte[] sjisArray);
 

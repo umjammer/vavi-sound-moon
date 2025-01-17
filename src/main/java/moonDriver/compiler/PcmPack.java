@@ -7,7 +7,7 @@ import java.util.List;
 import dotnet4j.io.File;
 import dotnet4j.io.Path;
 import dotnet4j.util.compat.StringUtilities;
-import moonDriver.common.myEncoding;
+import moonDriver.common.MyEncoding;
 
 import static java.lang.System.getLogger;
 
@@ -29,7 +29,7 @@ public class PcmPack {
         public int fp;
         public int size;
         public int header = 0;
-        public String pcmname;//[PATH_MAX]; // pos:0x40 pcmname
+        public String pcmname; // [PATH_MAX]; // pos:0x40 pcmname
         public int pcm_packed; // pos: 0x2a 1:pcm is packed
         public int pcm_startadrs; // pos:0x30 start address of PCM RAM(* 0x10000)
         public int pcm_startbank; // pos:0x31 start bank (* 8192)
@@ -54,7 +54,7 @@ public class PcmPack {
                 for (int i = 0; i < 0x40; i++) {
                     fn[i] = (byte) destBuf.get(m.header + i).dat;
                 }
-                myEncoding enc = new myEncoding();
+                MyEncoding enc = new MyEncoding();
                 m.pcmname = enc.GetStringFromSjisArray(fn);
             }
 

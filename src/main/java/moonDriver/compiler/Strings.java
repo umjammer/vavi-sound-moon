@@ -1,18 +1,9 @@
-
-
-
 package moonDriver.compiler;
 
-public class strings {
-    //		/************************************************************/
-    //		/*															*/
-    //		/************************************************************/
-    //# include	<stddef.h>
-    //# include	<ctype.h>
-    //# include	<stdio.h>
-    //# include	<stdlib.h>
-    //# include	<String.h>
-
+/**
+ *
+ */
+public class Strings {
 
     /*--------------------------------------------------------------
         スペース／タブのスキップ
@@ -31,23 +22,20 @@ public class strings {
         return ptr;
     }
 
-
-        /*--------------------------------------------------------------
-            文字列のスキップ
-        --------------------------------------------------------------*/
-
+    /*--------------------------------------------------------------
+        文字列のスキップ
+    --------------------------------------------------------------*/
     public int skipQuote(String buf, int ptr) {
         if (buf.charAt(ptr) != 0 &&
                 buf.charAt(ptr) == '\"') {
             ptr++; // skip start charactor
             while (ptr < buf.length() && buf.charAt(ptr) != 0) {
-                if (buf.charAt(ptr) == '\"') // end of the quote
-                {
+                if (buf.charAt(ptr) == '\"') { // end of the quote
                     ptr++;
                     break;
                 }
 
-                if (buf.charAt(ptr) == '\\' && buf[ptr + 1] != 0) // skip Escape
+                if (buf.charAt(ptr) == '\\' && buf.charAt(ptr + 1) != 0) // skip Escape
                     ptr++;
                 ptr++;
             }
@@ -171,7 +159,7 @@ public class strings {
                 ptr++;
                 cnt++;
                 while (true) {
-                    c = String.valueOf(Character.toUpperCase(buf.charAt(ptr)))[0];
+                    c = String.valueOf(Character.toUpperCase(buf.charAt(ptr))).charAt(0);
                     if ('0' <= c && c <= '9') {
                         num = num * 16 + (c - '0');
                     } else if ('A' <= c && c <= 'F') {
