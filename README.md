@@ -1,98 +1,147 @@
-# MoonDriverDotNET  
- MoonDriverの.NET版です。  
-   
-[概要]  
-  MoonDriverを.NET版に移植したものです。  
-  
-[機能、特徴]  
- MoonDriverのコンパイラ、ドライバの機能が使用できます。  
-  
-[必要な環境]  
- ・Windows7以降のOSがインストールされたPC  
- ・テキストエディタ  
- ・気合と根性  
-  
-[ご使用の前に]  
- アーカイブに同梱されているremoveZoneIdent.batを実行し、ゾーン識別子を削除してください。  
- (ゾーン識別子とは意図せずにダウンロードしたプログラムを実行した際に、動作を抑制するためにファイルに追加される、  
- セキュリティに関する情報です。意図したダウンロードであっても付加されますので動作に支障がある場合があります。)  
-  
-[クイックスタート]  
-  コンパイル  
-    同梱のcompile.batにmmlファイル(拡張子は.mdlを推奨)をドロップしてコンパイルを行います。  
-  演奏  
-    同梱のplay.batにmdrファイルをドロップして演奏を行います。  
-  オプションなどの指定は上記のbatファイルを編集して指定してください。  
-  (もちろんコマンドラインから直接指定することもできます。)  
-  
-[オリジナル版と異なる機能]  
-  コンパイラ  
-　　・PCMPACKに関する機能  
+[![Release](https://jitpack.io/v/umjammer/vavi-sound-moon.svg)](https://jitpack.io/#umjammer/vavi-sound-moon)
+[![Java CI](https://github.com/umjammer/vavi-sound-moon/actions/workflows/maven.yml/badge.svg)](https://github.com/umjammer/vavi-sound-moon/actions/workflows/maven.yml)
+[![CodeQL](https://github.com/umjammer/vavi-sound-moon/actions/workflows/codeql.yml/badge.svg)](https://github.com/umjammer/vavi-sound-moon/actions/workflows/codeql.yml)
+![Java](https://img.shields.io/badge/Java-17-b07219)
 
-        コンパイル時のオプション  
-            -PCMPACK オプション PCMを指定したファイル名でPACKします。  
-                書式)  
-                -PCMPACK:pcmFileName
-                    pcmFileName  PCMファイル  
-                使用例)  
-                    -PCMPACK:TEST.PCM  
-  
-        .mdlファイル中のmmlとしてのタグ指定  
-            #PCMFILE タグ    使用するPCMファイルを指定します。  
-                使用例)  
-                    #PCMFILE TEST.PCM  
-                詳細)  
-                    このタグを指定した.mdlファイルは指定したPCMファイルを使用することを宣言します。  
-                    コンパイルによって生成された.mdrファイルに、PCMPACK機能によってPCMを同梱しなかった場合は、  
-                    演奏時にドライバがこのファイル名を参照し、ファイルを読み込みます。  
-                    後述の#PCMPACKタグによってPCM同梱を指定した場合は、  
-                    コンパイル時にコンパイラがこのファイル名を参照し、ファイルを読み込み.mdrファイルに同梱します。  
-                    尚、MoonDriverDotNETではPCMPACKをコンパイルオプションとして指定することが可能です。  
-                    その場合はオプションで指定したファイル名をPCMファイルとして使用します。  
-  
-            #PCMPACK タグ    PCMをPACKするかどうか指定します。  
-                書式)  
-                    #PCMPACK [ ON | OFF ]  
-                        ON PACKする  
-                        OFF PACKしない(規定値)  
-                使用例)  
-                    #PCMPACK ON  
-                詳細)  
-                    このタグを指定した.mdlファイルはPCMファイルを同梱(PACK)するかどうかを指定します。  
-                    ONを指定することで同梱します。OFFは同梱しません。  
-                    同梱を指定することで、コンパイラは指定したPCMファイルの内容(PCMデータ)を.mdrファイルに追加します。  
-                    演奏時、ドライバは.mdrファイルに同梱したPCMデータを使用するようになり、新たにPCMを読み込みません。  
-                    尚、MoonDriverDotNETではPCMPACKをコンパイルオプションとして指定することも可能です。  
-                    その場合はオプションが優先されます。  
-  
-        オプション、#PCMFILE、#PCMPACKの指定優先順位
-            -PCMPACKオプションを指定すると、コンパイラは#PCMFILE、#PCMPACKタグを無視します。  
-        
-  
-[著作権・免責]  
-MoonDriverDotNETはMITライセンスとします。  
-著作権は作者が保有しています。  
-このソフトは無保証であり、このソフトを使用した事による  
-いかなる損害も作者は一切の責任を負いません。  
-  
-以下のソフトウェアのソースコードをC#向けに改変し使用しています。  
-又はコード/dllを使用させていただいております。  
-これらのソース/バイナリは各著作者が著作権を持ちます。  
-ライセンスに関しては、各ドキュメントを参照してください。  
-  
- ・moon_driver/mmckc    -> ?               -> コード参考、移植、改変  
- ・musicDriverInterface -> MIT             -> dll動的リンクで使用  
-  
-  
-[SpecialThanks]  
- 本ツールは以下の方々にお世話になっております。また以下のソフトウェア、ウェブページを参考、使用しています。  
- ・ぼうきち さん  
- ・Manbow-J さん  
- ・ゆみちゃん さん  
+# vavi-sound-moon
 
- ・moon_driver/mmckc  
- ・Visual Studio Community 2019  
- ・さくらエディター  
- ・NAUDIO  
- ・沢山の素晴らしい音楽データ並びにそのプログラマの方々  
+Java version of MoonDriver.
 
+this is a fork of [MoonDriverDotNET](https://github.com/kuma4649/MoonDriverDotNET)
+
+## Install
+
+* [maven](https://jitpack.io/#umjammer/vavi-sound-moon)
+
+## Usage
+
+## References
+
+ * https://github.com/BouKiCHi/moondrv
+
+## TODO
+
+
+---
+
+# [Original]()
+
+.NET version of MoonDriver.
+
+## Overview
+
+This is a port of MoonDriver to the .NET version.
+
+## Functions, Features
+You can use the compiler and driver functions of MoonDriver.
+
+## Required environment
+
+- PC with Windows 7 or later OS installed
+- Text editor
+- Motivation and guts
+
+## Before use
+Run removeZoneIdent.bat included in the archive to remove the zone identifier.
+(A zone identifier is security information that is added to a file to suppress operation when an unintentionally downloaded program is executed. It is added even if the download is intended, so it may cause problems.)
+
+## Quick start
+### Compilation
+Drop an mml file (extension .mdl is recommended) into the included compile.bat to compile.
+### Playing
+Drop an mdr file into the included play.bat to play.
+Specify options, etc. by editing the above bat file.
+(Of course, you can also specify it directly from the command line.)
+
+## Features different from the original version
+
+### Compiler
+
+- PCMPACK-related features
+
+#### Compile options
+
+##### -PCMPACK option Packs PCM with the specified file name.
+
+###### Format
+
+-PCMPACK:pcmFileName
+
+pcmFileName PCM file
+
+###### Example
+
+-PCMPACK:TEST.PCM
+
+#### Specifying tags as mml in .mdl files
+
+##### #PCMFILE tag Specifies the PCM file to use.
+
+###### Example
+
+#PCMFILE TEST.PCM
+
+###### Details
+
+Declares that the .mdl file specifying this tag will use the specified PCM file.
+
+If the .mdr file generated by compilation does not include PCM using the PCMPACK function,
+the driver will refer to this file name and load the file when playing.
+
+If you specify PCM inclusion using the #PCMPACK tag described below,
+the compiler will refer to this file name when compiling, load the file, and include it in the .mdr file.
+In addition, MoonDriverDotNET allows you to specify PCMPACK as a compile option.
+In that case, the file name specified in the option will be used as the PCM file.
+
+##### #PCMPACK tag Specifies whether to pack PCM.
+###### Format
+#PCMPACK [ ON | OFF ]
+ - ON Pack
+ - OFF Do not pack (default value)
+###### Example
+#PCMPACK ON
+###### Details
+Specifies whether to pack (PACK) the PCM file for the .mdl file that specifies this tag.
+Specify ON to pack. OFF does not pack.
+By specifying packing, the compiler will add the contents (PCM data) of the specified PCM file to the .mdr file.
+When playing, the driver will use the PCM data packed in the .mdr file and will not load any new PCM.
+In addition, MoonDriverDotNET allows you to specify PCMPACK as a compile option.
+In that case, the option takes priority.
+
+##### Priority of options, #PCMFILE, #PCMPACK
+
+If you specify the -PCMPACK option, the compiler will ignore the #PCMFILE and #PCMPACK tags.
+
+## Copyright/Disclaimer
+
+MoonDriverDotNET is licensed under the MIT license.
+
+Copyright is held by the author.
+
+This software is not guaranteed, and the author is not responsible for any damages caused by the use of this software.
+
+The source code of the following software has been modified for C# and is used.
+
+Or code/dll is used.
+
+The copyright of these sources/binaries belongs to the respective authors.
+
+For the license, please refer to each document.
+
+- moon_driver/mmckc -> ? -> Code reference, porting, modification
+
+- musicDriverInterface -> MIT -> Used with dll dynamic link
+
+## SpecialThanks
+
+This tool is indebted to the following people. The following software and web pages have also been referenced and used.
+
+- Boukichi
+- Manbow-J
+- Yumichan
+
+- moon_driver/mmckc
+- Visual Studio Community 2019
+- Sakura Editor
+- NAUDIO
+- Lots of great music data and the programmers who made it
