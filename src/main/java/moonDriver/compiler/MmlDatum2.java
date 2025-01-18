@@ -59,7 +59,7 @@ public class MmlDatum2 extends MmlDatum implements Serializable {
     public String toString() {
         String c = StringUtilities.isNullOrEmpty(code) ? "" : code;
         String d = "";
-        while (c.length() > 0 && c.charAt(c.length() - 1) == '\n') {
+        while (!c.isEmpty() && c.charAt(c.length() - 1) == '\n') {
             c = c.substring(0, c.length() - 1);
             d += "\n";
         }

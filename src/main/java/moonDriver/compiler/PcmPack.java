@@ -19,12 +19,12 @@ public class PcmPack {
     // pcmpack.c
     //
 
-    private final String PRG_NAME = "PCMPACK";
-    private final String PRG_VER = "Ver 0.1";
-    private final String PRG_AUTHOR = "BouKiCHi";
+    private static final String PRG_NAME = "PCMPACK";
+    private static final String PRG_VER = "Ver 0.1";
+    private static final String PRG_AUTHOR = "BouKiCHi";
 
     // MDRファイル定義
-    private class _mdr {
+    private static class _mdr {
 
         public int fp;
         public int size;
@@ -81,7 +81,7 @@ public class PcmPack {
         destBuf.get(m.header + 0x33).dat = m.pcm_lastsize;
     }
 
-    private final int BANK_SIZE = 0x2000;
+    private static final int BANK_SIZE = 0x2000;
 
     // MDRファイル読み出し
     private List<MmlDatum2> packPCMintoMDR(List<MmlDatum2> destBuf, String file, String pcm, /* ref */ _mdr m) {
@@ -133,7 +133,7 @@ public class PcmPack {
 
         m.pcm_packed = 1;
         m.pcm_startadrs = 0x20; // SRAM開始アドレス
-        m.pcm_startbank = (int) (start_pos / BANK_SIZE); // 開始バンク
+        m.pcm_startbank = start_pos / BANK_SIZE; // 開始バンク
         m.pcm_banks = pcm_blocks - 1; // ブロック数
         m.pcm_lastsize = (block_len + 0xff) / 0x100; // 最後のブロックサイズ
 

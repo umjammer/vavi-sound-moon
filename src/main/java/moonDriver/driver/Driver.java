@@ -92,7 +92,7 @@ public class Driver implements IDriver {
 
     public void init(String fileName, Consumer<ChipDatum> oPNAWrite, double sampleRate,
                      MoonDriverJavaOption dop, String[] vs, Function<String, Stream> appendFileReaderCallback) {
-        if (!Path.getExtension(fileName).toLowerCase().equals(".xml")) {
+        if (!Path.getExtension(fileName).equalsIgnoreCase(".xml")) {
             byte[] srcBuf = File.readAllBytes(fileName);
             if (srcBuf == null || srcBuf.length < 1) return;
             init(fileName, srcBuf, oPNAWrite, sampleRate,
@@ -134,7 +134,7 @@ public class Driver implements IDriver {
             MoonDriverJavaOption addtionalPMDDotNETOption, String[] addtionalPMDOption,
             Function<String, Stream> appendFileReaderCallback
     ) {
-        if (srcBuf == null || srcBuf.size() < 1) return;
+        if (srcBuf == null || srcBuf.isEmpty()) return;
 
         Driver.srcBuf = srcBuf.toArray(MmlDatum[]::new);
 

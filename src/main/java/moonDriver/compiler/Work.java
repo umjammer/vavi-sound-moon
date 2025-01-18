@@ -2,12 +2,12 @@ package moonDriver.compiler;
 
 public class Work {
 
-    public final int EXIT_SUCCESS = 0;
-    public final int EXIT_FAILURE = -1;
+    public static final int EXIT_SUCCESS = 0;
+    public static final int EXIT_FAILURE = -1;
 
-    public final int VersionNo = 27;
+    public static final int VersionNo = 27;
     public static final int MML_MAX = 128;
-    public final int MML_MAX_NAME = 512;
+    public static final int MML_MAX_NAME = 512;
 
     public String[] mml_names = new String[MML_MAX];
     public String[] mml_short_names = new String[MML_MAX];

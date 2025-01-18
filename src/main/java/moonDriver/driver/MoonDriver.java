@@ -215,9 +215,9 @@ public class MoonDriver {
         }
     }
 
-    private final short MOON_VERNUM = 0x0002;
+    private static final short MOON_VERNUM = 0x0002;
 
-    private final short MOON_BASE = 0x00C4;
+    private static final short MOON_BASE = 0x00C4;
     private final short MOON_REG1 = MOON_BASE;
     private final short MOON_DAT1 = MOON_BASE + 1;
     private final short MOON_REG2 = MOON_BASE + 2;
@@ -225,29 +225,29 @@ public class MoonDriver {
     private final short MOON_STAT = MOON_BASE;
 
     // I/O
-    private final short MOON_WREG = 0x7E;
+    private static final short MOON_WREG = 0x7E;
     private final short MOON_WDAT = MOON_WREG + 1;
 
-    private final byte RAM_PAGE3 = (byte) 0xFE;
+    private static final byte RAM_PAGE3 = (byte) 0xFE;
 
-    private final short USE_CH = 24 + 18;
-    private final short FM_BASECH = 24;
+    private static final short USE_CH = 24 + 18;
+    private static final short FM_BASECH = 24;
 
     //
     // MDR file format
     //
 
-    private final short MDR_ID = (short) 0x8000;
-    private final short MDR_PACKED = (short) 0x802A; // 1 if packed
+    private static final short MDR_ID = (short) 0x8000;
+    private static final short MDR_PACKED = (short) 0x802A; // 1 if packed
 
-    private final short MDR_DSTPCM = (short) 0x8030; // destination address of PCM
-    private final short MDR_STPCM = (short) 0x8031; // PCM start bank
-    private final short MDR_PCMBANKS = (short) 0x8032; // PCM banks
-    private final short MDR_LASTS = (short) 0x8033; // PCM size of lastbank
+    private static final short MDR_DSTPCM = (short) 0x8030; // destination address of PCM
+    private static final short MDR_STPCM = (short) 0x8031; // PCM start bank
+    private static final short MDR_PCMBANKS = (short) 0x8032; // PCM banks
+    private static final short MDR_LASTS = (short) 0x8033; // PCM size of lastbank
 
-    private final short S_DEVICE_FLAGS = (short) 0x8007;
+    private static final short S_DEVICE_FLAGS = (short) 0x8007;
 
-    private final short S_TRACK_TABLE = (short) 0x8010;
+    private static final short S_TRACK_TABLE = (short) 0x8010;
     private final short S_TRACK_BANK = S_TRACK_TABLE + 2;
     private final short S_LOOP_TABLE = S_TRACK_TABLE + 4;
     private final short S_LOOP_BANK = S_TRACK_TABLE + 6;
@@ -1123,7 +1123,7 @@ public class MoonDriver {
                 Stopped = true;
             }
 
-            vgmCurLoop = (int) loop;
+            vgmCurLoop = loop;
 
             //proc_tracks_end:
             a = work.seq_jump_flag;
@@ -2835,7 +2835,7 @@ public class MoonDriver {
 
         c = a;
         b = 0;
-        hl = (short) c;
+        hl = c;
         //hl += (short)((b << 8) + c);
         //hl += (short)((b << 8) + c);
 
@@ -3440,12 +3440,12 @@ public class MoonDriver {
     // load pcm
     //
 
-    private final short MDB_LDFLAG = 0;// MDB_BASE;
-    private final short MDB_ADRHI = 1;// MDB_BASE + 1;
-    private final short MDB_ADRMI = 2;// MDB_BASE + 2;
-    private final short MDB_ADRLO = 3;// MDB_BASE + 3;
-    private final short MDB_RESULT = 4;// MDB_BASE + 4;
-    private final short MDB_ROM = 5;// MDB_BASE + 5;
+    private static final short MDB_LDFLAG = 0;// MDB_BASE;
+    private static final short MDB_ADRHI = 1;// MDB_BASE + 1;
+    private static final short MDB_ADRMI = 2;// MDB_BASE + 2;
+    private static final short MDB_ADRLO = 3;// MDB_BASE + 3;
+    private static final short MDB_RESULT = 4;// MDB_BASE + 4;
+    private static final short MDB_ROM = 5;// MDB_BASE + 5;
 
     /** Resets R/W address pointer */
     private void moon_reset_sram_adrs() {
@@ -3805,27 +3805,27 @@ public class MoonDriver {
             default:
                 if (seg0x0000 == null)
                     return mem[adr];
-                if (extMem[(byte) seg0x0000] == null)
-                    extMem[(byte) seg0x0000] = new MmlDatum[1024 * 16];
-                return extMem[(byte) seg0x0000][adr & 0x3fff];
+                if (extMem[seg0x0000] == null)
+                    extMem[seg0x0000] = new MmlDatum[1024 * 16];
+                return extMem[seg0x0000][adr & 0x3fff];
             case 1: // 0x4000 - 0x7fff
                 if (seg0x4000 == null)
                     return mem[adr];
-                if (extMem[(byte) seg0x4000] == null)
-                    extMem[(byte) seg0x4000] = new MmlDatum[1024 * 16];
-                return extMem[(byte) seg0x4000][adr & 0x3fff];
+                if (extMem[seg0x4000] == null)
+                    extMem[seg0x4000] = new MmlDatum[1024 * 16];
+                return extMem[seg0x4000][adr & 0x3fff];
             case 2: // 0x8000 - 0xbfff
                 if (seg0x8000 == null || seg0x8000 == 0)
                     return mem[adr];
-                if (extMem[(byte) seg0x8000] == null)
-                    extMem[(byte) seg0x8000] = new MmlDatum[1024 * 16];
-                return extMem[(byte) seg0x8000][adr & 0x3fff];
+                if (extMem[seg0x8000] == null)
+                    extMem[seg0x8000] = new MmlDatum[1024 * 16];
+                return extMem[seg0x8000][adr & 0x3fff];
             case 3: // 0xc000 - 0xffff
                 if (seg0xc000 == null)
                     return mem[adr];
-                if (extMem[(byte) seg0xc000] == null)
-                    extMem[(byte) seg0xc000] = new MmlDatum[1024 * 16];
-                return extMem[(byte) seg0xc000][adr & 0x3fff];
+                if (extMem[seg0xc000] == null)
+                    extMem[seg0xc000] = new MmlDatum[1024 * 16];
+                return extMem[seg0xc000][adr & 0x3fff];
         }
     }
 
@@ -3836,36 +3836,36 @@ public class MoonDriver {
                 if (seg0x0000 == null || seg0x0000 == 0) {
                     mem[adr] = dat;
                 } else {
-                    if (extMem[(byte) seg0x0000] == null)
-                        extMem[(byte) seg0x0000] = new MmlDatum[1024 * 16];
-                    extMem[(byte) seg0x0000][adr & 0x3fff] = dat;
+                    if (extMem[seg0x0000] == null)
+                        extMem[seg0x0000] = new MmlDatum[1024 * 16];
+                    extMem[seg0x0000][adr & 0x3fff] = dat;
                 }
                 break;
             case 1: // 0x4000 - 0x7fff
                 if (seg0x4000 == null || seg0x4000 == 0) {
                     mem[adr] = dat;
                 } else {
-                    if (extMem[(byte) seg0x4000] == null)
-                        extMem[(byte) seg0x4000] = new MmlDatum[1024 * 16];
-                    extMem[(byte) seg0x4000][adr & 0x3fff] = dat;
+                    if (extMem[seg0x4000] == null)
+                        extMem[seg0x4000] = new MmlDatum[1024 * 16];
+                    extMem[seg0x4000][adr & 0x3fff] = dat;
                 }
                 break;
             case 2: // 0x8000 - 0xbfff
                 if (seg0x8000 == null || seg0x8000 == 0) {
                     mem[adr] = dat;
                 } else {
-                    if (extMem[(byte) seg0x8000] == null)
-                        extMem[(byte) seg0x8000] = new MmlDatum[1024 * 16];
-                    extMem[(byte) seg0x8000][adr & 0x3fff] = dat;
+                    if (extMem[seg0x8000] == null)
+                        extMem[seg0x8000] = new MmlDatum[1024 * 16];
+                    extMem[seg0x8000][adr & 0x3fff] = dat;
                 }
                 break;
             case 3: // 0xc000 - 0xffff
                 if (seg0xc000 == null || seg0xc000 == 0) {
                     mem[adr] = dat;
                 } else {
-                    if (extMem[(byte) seg0xc000] == null)
-                        extMem[(byte) seg0xc000] = new MmlDatum[1024 * 16];
-                    extMem[(byte) seg0xc000][adr & 0x3fff] = dat;
+                    if (extMem[seg0xc000] == null)
+                        extMem[seg0xc000] = new MmlDatum[1024 * 16];
+                    extMem[seg0xc000][adr & 0x3fff] = dat;
                 }
                 break;
         }

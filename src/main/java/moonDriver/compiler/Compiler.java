@@ -138,19 +138,19 @@ public class Compiler implements ICompiler {
 
             if (!(prm instanceof String)) continue;
 
-            if (((String) prm).equals("SRC")) {
+            if (prm.equals("SRC")) {
                 this.isSrc = true;
             }
 
             // PCMPACK指定の場合は単独で指定する必要あり
-            if (((String) prm).equals("PCMPACK")) {
+            if (prm.equals("PCMPACK")) {
                 this.doPackPCM = true;
                 this.pcmFileName = (String) param[1];
                 return;
             }
 
             // IDEフラグオン
-            if (((String) prm).equals("IDE")) {
+            if (prm.equals("IDE")) {
                 this.isIDE = true;
             }
 

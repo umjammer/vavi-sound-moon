@@ -70,45 +70,45 @@ public class DataMaker {
     //int checkBankRange(int bank);
     //int double2int(double d);
 
-    //#define arraysizeof(x) ( sizeof(x) / sizeof(x[0]) )
+//#define arraysizeof(x) ( sizeof(x) / sizeof(x[0]) )
 
-    private int error_flag;                 // エラーが発生していると0以外に
-    private int octave;                     // 変換中のオクターブ
-    private double length;                      // 変換中の音長
-    private int octave_flag = 0;            // オクターブスイッチ ("<" ">" の処理)
-    private int gate_denom = 8;             //qコマンドの分母
-    private int pitch_correction = 0;       //拡張音源のディチューン、ピッチエンベロープ、LFOの方向修正
+    private int error_flag;                 // If an error occurs, the value is non-zero.
+    private int octave;                     // Octave being converted
+    private double length;                      // Length of note being converted
+    private int octave_flag = 0;            // Octave switch ("<" ">" processing)
+    private int gate_denom = 8;             // Denominator of q command
+    private int pitch_correction = 0;       // Detune extended sounds, pitch envelopes, and LFO direction correction
 
-    private int loop_flag;                  // チャンネルループがあると0以外に
+    private int loop_flag;                  // If there is a channel loop, the value is other than 0.
     private int putAsm_pos;                 //
 
-    private String mml_file_name;                //現在のmmlファイル名(アセンブラ出力時に使用)
+    private String mml_file_name;                // Current mml file name (used when outputting to assembler)
     private int mml_line_pos;               //
     private int mml_trk;                    //
 
-    private int nest;                       // リピートのネスト数
-    private LEN[][][] track_count; // [MML_MAX][_TRACK_MAX] [2];			// 音長トータル保管場所(音長/フレーム/ループ音長/ループフレーム)
-    private int volume_flag;                // 音量の状態
-    private double tbase = 0.625;               // 変換中の[frame/count]割合
+    private int nest;                       // Repeat nesting level
+    private LEN[][][] track_count; // [MML_MAX][_TRACK_MAX] [2];			// Total note length storage location (note length/frame/loop note length/loop frame)
+    private int volume_flag;                // Volume Status
+    private double tbase = 0.625;               // [frame/count] rate during conversion
 
-    private int transpose;                  // 現在のトランスポーズ値
+    private int transpose;                  // The current transpose value
 
     // for MoonDriver
-    private final int ALLTRACK = 0xffff_ffff;
+    private static final int ALLTRACK = 0xffff_ffff;
 
-    private final int BOPL4FLAG = 0x01;
-    private final int BOPL3FLAG = 0x02;
+    private static final int BOPL4FLAG = 0x01;
+    private static final int BOPL3FLAG = 0x02;
 
-    private final int OPL4_MAX = 24;
-    private final int OPL3_MAX = 18;
+    private static final int OPL4_MAX = 24;
+    private static final int OPL3_MAX = 18;
 
     private int BOPL3TRACK() {
         return BTRACK(24);
     }
 
-    private final int MAX_VOLUME = 127;
+    private static final int MAX_VOLUME = 127;
 
-    private final int HUSIC_EXT = 1;
+    private static final int HUSIC_EXT = 1;
 
     public enum enmEFTBL {
         END(0xffff),
@@ -165,45 +165,45 @@ public class DataMaker {
         }
     }
 
-    private int sndgen_flag = BOPL4FLAG;    // 拡張音源フラグ
-    // トラック許可フラグ
+    private int sndgen_flag = BOPL4FLAG;    // Extended Sound Source Flag
+    // Track Permission Flag
     private long track_allow_flag = ALLTRACK;
-    //実際に使ったトラック
+    // The actual track used
     private long actual_track_flag = 0;
-    private int dpcm_track_num = 1;         // DPCMトラック
-    private int fds_track_num = 0;          // FDSトラック
-    private int vrc7_track_num = 0;         // VRC7トラック
-    private int vrc6_track_num = 0;         // VRC6トラック
-    private int n106_track_num = 0;         // 拡張音源(namco106)使用トラック数
-    private int fme7_track_num = 0;         // FME7トラック
-    private int mmc5_track_num = 0;         // MMC5トラック
+    private int dpcm_track_num = 1;         // DPCM Track
+    private int fds_track_num = 0;          // FDS Track
+    private int vrc7_track_num = 0;         // VRC7 Track
+    private int vrc6_track_num = 0;         // VRC6 Track
+    private int n106_track_num = 0;         // Number of tracks using expansion sound source (namco106)
+    private int fme7_track_num = 0;         // FME7 Track
+    private int mmc5_track_num = 0;         // MMC5 Track
 
     private int opl4_track_num = OPL4_MAX;
     private int opl3_track_num = 0;
 
-    /** DPCM用バッファ */
-    public class DPCMTBL {
+    /** DPCM Buffer */
+    public static class DPCMTBL {
 
-        public int flag;                       // 音色使用/未使用フラグ
-        public int index;                      // 実際にファイルに書き込まれるインデックス番号
-        // ココが-1以外の時はfilenameは無視されてindex番号のDPCMを使用する(ソート時)
+        public int flag;                       // Tone use/unuse flag
+        public int index;                      // The index number that is actually written to the file.
+        // If this is not -1, the filename is ignored and the DPCM of the index number is used (when sorting).
         public String fname;
         public int freq;
         public int start_adr;
         public int size;
         public int delta_init;
-        public int bank_ofs;                    //16KB(0x4000)
+        public int bank_ofs;                    // 16KB(0x4000)
     }
 
-    private byte[] dpcm_data;   // DPCM展開データ
+    private byte[] dpcm_data;   // DPCM expansion data
     private int dpcm_size = 0;
     private int dpcm_reststop = 0;
 
     // HuSIC
-    private int panvol = 0;                 // 現在のパンボリューム
+    private int panvol = 0;                 // Current Pan Volume
     private int xpcm_size = 0;
 
-    private int use_jump = 0; // jumpを行う
+    private int use_jump = 0; // Do a jump
 
     private String song_name = "Song Name"; // [1024]
     private String composer = "Artist"; // [1024]
@@ -213,14 +213,14 @@ public class DataMaker {
     private String programer = null;
 
     // MoonDriver
-    // PCMファイル
+    // PCM File
     private String pcm_name = ""; // [1024]
     private int use_pcm = 0;
     private boolean pcm_pack = false;
 
     private static final String str_track = "ABCDEFGHIJKLMNOPQRSTUVWXabcdefghijklmnopqr";// _TRACK_STR;
 
-    // エラー番号
+    // Error number
     private enum enmErrNum {
         COMMAND_NOT_DEFINED,
         DATA_ENDED_BY_LOOP_DEPTH_EXCEPT_0,
@@ -294,6 +294,7 @@ public class DataMaker {
     }
 
     // エラー文字列
+    // TODO make it resource bundle, vavi created properties already, see src/main/resources/lang
     private String[] ErrorlMessage = {
             "指定のコマンドはありません", "Command not defined",
             "ループ深度が0以外でデータが終了しました", "Data ended by loop depth except 0",
@@ -349,7 +350,6 @@ public class DataMaker {
             "#PITCH-CORRECTIONを指定しない限りピッチシフト量コマンドは使用できません", "Cannot use SA<num> without #PITCH-CORRECTION",
             "このトラックでは使用できないコマンドです", "Unuse command in this track",
 
-            /* for HuSIC */
             "WaveTable音色設定に誤りがあります", "WaveTable tone definition is wrong",
             "WaveTable用音色のパラメータが異常です", "Abnormal parameters of WaveTable tone",
             "XPCM設定に誤りがあります", "XPCM definition is wrong",
@@ -394,23 +394,23 @@ public class DataMaker {
     }
 
     /* テンポベース -> フレームベースへの変換パラメータ */
-    private final double _BASE = 192.0;
-    private final int _BASETEMPO = 75;
+    private static final double _BASE = 192.0;
+    private static final int _BASETEMPO = 75;
 
-    public class LEN {
+    public static class LEN {
 
         public double cnt;
         public int frm;
     }
 
-    public class GATE_Q {
+    public static class GATE_Q {
 
         public int rate;
         public int adjust;
         // gate length = delta * rate/gate_denom + adjust
     }
 
-    public class HEAD {
+    public static class HEAD {
 
         public String str;
         public int status;
@@ -421,53 +421,53 @@ public class DataMaker {
         }
     }
 
-    private final int _HEADER = 1;
-    private final int _TITLE = 2;
-    private final int _COMPOSER = 3;
-    private final int _MAKER = 4;
-    private final int _PROGRAMER = 5;
-    private final int _OCTAVE_REV = 6;
-    private final int _EX_DISKFM = 7;
-    private final int _EX_NAMCO106 = 8;
-    private final int _INCLUDE = 9;
-    private final int _BANK_CHANGE = 10;
-    private final int _EFFECT_INCLUDE = 11;
-    private final int _SET_SBANK = 12;
-    private final int _EX_VRC7 = 13;
-    private final int _EX_VRC6 = 14;
-    private final int _EX_FME7 = 15;
-    private final int _EX_MMC5 = 16;
-    private final int _NO_BANKSWITCH = 17;
-    private final int _DPCM_RESTSTOP = 18;
-    private final int _GATE_DENOM = 19;
-    private final int _AUTO_BANKSWITCH = 20;
-    private final int _PITCH_CORRECTION = 21;
+    private static final int _HEADER = 1;
+    private static final int _TITLE = 2;
+    private static final int _COMPOSER = 3;
+    private static final int _MAKER = 4;
+    private static final int _PROGRAMER = 5;
+    private static final int _OCTAVE_REV = 6;
+    private static final int _EX_DISKFM = 7;
+    private static final int _EX_NAMCO106 = 8;
+    private static final int _INCLUDE = 9;
+    private static final int _BANK_CHANGE = 10;
+    private static final int _EFFECT_INCLUDE = 11;
+    private static final int _SET_SBANK = 12;
+    private static final int _EX_VRC7 = 13;
+    private static final int _EX_VRC6 = 14;
+    private static final int _EX_FME7 = 15;
+    private static final int _EX_MMC5 = 16;
+    private static final int _NO_BANKSWITCH = 17;
+    private static final int _DPCM_RESTSTOP = 18;
+    private static final int _GATE_DENOM = 19;
+    private static final int _AUTO_BANKSWITCH = 20;
+    private static final int _PITCH_CORRECTION = 21;
 
-    private final int _SET_EFFECT = 0x20;
-    private final int _SET_TONE = 0x21;
-    private final int _SET_ENVELOPE = 0x22;
-    private final int _SET_PITCH_MOD = 0x23;
-    private final int _SET_PITCH_ENV = 0x24;
-    private final int _SET_ARPEGGIO = 0x25;
-    private final int _SET_DPCM_DATA = 0x26;
-    private final int _SET_FM_TONE = 0x27;
-    private final int _SET_N106_TONE = 0x28;
-    private final int _SET_VRC7_TONE = 0x29;
-    private final int _SET_HARD_EFFECT = 0x2A;
-    private final int _SET_EFFECT_WAVE = 0x2B;
+    private static final int _SET_EFFECT = 0x20;
+    private static final int _SET_TONE = 0x21;
+    private static final int _SET_ENVELOPE = 0x22;
+    private static final int _SET_PITCH_MOD = 0x23;
+    private static final int _SET_PITCH_ENV = 0x24;
+    private static final int _SET_ARPEGGIO = 0x25;
+    private static final int _SET_DPCM_DATA = 0x26;
+    private static final int _SET_FM_TONE = 0x27;
+    private static final int _SET_N106_TONE = 0x28;
+    private static final int _SET_VRC7_TONE = 0x29;
+    private static final int _SET_HARD_EFFECT = 0x2A;
+    private static final int _SET_EFFECT_WAVE = 0x2B;
     // MoonDriver
-    private final int _SET_TONETBL = 0x2E;
-    private final int _SET_FMOP = 0x2F;
-    private final int _SET_FMOP_FOUR = 0x30;
-    private final int _EX_OPL3 = 0x31;
-    private final int _OPL4_NOUSE = 0x32;
-    private final int _PCM_FILE = 0x33;
-    private final int _PCM_PACK = 0x1000;
+    private static final int _SET_TONETBL = 0x2E;
+    private static final int _SET_FMOP = 0x2F;
+    private static final int _SET_FMOP_FOUR = 0x30;
+    private static final int _EX_OPL3 = 0x31;
+    private static final int _OPL4_NOUSE = 0x32;
+    private static final int _PCM_FILE = 0x33;
+    private static final int _PCM_PACK = 0x1000;
 
-    private final int _TRACK = 0x40;
-    private final int _SAME_LINE = 0x8000_0000;
+    private static final int _TRACK = 0x40;
+    private static final int _SAME_LINE = 0x8000_0000;
 
-    private final int _TRACK_MAX = (24 + 18);
+    private static final int _TRACK_MAX = (24 + 18);
 
     //                                        012345678901234567890123012345678901234567
     private static final String _TRACK_STR = "ABCDEFGHIJKLMNOPQRSTUVWXabcdefghijklmnopqr";
@@ -514,21 +514,21 @@ public class DataMaker {
 
 //    private int ALLTRACK = 0xffffffff;
 
-    private final int _PITCH_MOD_MAX = 64;
-    private final int _PITCH_ENV_MAX = 128;
-    private final int _ENVELOPE_MAX = 128;
-    private final int _TONE_MAX = 128;
-    private final int _DPCM_MAX = 64;
-    private final int _ARPEGGIO_MAX = 128;
-    private final int _FM_TONE_MAX = 128;
-    private final int _N106_TONE_MAX = 128;
-    private final int _VRC7_TONE_MAX = 64;
-    private final int _HARD_EFFECT_MAX = 16;
-    private final int _EFFECT_WAVE_MAX = 8;
+    private static final int _PITCH_MOD_MAX = 64;
+    private static final int _PITCH_ENV_MAX = 128;
+    private static final int _ENVELOPE_MAX = 128;
+    private static final int _TONE_MAX = 128;
+    private static final int _DPCM_MAX = 64;
+    private static final int _ARPEGGIO_MAX = 128;
+    private static final int _FM_TONE_MAX = 128;
+    private static final int _N106_TONE_MAX = 128;
+    private static final int _VRC7_TONE_MAX = 64;
+    private static final int _HARD_EFFECT_MAX = 16;
+    private static final int _EFFECT_WAVE_MAX = 8;
 
     // MoonSound
-    private final int _TONETBL_MAX = 256;
-    private final int _OPL3TBL_MAX = 256;
+    private static final int _TONETBL_MAX = 256;
+    private static final int _OPL3TBL_MAX = 256;
 
     /* コマンドステータス */
     private static final int PARAM_MAX = 8;
@@ -546,16 +546,16 @@ public class DataMaker {
         public int[] param = new int[PARAM_MAX];
     }
 
-    private final long PARAM_OMITTED = 0x8000_0000;
+    private static final long PARAM_OMITTED = 0x8000_0000;
 
-    private final int _NOTE_C = 0;
-    private final int _NOTE_D = 2;
-    private final int _NOTE_E = 4;
-    private final int _NOTE_F = 5;
-    private final int _NOTE_G = 7;
-    private final int _NOTE_A = 9;
-    private final int _NOTE_B = 11;
-    private final int MIN_NOTE = -3;
+    private static final int _NOTE_C = 0;
+    private static final int _NOTE_D = 2;
+    private static final int _NOTE_E = 4;
+    private static final int _NOTE_F = 5;
+    private static final int _NOTE_G = 7;
+    private static final int _NOTE_A = 9;
+    private static final int _NOTE_B = 11;
+    private static final int MIN_NOTE = -3;
     private static final int MAX_NOTE = 0x8f;
 
     private int[] bank_sel = new int[_TRACK_MAX];   // 0 〜 127 = バンク切り替え , 0xFF = 変更無し
@@ -1155,7 +1155,7 @@ on_error:
             ptr = str.skipSpace(ln, ptr);
             /* 前の行がエフェクト定義処理だった？ */
             if (((lbuf[lptr + line - 1].status & _SET_EFFECT) != 0) && (status_end_flag != 0)) {
-                lbuf[lptr + line].status = (int) (lbuf[lptr + line - 1].status | _SAME_LINE);
+                lbuf[lptr + line].status = lbuf[lptr + line - 1].status | _SAME_LINE;
                 lbuf[lptr + line].param = lbuf[lptr + line - 1].param;
                 lbuf[lptr + line].str = ln;
                 temp = ln;
@@ -1192,7 +1192,7 @@ on_error:
                     }
                     /* ヘッダーも字列をテーブル文字列と比較 */
                     for (i = 0; head[i].status != -1; i++) {
-                        if (sb.toString().substring(ptr).indexOf(head[i].str) >= 0) {
+                        if (sb.substring(ptr).indexOf(head[i].str) >= 0) {
                             break;
                         }
                     }
@@ -1530,7 +1530,7 @@ on_error:
                     case _TITLE:
                         //tempPtr = str.skipSpaceOld(lbuf[lptr + line].str, 0);
                         song_name = lbuf[lptr + line].str.replaceFirst("^\\s+", "");
-                        if (song_name.length() > 0 && song_name.charAt(song_name.length() - 1) == ' ')
+                        if (!song_name.isEmpty() && song_name.charAt(song_name.length() - 1) == ' ')
                             song_name = song_name.substring(0, song_name.length() - 1);
                         song_name = song_name.substring(0, Math.min(song_name.length(), 1023));
                         break;
@@ -1538,7 +1538,7 @@ on_error:
                     case _COMPOSER:
                         //temp = skipSpaceOld(lptr[line].str);
                         composer = lbuf[lptr + line].str.replaceFirst("^\\s+", "");
-                        if (composer.length() > 0 && composer.charAt(composer.length() - 1) == ' ')
+                        if (!composer.isEmpty() && composer.charAt(composer.length() - 1) == ' ')
                             composer = composer.substring(0, composer.length() - 1);
                         composer = composer.substring(0, Math.min(composer.length(), 1023));
                         break;
@@ -1546,7 +1546,7 @@ on_error:
                     case _MAKER:
                         //temp = skipSpaceOld(lptr[line].str);
                         maker = lbuf[lptr + line].str.replaceFirst("^\\s+", "");
-                        if (maker.length() > 0 && maker.charAt(maker.length() - 1) == ' ')
+                        if (!maker.isEmpty() && maker.charAt(maker.length() - 1) == ' ')
                             maker = maker.substring(0, maker.length() - 1);
                         maker = maker.substring(0, Math.min(maker.length(), 1023));
                         break;
@@ -1554,7 +1554,7 @@ on_error:
                     case _PROGRAMER:
                         //temp = skipSpaceOld(lptr[line].str);
                         programer_buf = lbuf[lptr + line].str.replaceFirst("^\\s+", "");
-                        if (programer_buf.length() > 0 && programer_buf.charAt(programer_buf.length() - 1) == ' ')
+                        if (!programer_buf.isEmpty() && programer_buf.charAt(programer_buf.length() - 1) == ' ')
                             programer_buf = programer_buf.substring(0, programer_buf.length() - 1);
                         programer_buf = programer_buf.substring(0, Math.min(programer_buf.length(), 1023));
                         programer = programer_buf;
@@ -1613,7 +1613,7 @@ on_error:
                     /* ヘッダ無し */
                     case -1:
                         if ((lbuf[lptr + line - 1].status & _SET_EFFECT) != 0) {
-                            lbuf[lptr + line].status = (int) (lbuf[lptr + line - 1].status | _SAME_LINE);
+                            lbuf[lptr + line].status = lbuf[lptr + line - 1].status | _SAME_LINE;
                             lbuf[lptr + line].str = ln;// ptr;
                         } else {
                             /* エラーチェック */
@@ -1647,7 +1647,7 @@ on_error:
 
         for (line = 1; line < lptr.length; line++) { // lptr[line].line; line++)
             /* 音色定義だけど_SAME_LINEの時はエラー */
-            if (lptr[line].status == ((int) _SET_TONE | (int) _SAME_LINE)) {
+            if (lptr[line].status == (_SET_TONE | _SAME_LINE)) {
                 dispError(enmErrNum.TONE_DEFINITION_IS_WRONG.ordinal(), lptr[line].filename, line);
                 continue;
             }
@@ -1679,17 +1679,17 @@ on_error:
                 switch (ptrs.charAt(ptr)) {
                     case '}':
                         if (tone_tbl[no][0] >= 1) {
-                            tone_tbl[no][i] = (int) enmEFTBL.END.v;
+                            tone_tbl[no][i] = enmEFTBL.END.v;
                             tone_tbl[no][0]++;
                         } else {
-                            dispError((int) enmErrNum.PARAMETER_IS_LACKING.ordinal(), lptr[line].filename, line);
+                            dispError(enmErrNum.PARAMETER_IS_LACKING.ordinal(), lptr[line].filename, line);
                             tone_tbl[no][0] = 0;
                         }
                         end_flag = 1;
                         line += offset;
                         break;
                     case '|':
-                        tone_tbl[no][i] = (int) enmEFTBL.LOOP.v;
+                        tone_tbl[no][i] = enmEFTBL.LOOP.v;
                         tone_tbl[no][0]++;
                         i++;
                         ptr++;
@@ -1702,7 +1702,7 @@ on_error:
                                 ptr = 0;
                             }
                         } else {
-                            dispError((int) enmErrNum.TONE_DEFINITION_IS_WRONG.ordinal(), lptr[line].filename, line);
+                            dispError(enmErrNum.TONE_DEFINITION_IS_WRONG.ordinal(), lptr[line].filename, line);
                             tone_tbl[no][0] = 0;
                             end_flag = 1;
                         }
@@ -1717,7 +1717,7 @@ on_error:
                             ptr += cnt;
                             i++;
                         } else {
-                            dispError((int) enmErrNum.TONE_DEFINITION_IS_WRONG.ordinal(), lptr[line + offset].filename, line);
+                            dispError(enmErrNum.TONE_DEFINITION_IS_WRONG.ordinal(), lptr[line + offset].filename, line);
                             tone_tbl[no][0] = 0;
                             end_flag = 1;
                         }
@@ -1747,8 +1747,8 @@ on_error:
 
         for (line = 1; line < lptr.length; line++) {
             /* エンベロープ定義だけど_SAME_LINEの時はエラー */
-            if (lptr[line].status == (_SET_ENVELOPE | (int) _SAME_LINE)) {
-                dispError((int) enmErrNum.ENVELOPE_DEFINITION_IS_WRONG.ordinal(), lptr[line].filename, line);
+            if (lptr[line].status == (_SET_ENVELOPE | _SAME_LINE)) {
+                dispError(enmErrNum.ENVELOPE_DEFINITION_IS_WRONG.ordinal(), lptr[line].filename, line);
                 continue;
             }
 
@@ -1765,7 +1765,7 @@ on_error:
                 ptr = 0;
                 ptr++;                              /* '{'の分を飛ばす */
                 if (envelope_tbl[no][0] != 0) {
-                    dispWarning((int) enmSys.THIS_NUMBER_IS_ALREADY_USED.ordinal(), lptr[line].filename, line);
+                    dispWarning(enmSys.THIS_NUMBER_IS_ALREADY_USED.ordinal(), lptr[line].filename, line);
                 }
                 envelope_tbl[no][0] = 0;
                 offset = 0;
@@ -1777,18 +1777,17 @@ on_error:
                     switch (c) {
                         case '}':
                             if (envelope_tbl[no][0] >= 1) {
-                                envelope_tbl[no][i] = (int) enmEFTBL.END.v;
-                                ;
+                                envelope_tbl[no][i] = enmEFTBL.END.v;
                                 envelope_tbl[no][0]++;
                             } else {
-                                dispError((int) enmErrNum.PARAMETER_IS_LACKING.ordinal(), lptr[line].filename, line);
+                                dispError(enmErrNum.PARAMETER_IS_LACKING.ordinal(), lptr[line].filename, line);
                                 envelope_tbl[no][0] = 0;
                             }
                             end_flag = 1;
                             line += offset;
                             break;
                         case '|':
-                            envelope_tbl[no][i] = (int) enmEFTBL.LOOP.v;
+                            envelope_tbl[no][i] = enmEFTBL.LOOP.v;
                             envelope_tbl[no][0]++;
                             i++;
                             ptr++;
@@ -1801,7 +1800,7 @@ on_error:
                                     ptr = 0;
                                 }
                             } else {
-                                dispError((int) enmErrNum.ENVELOPE_DEFINITION_IS_WRONG.ordinal(), lptr[line].filename, line);
+                                dispError(enmErrNum.ENVELOPE_DEFINITION_IS_WRONG.ordinal(), lptr[line].filename, line);
                                 envelope_tbl[no][0] = 0;
                                 end_flag = 1;
                             }
@@ -1814,7 +1813,7 @@ on_error:
                                 ptr += cnt;
                                 i++;
                             } else {
-                                dispError((int) enmErrNum.ENVELOPE_DEFINITION_IS_WRONG.ordinal(), lptr[line + offset].filename, line);
+                                dispError(enmErrNum.ENVELOPE_DEFINITION_IS_WRONG.ordinal(), lptr[line + offset].filename, line);
                                 envelope_tbl[no][0] = 0;
                                 end_flag = 1;
                             }
@@ -1846,8 +1845,8 @@ on_error:
 
         for (line = 1; line < lptr.length; line++) {
             /* ピッチエンベロープ定義だけど_SAME_LINEの時はエラー */
-            if (lptr[line].status == (_SET_PITCH_ENV | (int) _SAME_LINE)) {
-                dispError((int) enmErrNum.PITCH_ENVELOPE_DEFINITION_IS_WRONG.ordinal(), lptr[line].filename, line);
+            if (lptr[line].status == (_SET_PITCH_ENV | _SAME_LINE)) {
+                dispError(enmErrNum.PITCH_ENVELOPE_DEFINITION_IS_WRONG.ordinal(), lptr[line].filename, line);
                 continue;
             }
 
@@ -1866,7 +1865,7 @@ on_error:
             ptr = 0;
             ptr++;                              /* '{'の分を飛ばす */
             if (pitch_env_tbl[no][0] != 0) {
-                dispWarning((int) enmSys.THIS_NUMBER_IS_ALREADY_USED.ordinal(), lptr[line].filename, line);
+                dispWarning(enmSys.THIS_NUMBER_IS_ALREADY_USED.ordinal(), lptr[line].filename, line);
             }
             pitch_env_tbl[no][0] = 0;
             offset = 0;
@@ -1879,17 +1878,17 @@ on_error:
                 switch (c) {
                     case '}':
                         if (pitch_env_tbl[no][0] >= 1) {
-                            pitch_env_tbl[no][i] = (int) enmEFTBL.END.v;
+                            pitch_env_tbl[no][i] = enmEFTBL.END.v;
                             pitch_env_tbl[no][0]++;
                         } else {
-                            dispError((int) enmErrNum.PARAMETER_IS_LACKING.ordinal(), lptr[line].filename, line);
+                            dispError(enmErrNum.PARAMETER_IS_LACKING.ordinal(), lptr[line].filename, line);
                             pitch_env_tbl[no][0] = 0;
                         }
                         end_flag = 1;
                         line += offset;
                         break;
                     case '|':
-                        pitch_env_tbl[no][i] = (int) enmEFTBL.LOOP.v;
+                        pitch_env_tbl[no][i] = enmEFTBL.LOOP.v;
                         pitch_env_tbl[no][0]++;
                         i++;
                         ptr++;
@@ -1902,7 +1901,7 @@ on_error:
                                 ptr = 0;
                             }
                         } else {
-                            dispError((int) enmErrNum.PITCH_ENVELOPE_DEFINITION_IS_WRONG.ordinal(), lptr[line].filename, line);
+                            dispError(enmErrNum.PITCH_ENVELOPE_DEFINITION_IS_WRONG.ordinal(), lptr[line].filename, line);
                             pitch_env_tbl[no][0] = 0;
                             end_flag = 1;
                         }
@@ -1920,7 +1919,7 @@ on_error:
                             ptr += cnt;
                             i++;
                         } else {
-                            dispError((int) enmErrNum.PITCH_ENVELOPE_DEFINITION_IS_WRONG.ordinal(), lptr[line + offset].filename, line);
+                            dispError(enmErrNum.PITCH_ENVELOPE_DEFINITION_IS_WRONG.ordinal(), lptr[line + offset].filename, line);
                             pitch_env_tbl[no][0] = 0;
                             end_flag = 1;
                         }
@@ -1953,8 +1952,8 @@ on_error:
 
         for (line = 1; line < lptr.length; line++) {
             /* 音色定義だけど_SAME_LINEの時はエラー */
-            if (lptr[line].status == (_SET_PITCH_MOD | (int) _SAME_LINE)) {
-                dispError((int) enmErrNum.LFO_DEFINITION_IS_WRONG.ordinal(), lptr[line].filename, line);
+            if (lptr[line].status == (_SET_PITCH_MOD | _SAME_LINE)) {
+                dispError(enmErrNum.LFO_DEFINITION_IS_WRONG.ordinal(), lptr[line].filename, line);
             }
 
             /* インクルードファイル処理 */
@@ -1969,7 +1968,7 @@ on_error:
                 ptr = 0;
                 ptr++;                              /* '{'の分を飛ばす */
                 if (pitch_mod_tbl[no][0] != 0) {
-                    dispWarning((int) enmSys.THIS_NUMBER_IS_ALREADY_USED.ordinal(), lptr[line].filename, line);
+                    dispWarning(enmSys.THIS_NUMBER_IS_ALREADY_USED.ordinal(), lptr[line].filename, line);
                 }
                 pitch_mod_tbl[no][0] = 0;
                 offset = 0;
@@ -1983,7 +1982,7 @@ on_error:
                             if (pitch_mod_tbl[no][0] >= 3) {
                                 //OK.
                             } else {
-                                dispError((int) enmErrNum.PARAMETER_IS_LACKING.ordinal(), lptr[line].filename, line);
+                                dispError(enmErrNum.PARAMETER_IS_LACKING.ordinal(), lptr[line].filename, line);
                                 pitch_mod_tbl[no][0] = 0;
                             }
                             end_flag = 1;
@@ -1997,7 +1996,7 @@ on_error:
                                     ptr = 0;
                                 }
                             } else {
-                                dispError((int) enmErrNum.LFO_DEFINITION_IS_WRONG.ordinal(), lptr[line].filename, line);
+                                dispError(enmErrNum.LFO_DEFINITION_IS_WRONG.ordinal(), lptr[line].filename, line);
                                 pitch_mod_tbl[no][0] = 0;
                                 end_flag = 1;
                             }
@@ -2015,7 +2014,7 @@ on_error:
                                             ptr += cnt;
                                             i++;
                                         } else {
-                                            dispError((int) enmErrNum.LFO_DEFINITION_IS_WRONG.ordinal(), lptr[line + offset].filename, line);
+                                            dispError(enmErrNum.LFO_DEFINITION_IS_WRONG.ordinal(), lptr[line + offset].filename, line);
                                             pitch_mod_tbl[no][0] = 0;
                                             end_flag = 1;
                                         }
@@ -2027,19 +2026,19 @@ on_error:
                                             ptr += cnt;
                                             i++;
                                         } else {
-                                            dispError((int) enmErrNum.LFO_DEFINITION_IS_WRONG.ordinal(), lptr[line + offset].filename, line);
+                                            dispError(enmErrNum.LFO_DEFINITION_IS_WRONG.ordinal(), lptr[line + offset].filename, line);
                                             pitch_mod_tbl[no][0] = 0;
                                             end_flag = 1;
                                         }
                                         break;
                                     default:
-                                        dispError((int) enmErrNum.LFO_DEFINITION_IS_WRONG.ordinal(), lptr[line + offset].filename, line);
+                                        dispError(enmErrNum.LFO_DEFINITION_IS_WRONG.ordinal(), lptr[line + offset].filename, line);
                                         pitch_mod_tbl[no][0] = 0;
                                         end_flag = 1;
                                         break;
                                 }
                             } else {
-                                dispError((int) enmErrNum.LFO_DEFINITION_IS_WRONG.ordinal(), lptr[line + offset].filename, line);
+                                dispError(enmErrNum.LFO_DEFINITION_IS_WRONG.ordinal(), lptr[line + offset].filename, line);
                                 pitch_mod_tbl[no][0] = 0;
                                 end_flag = 1;
                             }
@@ -2077,7 +2076,7 @@ on_error:
                 ptr = 0;
                 ptr++;                              /* '{'の分を飛ばす */
                 if (arpeggio_tbl[no][0] != 0) {
-                    dispWarning((int) enmSys.THIS_NUMBER_IS_ALREADY_USED.ordinal(), lptr[line].filename, line);
+                    dispWarning(enmSys.THIS_NUMBER_IS_ALREADY_USED.ordinal(), lptr[line].filename, line);
                 }
                 arpeggio_tbl[no][0] = 0;
                 offset = 0;
@@ -2089,17 +2088,17 @@ on_error:
                     switch (c) {
                         case '}':
                             if (arpeggio_tbl[no][0] >= 1) {
-                                arpeggio_tbl[no][i] = (int) enmEFTBL.END.v;
+                                arpeggio_tbl[no][i] = enmEFTBL.END.v;
                                 arpeggio_tbl[no][0]++;
                             } else {
-                                dispError((int) enmErrNum.PARAMETER_IS_LACKING.ordinal(), lptr[line].filename, line);
+                                dispError(enmErrNum.PARAMETER_IS_LACKING.ordinal(), lptr[line].filename, line);
                                 arpeggio_tbl[no][0] = 0;
                             }
                             end_flag = 1;
                             line += offset;
                             break;
                         case '|':
-                            arpeggio_tbl[no][i] = (int) enmEFTBL.LOOP.v;
+                            arpeggio_tbl[no][i] = enmEFTBL.LOOP.v;
                             arpeggio_tbl[no][0]++;
                             i++;
                             ptr++;
@@ -2112,7 +2111,7 @@ on_error:
                                     ptr = 0;
                                 }
                             } else {
-                                dispError((int) enmErrNum.NOTE_ENVELOPE_DEFINITION_IS_WRONG.ordinal(), lptr[line].filename, line);
+                                dispError(enmErrNum.NOTE_ENVELOPE_DEFINITION_IS_WRONG.ordinal(), lptr[line].filename, line);
                                 arpeggio_tbl[no][0] = 0;
                                 end_flag = 1;
                             }
@@ -2129,7 +2128,7 @@ on_error:
                                 ptr += cnt;
                                 i++;
                             } else {
-                                dispError((int) enmErrNum.NOTE_ENVELOPE_DEFINITION_IS_WRONG.ordinal(), lptr[line + offset].filename, line);
+                                dispError(enmErrNum.NOTE_ENVELOPE_DEFINITION_IS_WRONG.ordinal(), lptr[line + offset].filename, line);
                                 arpeggio_tbl[no][0] = 0;
                                 end_flag = 1;
                             }
@@ -2142,8 +2141,8 @@ on_error:
                     }
                 }
                 /* アルペジオ定義だけど_SAME_LINEの時はエラー */
-            } else if (lptr[line].status == (_SET_ARPEGGIO | (int) _SAME_LINE)) {
-                dispError((int) enmErrNum.NOTE_ENVELOPE_DEFINITION_IS_WRONG.ordinal(), lptr[line].filename, line);
+            } else if (lptr[line].status == (_SET_ARPEGGIO | _SAME_LINE)) {
+                dispError(enmErrNum.NOTE_ENVELOPE_DEFINITION_IS_WRONG.ordinal(), lptr[line].filename, line);
                 /* インクルードファイル処理 */
             } else if (lptr[line].status == _INCLUDE) {
                 getArpeggio(lptr[line].inc_ptr);
@@ -2722,7 +2721,7 @@ on_error:
                                     ptr = 0;
                                 }
                             } else {
-                                dispError((int) enmErrNum.TONETBL_DEFINITION_IS_WRONG.ordinal(), lptr[line].filename, line + offset);
+                                dispError(enmErrNum.TONETBL_DEFINITION_IS_WRONG.ordinal(), lptr[line].filename, line + offset);
                                 tonetbl_tbl[no][0] = 0;
                                 line += offset;
                                 end_flag = 1;
@@ -2736,13 +2735,13 @@ on_error:
                                 ptr += cnt;
                                 i++;
                                 if (i > 1024 + 1) {
-                                    dispError((int) enmErrNum.ABNORMAL_PARAMETERS_OF_TONETBL.ordinal(), lptr[line + offset].filename, line + offset);
+                                    dispError(enmErrNum.ABNORMAL_PARAMETERS_OF_TONETBL.ordinal(), lptr[line + offset].filename, line + offset);
                                     tonetbl_tbl[no][0] = 0;
                                     line += offset;
                                     end_flag = 1;
                                 }
                             } else {
-                                dispError((int) enmErrNum.TONETBL_DEFINITION_IS_WRONG.ordinal(), lptr[line + offset].filename, line + offset);
+                                dispError(enmErrNum.TONETBL_DEFINITION_IS_WRONG.ordinal(), lptr[line + offset].filename, line + offset);
                                 tonetbl_tbl[no][0] = 0;
                                 line += offset;
                                 end_flag = 1;
@@ -2759,15 +2758,15 @@ on_error:
                 }
                 if ((i % 9) != 1) {
                     if (error_flag == 0) {
-                        dispError((int) enmErrNum.ABNORMAL_PARAMETERS_OF_TONETBL.ordinal(), lptr[line].filename, line);
+                        dispError(enmErrNum.ABNORMAL_PARAMETERS_OF_TONETBL.ordinal(), lptr[line].filename, line);
                         tonetbl_tbl[no][0] = 0;
                     }
                 }
 
 
                 /* 音色定義だけど_SAME_LINEの時はエラー */
-            } else if ((int) lptr[line].status == (_SET_TONETBL | _SAME_LINE)) {
-                dispError((int) enmErrNum.TONETBL_DEFINITION_IS_WRONG.ordinal(), lptr[line].filename, line);
+            } else if (lptr[line].status == (_SET_TONETBL | _SAME_LINE)) {
+                dispError(enmErrNum.TONETBL_DEFINITION_IS_WRONG.ordinal(), lptr[line].filename, line);
                 /* インクルードファイル処理 */
             } else if (lptr[line].status == _INCLUDE) {
                 getToneTable(lptr[line].inc_ptr);
@@ -2793,9 +2792,9 @@ on_error:
 
         for (line = 1; line < lptr.length; line++) {
             /* 音色定義だけど_SAME_LINEの時はエラー */
-            if (lptr[line].status == (_SET_FMOP | (int) _SAME_LINE) ||
-                    lptr[line].status == (_SET_FMOP_FOUR | (int) _SAME_LINE)) {
-                dispError((int) enmErrNum.FM_TONE_DEFINITION_IS_WRONG.ordinal(), lptr[line].filename, line);
+            if (lptr[line].status == (_SET_FMOP | _SAME_LINE) ||
+                    lptr[line].status == (_SET_FMOP_FOUR | _SAME_LINE)) {
+                dispError(enmErrNum.FM_TONE_DEFINITION_IS_WRONG.ordinal(), lptr[line].filename, line);
                 continue;
             }
 
@@ -2843,7 +2842,7 @@ on_error:
                                 ptr = 0;
                             }
                         } else {
-                            dispError((int) enmErrNum.FM_TONE_DEFINITION_IS_WRONG.ordinal(), lptr[line].filename, line + offset);
+                            dispError(enmErrNum.FM_TONE_DEFINITION_IS_WRONG.ordinal(), lptr[line].filename, line + offset);
                             opl3op_tbl[no][0] = 0;
                             line += offset;
                             end_flag = 1;
@@ -2863,7 +2862,7 @@ on_error:
                                 end_flag = 1;
                             }
                         } else {
-                            dispError((int) enmErrNum.FM_TONE_DEFINITION_IS_WRONG.ordinal(), lptr[line + offset].filename, line + offset);
+                            dispError(enmErrNum.FM_TONE_DEFINITION_IS_WRONG.ordinal(), lptr[line + offset].filename, line + offset);
                             opl3op_tbl[no][0] = 0;
                             line += offset;
                             end_flag = 1;
@@ -3208,7 +3207,7 @@ on_error:
                                     ptr = 0;
                                 }
                             } else {
-                                dispError((int) enmErrNum.LFO_DEFINITION_IS_WRONG.ordinal(), lptr[line].filename, line);
+                                dispError(enmErrNum.LFO_DEFINITION_IS_WRONG.ordinal(), lptr[line].filename, line);
                                 hard_effect_tbl[no][0] = 0;
                                 end_flag = 1;
                             }
@@ -3224,7 +3223,7 @@ on_error:
                                             ptr += cnt;
                                             i++;
                                         } else {
-                                            dispError((int) enmErrNum.LFO_DEFINITION_IS_WRONG.ordinal(), lptr[line + offset].filename, line);
+                                            dispError(enmErrNum.LFO_DEFINITION_IS_WRONG.ordinal(), lptr[line + offset].filename, line);
                                             hard_effect_tbl[no][0] = 0;
                                             end_flag = 1;
                                         }
@@ -3236,7 +3235,7 @@ on_error:
                                             ptr += cnt;
                                             i++;
                                         } else {
-                                            dispError((int) enmErrNum.LFO_DEFINITION_IS_WRONG.ordinal(), lptr[line + offset].filename, line);
+                                            dispError(enmErrNum.LFO_DEFINITION_IS_WRONG.ordinal(), lptr[line + offset].filename, line);
                                             hard_effect_tbl[no][0] = 0;
                                             end_flag = 1;
                                         }
@@ -3248,7 +3247,7 @@ on_error:
                                             ptr += cnt;
                                             i++;
                                         } else {
-                                            dispError((int) enmErrNum.LFO_DEFINITION_IS_WRONG.ordinal(), lptr[line + offset].filename, line);
+                                            dispError(enmErrNum.LFO_DEFINITION_IS_WRONG.ordinal(), lptr[line + offset].filename, line);
                                             hard_effect_tbl[no][0] = 0;
                                             end_flag = 1;
                                         }
@@ -3260,19 +3259,19 @@ on_error:
                                             ptr += cnt;
                                             i++;
                                         } else {
-                                            dispError((int) enmErrNum.LFO_DEFINITION_IS_WRONG.ordinal(), lptr[line + offset].filename, line);
+                                            dispError(enmErrNum.LFO_DEFINITION_IS_WRONG.ordinal(), lptr[line + offset].filename, line);
                                             hard_effect_tbl[no][0] = 0;
                                             end_flag = 1;
                                         }
                                         break;
                                     default:
-                                        dispError((int) enmErrNum.LFO_DEFINITION_IS_WRONG.ordinal(), lptr[line + offset].filename, line);
+                                        dispError(enmErrNum.LFO_DEFINITION_IS_WRONG.ordinal(), lptr[line + offset].filename, line);
                                         hard_effect_tbl[no][0] = 0;
                                         end_flag = 1;
                                         break;
                                 }
                             } else {
-                                dispError((int) enmErrNum.LFO_DEFINITION_IS_WRONG.ordinal(), lptr[line + offset].filename, line);
+                                dispError(enmErrNum.LFO_DEFINITION_IS_WRONG.ordinal(), lptr[line + offset].filename, line);
                                 hard_effect_tbl[no][0] = 0;
                                 end_flag = 1;
                             }
@@ -3285,8 +3284,8 @@ on_error:
                     }
                 }
                 /* 音色定義だけど_SAME_LINEの時はエラー */
-            } else if (lptr[line].status == (_SET_HARD_EFFECT | (int) _SAME_LINE)) {
-                dispError((int) enmErrNum.LFO_DEFINITION_IS_WRONG.ordinal(), lptr[line].filename, line);
+            } else if (lptr[line].status == (_SET_HARD_EFFECT | _SAME_LINE)) {
+                dispError(enmErrNum.LFO_DEFINITION_IS_WRONG.ordinal(), lptr[line].filename, line);
                 /* インクルードファイル処理 */
             } else if (lptr[line].status == _INCLUDE) {
                 getHardEffect(lptr[line].inc_ptr);
@@ -3345,7 +3344,7 @@ on_error:
                                     ptr = 0;
                                 }
                             } else {
-                                dispError((int) enmErrNum.EFFECT_WAVE_DEFINITION_IS_WRONG.ordinal(), lptr[line].filename, line + offset);
+                                dispError(enmErrNum.EFFECT_WAVE_DEFINITION_IS_WRONG.ordinal(), lptr[line].filename, line + offset);
                                 effect_wave_tbl[no][0] = 0;
                                 line += offset;
                                 end_flag = 1;
@@ -3359,13 +3358,13 @@ on_error:
                                 ptr += cnt;
                                 i++;
                                 if (i > 33) {
-                                    dispError((int) enmErrNum.EFFECT_WAVE_DEFINITION_IS_WRONG.ordinal(), lptr[line + offset].filename, line + offset);
+                                    dispError(enmErrNum.EFFECT_WAVE_DEFINITION_IS_WRONG.ordinal(), lptr[line + offset].filename, line + offset);
                                     effect_wave_tbl[no][0] = 0;
                                     line += offset;
                                     end_flag = 1;
                                 }
                             } else {
-                                dispError((int) enmErrNum.EFFECT_WAVE_DEFINITION_IS_WRONG.ordinal(), lptr[line + offset].filename, line + offset);
+                                dispError(enmErrNum.EFFECT_WAVE_DEFINITION_IS_WRONG.ordinal(), lptr[line + offset].filename, line + offset);
                                 effect_wave_tbl[no][0] = 0;
                                 line += offset;
                                 end_flag = 1;
@@ -3379,8 +3378,8 @@ on_error:
                     }
                 }
                 /* 音色定義だけど_SAME_LINEの時はエラー */
-            } else if (lptr[line].status == (_SET_EFFECT_WAVE | (int) _SAME_LINE)) {
-                dispError((int) enmErrNum.EFFECT_WAVE_DEFINITION_IS_WRONG.ordinal(), lptr[line].filename, line);
+            } else if (lptr[line].status == (_SET_EFFECT_WAVE | _SAME_LINE)) {
+                dispError(enmErrNum.EFFECT_WAVE_DEFINITION_IS_WRONG.ordinal(), lptr[line].filename, line);
                 /* インクルードファイル処理 */
             } else if (lptr[line].status == _INCLUDE) {
                 getEffectWave(lptr[line].inc_ptr);
@@ -3388,163 +3387,140 @@ on_error:
         }
     }
 
+//    /**
+//     * DPCMデータのダブりを削除
+//     * Input:
+//     * 無し
+//     * Output:
+//     * 無し
+//     */
+//    void sortDPCM(DPCMTBL dpcm_tbl[_DPCM_MAX]) {
+//        int i, j;
+//
+//        for (i = 0; i < _DPCM_MAX; i++) {
+//            if (dpcm_tbl[i].flag == 0 || dpcm_tbl[i].index != -1) continue;
+//            for (j = 0; j < _DPCM_MAX; j++) {
+//                if (i == j) continue;
+//                if (dpcm_tbl[j].flag == 0) continue;
+//                // ファイル名が同じ？
+//                if (strcmp(dpcm_tbl[i].fname, dpcm_tbl[j].fname) == 0
+//                        && dpcm_tbl[i].size >= dpcm_tbl[j].size) {
+//                    dpcm_tbl[j].index = i;
+//                }
+//            }
+//        }
+//    }
 
-    //    /**
-    //        DPCMデータのダブりを削除
-    //     Input:
-    //        無し
-    //     Output:
-    //        無し
-    //     */
-    //    void sortDPCM(DPCMTBL dpcm_tbl[_DPCM_MAX] )
-    //    {
-    //        int i, j;
+//    /**
+//     * DPCMサイズ修正(16byteバウンダリに修正)
+//     * Input:
+//     * <p>
+//     * Output:
+//     * int: DPCMサイズ
+//     */
+//    int checkDPCMSize(DPCMTBL dpcm_tbl[_DPCM_MAX]) {
+//        int i;
+//        int adr = 0;
+//        int size = 0;
+//        int bank = 0; //0x4000ごとに増加
+//        for (i = 0; i < _DPCM_MAX; i++) {
+//            if (dpcm_tbl[i].flag != 0) {
+//                    /*
+//                         $4013 * 16 + 1 = size
+//                         $4013 = (size - 1) / 16
+//
+//                         newsize % 16 == 1が成立するように調整
+//                         size%16	(size-1)%16	diff(floor)	diff(ceil)
+//                         1		0		0		0
+//                         2		1		-1		+15
+//                         3		2		-2		+14
+//                         4		3		-3		+13
+//                         15		14		-14		+2
+//                         0		15		-15		+1
+//                    */
+//                //printf("%s size $%x\n", dpcm_tbl[i].fname, dpcm_tbl[i].size);
+//                if ((dpcm_tbl[i].size % 16) != 1) {
+//                    int diff;
+//                    diff = (16 - ((dpcm_tbl[i].size - 1) % 16)) % 16; //ceil
+//                    //diff =		- ((dpcm_tbl[i].size - 1) % 16); //floor
+//                    dpcm_tbl[i].size += diff;
+//                }
+//                //printf("%s fixed size $%x\n", dpcm_tbl[i].fname, dpcm_tbl[i].size);
+//                // スタートアドレスを設定
+//                if (dpcm_tbl[i].index == -1) {
+//                    if (((adr % 0x4000 + dpcm_tbl[i].size) > 0x4000) || (adr % 0x4000 == 0 && adr != 0)) {
+//                        /* 16KB境界をまたがる場合・または前回のアドレス切り上げで新しい16KB領域に乗った場合 */
+//                        adr += (0x4000 - (adr % 0x4000)) % 0x4000;
+//                        bank++;
+//                        dpcm_bankswitch = 1;
+//                    }
+//                    //printf("%s bank %d a %x s %x\n", dpcm_tbl[i].fname, bank, adr, size);
+//
+//                    dpcm_tbl[i].start_adr = adr;
+//                    dpcm_tbl[i].bank_ofs = bank;
+//                    adr += dpcm_tbl[i].size;
+//                    size = adr;
+//                    // adr % 64 == 0が成立するように切り上げ
+//                    adr += (64 - (adr % 64)) % 64;
+//                }
+//            }
+//        }
+//        return size;
+//    }
 
-    //        for (i = 0; i < _DPCM_MAX; i++)
-    //        {
-    //            if (dpcm_tbl[i].flag == 0 || dpcm_tbl[i].index != -1) continue;
-    //            for (j = 0; j < _DPCM_MAX; j++)
-    //            {
-    //                if (i == j) continue;
-    //                if (dpcm_tbl[j].flag == 0) continue;
-    //                // ファイル名が同じ？
-    //                if (strcmp(dpcm_tbl[i].fname, dpcm_tbl[j].fname) == 0
-    //                 && dpcm_tbl[i].size >= dpcm_tbl[j].size)
-    //                {
-    //                    dpcm_tbl[j].index = i;
-    //                }
-    //            }
-    //        }
-    //    }
+//    /**
+//     * DPCMサイズ修正(16byteバウンダリに修正)
+//     * Input:
+//     * <p>
+//     * Output:
+//     * int: DPCMサイズ
+//     */
+//    int checkXPCMSize(DPCMTBL xpcm_tbl[_DPCM_MAX]) {
+//        int i;
+//        int size = 0;
+//
+//        for (i = 0; i < _DPCM_MAX; i++) {
+//            if (xpcm_tbl[i].flag != 0)
+//                size += xpcm_tbl[i].size;
+//        }
+//        return size;
+//    }
 
-
-    //    /**
-    //        DPCMサイズ修正(16byteバウンダリに修正)
-    //     Input:
-
-    //     Output:
-    //         int: DPCMサイズ
-    //     */
-    //    int checkDPCMSize(DPCMTBL dpcm_tbl[_DPCM_MAX] )
-    //    {
-    //        int i;
-    //        int adr = 0;
-    //        int size = 0;
-    //        int bank = 0; //0x4000ごとに増加
-    //        for (i = 0; i < _DPCM_MAX; i++)
-    //        {
-    //            if (dpcm_tbl[i].flag != 0)
-    //            {
-    //                /*
-    //                     $4013 * 16 + 1 = size
-    //                     $4013 = (size - 1) / 16
-
-    //                     newsize % 16 == 1が成立するように調整
-    //                     size%16	(size-1)%16	diff(floor)	diff(ceil)
-    //                     1		0		0		0
-    //                     2		1		-1		+15
-    //                     3		2		-2		+14
-    //                     4		3		-3		+13
-    //                     15		14		-14		+2
-    //                     0		15		-15		+1
-    //                */
-    //                //printf("%s size $%x\n", dpcm_tbl[i].fname, dpcm_tbl[i].size);
-    //                if ((dpcm_tbl[i].size % 16) != 1)
-    //                {
-    //                    int diff;
-    //                    diff = (16 - ((dpcm_tbl[i].size - 1) % 16)) % 16; //ceil
-    //                                                                      //diff =		- ((dpcm_tbl[i].size - 1) % 16); //floor
-    //                    dpcm_tbl[i].size += diff;
-    //                }
-    //                //printf("%s fixed size $%x\n", dpcm_tbl[i].fname, dpcm_tbl[i].size);
-    //                // スタートアドレスを設定
-    //                if (dpcm_tbl[i].index == -1)
-    //                {
-    //                    if (((adr % 0x4000 + dpcm_tbl[i].size) > 0x4000) || (adr % 0x4000 == 0 && adr != 0))
-    //                    {
-    //                        /* 16KB境界をまたがる場合・または前回のアドレス切り上げで新しい16KB領域に乗った場合 */
-    //                        adr += (0x4000 - (adr % 0x4000)) % 0x4000;
-    //                        bank++;
-    //                        dpcm_bankswitch = 1;
-    //                    }
-    //                    //printf("%s bank %d a %x s %x\n", dpcm_tbl[i].fname, bank, adr, size);
-
-    //                    dpcm_tbl[i].start_adr = adr;
-    //                    dpcm_tbl[i].bank_ofs = bank;
-    //                    adr += dpcm_tbl[i].size;
-    //                    size = adr;
-    //                    // adr % 64 == 0が成立するように切り上げ
-    //                    adr += (64 - (adr % 64)) % 64;
-    //                }
-    //            }
-    //        }
-    //        return size;
-    //    }
-
-    //    /**
-    //        DPCMサイズ修正(16byteバウンダリに修正)
-    //     Input:
-
-    //     Output:
-    //         int: DPCMサイズ
-    //     */
-    //    int checkXPCMSize(DPCMTBL xpcm_tbl[_DPCM_MAX] )
-    //    {
-    //        int i;
-    //        int size = 0;
-
-    //        for (i = 0; i < _DPCM_MAX; i++)
-    //        {
-    //            if (xpcm_tbl[i].flag != 0)
-    //                size += xpcm_tbl[i].size;
-    //        }
-    //        return size;
-    //    }
-
-
-    //    /**
-    //        DPCMデータ読み込み
-    //     Input:
-
-    //     Output:
-    //     */
-    //    void readDPCM(DPCMTBL dpcm_tbl[_DPCM_MAX] )
-    //    {
-    //        int i;
-    //        FILE* fp;
-
-    //        for (i = 0; i < dpcm_size; i++)
-    //        {
-    //            dpcm_data[i] = 0xaa;
-    //        }
-
-    //        for (i = 0; i < _DPCM_MAX; i++)
-    //        {
-    //            if (dpcm_tbl[i].flag != 0 && dpcm_tbl[i].index == -1)
-    //            {
-    //                fp = openDmc(dpcm_tbl[i].fname);
-    //                if (fp == NULL)
-    //                {
-    //                    //				disperror( DPCM_FILE_NOT_FOUND, 0 );
-    //                }
-    //                else
-    //                {
-    //                    fread(&dpcm_data[dpcm_tbl[i].start_adr], 1, dpcm_tbl[i].size, fp);
-    //                    fclose(fp);
-    //                }
-    //            }
-    //        }
-    //#if 0
-    //    for( i = 0; i < _DPCM_TOTAL_SIZE; i++ ) {
-    //        if( (i&0x0f) != 0x0f ) {
-    //            printf( "%02x,", dpcm_data[i] );
-    //        } else {
-    //            printf( "%02x\n", dpcm_data[i] );
-    //        }
-    //    }
-    //#endif
-    //    }
-
+//    /**
+//     * DPCMデータ読み込み
+//     * Input:
+//     * <p>
+//     * Output:
+//     */
+//    void readDPCM(DPCMTBL dpcm_tbl[_DPCM_MAX]) {
+//        int i;
+//        FILE * fp;
+//
+//        for (i = 0; i < dpcm_size; i++) {
+//            dpcm_data[i] = 0xaa;
+//        }
+//
+//        for (i = 0; i < _DPCM_MAX; i++) {
+//            if (dpcm_tbl[i].flag != 0 && dpcm_tbl[i].index == -1) {
+//                fp = openDmc(dpcm_tbl[i].fname);
+//                if (fp == NULL) {
+//                    //				disperror( DPCM_FILE_NOT_FOUND, 0 );
+//                } else {
+//                    fread( & dpcm_data[dpcm_tbl[i].start_adr], 1, dpcm_tbl[i].size, fp);
+//                    fclose(fp);
+//                }
+//            }
+//        }
+//#if 0
+//        for (i = 0; i < _DPCM_TOTAL_SIZE; i++) {
+//            if ((i & 0x0f) != 0x0f) {
+//                printf("%02x,", dpcm_data[i]);
+//            } else {
+//                printf("%02x\n", dpcm_data[i]);
+//            }
+//        }
+//#endif
+//    }
 
     /**
      * 音色/エンベロープのループチェック
@@ -3578,7 +3554,6 @@ on_error:
         return ret;
     }
 
-
     /**
      * 音色の使用個数を返す
      * Input:
@@ -3605,8 +3580,7 @@ on_error:
      * Output:
      * int	: 一番大きい音色番号
      */
-    private int getMaxToneTable(int[][] ptr, int max) // [_TONETBL_MAX][1024+2]
-    {
+    private int getMaxToneTable(int[][] ptr, int max) { // [_TONETBL_MAX][1024+2]
         int i, ret;
         ret = 0;
         for (i = 0; i < max; i++) {
@@ -3624,8 +3598,7 @@ on_error:
      * Output:
      * int	: 一番大きい音色番号
      */
-    private int getMaxOpl3tbl(int[][] ptr, int max) // [_OPL3TBL_MAX][1024+2]
-    {
+    private int getMaxOpl3tbl(int[][] ptr, int max) { // [_OPL3TBL_MAX][1024+2]
         int i, ret;
         ret = 0;
         for (i = 0; i < max; i++) {
@@ -3635,7 +3608,6 @@ on_error:
         }
         return ret;
     }
-
 
     /**
      * LFOの使用個数を返す
@@ -3644,8 +3616,7 @@ on_error:
      * Output:
      * int	: 一番大きいLFO番号
      */
-    private int getMaxLFO(int[][] ptr, int max) // [_PITCH_MOD_MAX][5]
-    {
+    private int getMaxLFO(int[][] ptr, int max) { // [_PITCH_MOD_MAX][5]
         int i, ret;
         ret = 0;
         for (i = 0; i < max; i++) {
@@ -3656,28 +3627,23 @@ on_error:
         return ret;
     }
 
-
-    //    /**
-    //        DPCMの使用個数を返す
-    //     Input:
-
-    //     Output:
-    //        int	: 一番大きい音色番号
-    //     */
-    //    int getMaxDPCM(DPCMTBL dpcm_tbl[_DPCM_MAX] )
-    //    {
-    //        int i, ret = 0;
-
-    //        for (i = 0; i < _DPCM_MAX; i++)
-    //        {
-    //            if (dpcm_tbl[i].flag != 0)
-    //            {
-    //                ret = i + 1;
-    //            }
-    //        }
-    //        return ret;
-    //    }
-
+//    /**
+//     * DPCMの使用個数を返す
+//     * Input:
+//     * <p>
+//     * Output:
+//     * int	: 一番大きい音色番号
+//     */
+//    int getMaxDPCM(DPCMTBL dpcm_tbl[_DPCM_MAX]) {
+//        int i, ret = 0;
+//
+//        for (i = 0; i < _DPCM_MAX; i++) {
+//            if (dpcm_tbl[i].flag != 0) {
+//                ret = i + 1;
+//            }
+//        }
+//        return ret;
+//    }
 
     /**
      * ハードウェアエフェクトの使用個数を返す
@@ -3686,8 +3652,7 @@ on_error:
      * Output:
      * int	: 一番大きい音色番号
      */
-    private int getMaxHardEffect(int[][] ptr, int max) // [_HARD_EFFECT_MAX][5]
-    {
+    private int getMaxHardEffect(int[][] ptr, int max) { // [_HARD_EFFECT_MAX][5]
         int i, ret;
 
         ret = 0;
@@ -3699,7 +3664,6 @@ on_error:
         }
         return ret;
     }
-
 
     /**
      * エフェクト波形の使用個数を返す
@@ -3708,8 +3672,7 @@ on_error:
      * Output:
      * int	: 一番大きい音色番号
      */
-    private int getMaxEffectWave(int[][] ptr, int max) // [_EFFECT_WAVE_MAX][33]
-    {
+    private int getMaxEffectWave(int[][] ptr, int max) { // [_EFFECT_WAVE_MAX][33]
         int i, ret;
 
         ret = 0;
@@ -3722,7 +3685,6 @@ on_error:
         return ret;
     }
 
-
     /**
      * 音色/エンベロープの書き込み
      * Input:
@@ -3730,8 +3692,7 @@ on_error:
      * Output:
      * 無し
      */
-    private void writeTone(List<MmlDatum2> fp, int[][] tbl, String str, int max) // [128][1024]
-    {
+    private void writeTone(List<MmlDatum2> fp, int[][] tbl, String str, int max) { // [128][1024]
         int i, j, x;
         String t;
 
@@ -3791,118 +3752,89 @@ on_error:
         fp.add(new MmlDatum2("\n\n", 0));
     }
 
+//    /**
+//     * FM音色の書き込み
+//     * Input:
+//     * <p>
+//     * Output:
+//     * 無し
+//     */
+//    void writeToneFM(FILE*fp, int tbl[_FM_TONE_MAX][66], char*str, int max) {
+//        int i, j, x;
+//
+//        fprintf(fp, "%s_data_table:\n", str);
+//        if (max != 0) {
+//            for (i = 0; i < max; i++) {
+//                if (tbl[i][0] != 0) {
+//                    fprintf(fp, "\tdw\t%s_%03d\n", str, i);
+//                } else {
+//                    fprintf(fp, "\tdw\t0\n");
+//                }
+//            }
+//
+//            for (i = 0; i < max; i++) {
+//                if (tbl[i][0] != 0) {
+//                    fprintf(fp, "\n%s_%03d:\n", str, i);
+//                    x = 0;
+//                    for (j = 1; j <= tbl[i][0]; j++) {               // tbl[i][0] = データー量(byte)
+//                        if (x == 0) {
+//                            fprintf(fp, "\tdb\t$%02x", tbl[i][j] & 0xff);
+//                            x++;
+//                        } else if (x == 7) {
+//                            fprintf(fp, ",$%02x\n", tbl[i][j] & 0xff);
+//                            x = 0;
+//                        } else {
+//                            fprintf(fp, ",$%02x", tbl[i][j] & 0xff);
+//                            x++;
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//    }
 
-    //    /**
-    //        FM音色の書き込み
-    //     Input:
-
-    //     Output:
-    //        無し
-    //     */
-    //    void writeToneFM(FILE* fp, int tbl[_FM_TONE_MAX][66], char* str, int max)
-    //    {
-    //        int i, j, x;
-
-    //        fprintf(fp, "%s_data_table:\n", str);
-    //        if (max != 0)
-    //        {
-    //            for (i = 0; i < max; i++)
-    //            {
-    //                if (tbl[i][0] != 0)
-    //                {
-    //                    fprintf(fp, "\tdw\t%s_%03d\n", str, i);
-    //                }
-    //                else
-    //                {
-    //                    fprintf(fp, "\tdw\t0\n");
-    //                }
-    //            }
-
-    //            for (i = 0; i < max; i++)
-    //            {
-    //                if (tbl[i][0] != 0)
-    //                {
-    //                    fprintf(fp, "\n%s_%03d:\n", str, i);
-    //                    x = 0;
-    //                    for (j = 1; j <= tbl[i][0]; j++)
-    //                    {               // tbl[i][0] = データー量(byte)
-    //                        if (x == 0)
-    //                        {
-    //                            fprintf(fp, "\tdb\t$%02x", tbl[i][j] & 0xff);
-    //                            x++;
-    //                        }
-    //                        else if (x == 7)
-    //                        {
-    //                            fprintf(fp, ",$%02x\n", tbl[i][j] & 0xff);
-    //                            x = 0;
-    //                        }
-    //                        else
-    //                        {
-    //                            fprintf(fp, ",$%02x", tbl[i][j] & 0xff);
-    //                            x++;
-    //                        }
-    //                    }
-    //                }
-    //            }
-    //        }
-    //    }
-
-    //    /**
-    //        WTB音色の書き込み
-    //     Input:
-
-    //     Output:
-    //        無し
-    //     */
-    //    void writeToneWTB(FILE* fp, int tbl[_WTB_TONE_MAX][66], char* str, int max)
-    //    {
-    //        int i, j, x;
-
-    //        fprintf(fp, "%s_data_table:\n", str);
-    //        if (max != 0)
-    //        {
-    //            for (i = 0; i < max; i++)
-    //            {
-    //                if (tbl[i][0] != 0)
-    //                {
-    //                    fprintf(fp, "\tdw\t%s_%03d\n", str, i);
-    //                }
-    //                else
-    //                {
-    //                    fprintf(fp, "\tdw\t0\n");
-    //                }
-    //            }
-
-    //            for (i = 0; i < max; i++)
-    //            {
-    //                if (tbl[i][0] != 0)
-    //                {
-    //                    fprintf(fp, "\n%s_%03d:\n", str, i);
-    //                    x = 0;
-    //                    for (j = 1; j <= tbl[i][0]; j++)
-    //                    {               // tbl[i][0] = データー量(byte)
-    //                        if (x == 0)
-    //                        {
-    //                            fprintf(fp, "\tdb\t$%02x", tbl[i][j] & 0xff);
-    //                            x++;
-    //                        }
-    //                        else if (x == 7)
-    //                        {
-    //                            fprintf(fp, ",$%02x\n", tbl[i][j] & 0xff);
-    //                            x = 0;
-    //                        }
-    //                        else
-    //                        {
-    //                            fprintf(fp, ",$%02x", tbl[i][j] & 0xff);
-    //                            x++;
-    //                        }
-    //                    }
-    //                }
-    //            }
-    //        }
-
-    //        fprintf(fp, "\n\n");
-    //    }
+//    /**
+//     * WTB音色の書き込み
+//     * Input:
+//     * <p>
+//     * Output:
+//     * 無し
+//     */
+//    void writeToneWTB(FILE*fp, int tbl[_WTB_TONE_MAX][66], char*str, int max) {
+//        int i, j, x;
+//
+//        fprintf(fp, "%s_data_table:\n", str);
+//        if (max != 0) {
+//            for (i = 0; i < max; i++) {
+//                if (tbl[i][0] != 0) {
+//                    fprintf(fp, "\tdw\t%s_%03d\n", str, i);
+//                } else {
+//                    fprintf(fp, "\tdw\t0\n");
+//                }
+//            }
+//
+//            for (i = 0; i < max; i++) {
+//                if (tbl[i][0] != 0) {
+//                    fprintf(fp, "\n%s_%03d:\n", str, i);
+//                    x = 0;
+//                    for (j = 1; j <= tbl[i][0]; j++) {               // tbl[i][0] = データー量(byte)
+//                        if (x == 0) {
+//                            fprintf(fp, "\tdb\t$%02x", tbl[i][j] & 0xff);
+//                            x++;
+//                        } else if (x == 7) {
+//                            fprintf(fp, ",$%02x\n", tbl[i][j] & 0xff);
+//                            x = 0;
+//                        } else {
+//                            fprintf(fp, ",$%02x", tbl[i][j] & 0xff);
+//                            x++;
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//
+//        fprintf(fp, "\n\n");
+//    }
 
     /**
      * ToneTableの書き込み
@@ -3911,8 +3843,7 @@ on_error:
      * Output:
      * 無し
      */
-    private void writeToneTable(List<MmlDatum2> fp, int[][] tbl, String str, int max) // [_TONETBL_MAX][1024+2]
-    {
+    private void writeToneTable(List<MmlDatum2> fp, int[][] tbl, String str, int max) { // [_TONETBL_MAX][1024+2]
         int i, j, k, x;
         String t;
         byte b, b2;
@@ -4055,64 +3986,48 @@ on_error:
         fp.add(new MmlDatum2("\n\n", 0));
     }
 
-
-    //    /**
-    //        VRC7音色の書き込み
-    //     Input:
-
-    //     Output:
-    //        無し
-    //     */
-    //    void writeToneVRC7(FILE* fp, int tbl[_VRC7_TONE_MAX][66], char* str, int max)
-    //    {
-    //        int i, j, x;
-
-    //        fprintf(fp, "%s_data_table:\n", str);
-    //        if (max != 0)
-    //        {
-    //            for (i = 0; i < max; i++)
-    //            {
-    //                if (tbl[i][0] != 0)
-    //                {
-    //                    fprintf(fp, "\tdw\t%s_%03d\n", str, i);
-    //                }
-    //                else
-    //                {
-    //                    fprintf(fp, "\tdw\t0\n");
-    //                }
-    //            }
-
-    //            for (i = 0; i < max; i++)
-    //            {
-    //                if (tbl[i][0] != 0)
-    //                {
-    //                    fprintf(fp, "\n%s_%03d:\n", str, i);
-    //                    x = 0;
-    //                    for (j = 1; j <= tbl[i][0]; j++)
-    //                    {               // tbl[i][0] = データー量(byte)
-    //                        if (x == 0)
-    //                        {
-    //                            fprintf(fp, "\tdb\t$%02x", tbl[i][j] & 0xff);
-    //                            x++;
-    //                        }
-    //                        else if (x == 7)
-    //                        {
-    //                            fprintf(fp, ",$%02x\n", tbl[i][j] & 0xff);
-    //                            x = 0;
-    //                        }
-    //                        else
-    //                        {
-    //                            fprintf(fp, ",$%02x", tbl[i][j] & 0xff);
-    //                            x++;
-    //                        }
-    //                    }
-    //                }
-    //            }
-    //        }
-
-    //        fprintf(fp, "\n\n");
-    //    }
-
+//    /**
+//     * VRC7音色の書き込み
+//     * Input:
+//     * <p>
+//     * Output:
+//     * 無し
+//     */
+//    void writeToneVRC7(FILE*fp, int tbl[_VRC7_TONE_MAX][66], char*str, int max) {
+//        int i, j, x;
+//
+//        fprintf(fp, "%s_data_table:\n", str);
+//        if (max != 0) {
+//            for (i = 0; i < max; i++) {
+//                if (tbl[i][0] != 0) {
+//                    fprintf(fp, "\tdw\t%s_%03d\n", str, i);
+//                } else {
+//                    fprintf(fp, "\tdw\t0\n");
+//                }
+//            }
+//
+//            for (i = 0; i < max; i++) {
+//                if (tbl[i][0] != 0) {
+//                    fprintf(fp, "\n%s_%03d:\n", str, i);
+//                    x = 0;
+//                    for (j = 1; j <= tbl[i][0]; j++) {               // tbl[i][0] = データー量(byte)
+//                        if (x == 0) {
+//                            fprintf(fp, "\tdb\t$%02x", tbl[i][j] & 0xff);
+//                            x++;
+//                        } else if (x == 7) {
+//                            fprintf(fp, ",$%02x\n", tbl[i][j] & 0xff);
+//                            x = 0;
+//                        } else {
+//                            fprintf(fp, ",$%02x", tbl[i][j] & 0xff);
+//                            x++;
+//                        }
+//                    }
+//                }
+//            }
+//        }
+//
+//        fprintf(fp, "\n\n");
+//    }
 
     /**
      * ハードウェアエフェクトの書き込み
@@ -4121,8 +4036,7 @@ on_error:
      * Output:
      * 無し
      */
-    private void writeHardEffect(List<MmlDatum2> fp, int[][] tbl, String str, int max) // [_HARD_EFFECT_MAX][5]
-    {
+    private void writeHardEffect(List<MmlDatum2> fp, int[][] tbl, String str, int max) { // [_HARD_EFFECT_MAX][5]
         int i;
         String t;
         byte b1, b2, b3;
@@ -4149,8 +4063,7 @@ on_error:
      * Output:
      * 無し
      */
-    private void writeEffectWave(List<MmlDatum2> fp, int[][] tbl, String str, int max) // [_EFFECT_WAVE_MAX][33]
-    {
+    private void writeEffectWave(List<MmlDatum2> fp, int[][] tbl, String str, int max) { // [_EFFECT_WAVE_MAX][33]
         int i, j, x;
         String t;
         byte b1;
@@ -4187,310 +4100,271 @@ on_error:
         fp.add(new MmlDatum2("\n\n", 0));
     }
 
+//    /**
+//     * N106音色の書き込み
+//     * Input:
+//     * <p>
+//     * Output:
+//     * 無し
+//     */
+//    void writeToneN106(FILE*fp, int tbl[_N106_TONE_MAX][2+64], char*str, int max) {
+//        int i, j, x;
+//
+//        // 使用チャンネル書き込み
+//        fprintf(fp, "%s_channel:\n", str);
+//        fprintf(fp, "\tdb\t%d\n", n106_track_num);
+//        // パラメータ書き込み
+//        fprintf(fp, "%s_wave_init:\n", str);
+//        if (max != 0) {
+//            for (i = 0; i < max; i++) {
+//                switch (tbl[i][0]) {
+//                    case 2 * 2 + 1:
+//                        j = 7;
+//                        x = tbl[i][1] * 2 * 2;
+//                        break;
+//                    case 4 * 2 + 1:
+//                        j = 6;
+//                        x = tbl[i][1] * 4 * 2;
+//                        break;
+//                    case 6 * 2 + 1:
+//                        j = 5;
+//                        x = tbl[i][1] * 6 * 2;
+//                        break;
+//                    case 8 * 2 + 1:
+//                        j = 4;
+//                        x = tbl[i][1] * 8 * 2;
+//                        break;
+//                    case 10 * 2 + 1:
+//                        j = 3;
+//                        x = tbl[i][1] * 10 * 2;
+//                        break;
+//                    case 12 * 2 + 1:
+//                        j = 2;
+//                        x = tbl[i][1] * 12 * 2;
+//                        break;
+//                    case 14 * 2 + 1:
+//                        j = 1;
+//                        x = tbl[i][1] * 14 * 2;
+//                        break;
+//                    case 16 * 2 + 1:
+//                        j = 0;
+//                        x = tbl[i][1] * 16 * 2;
+//                        break;
+//                    default:
+//                        j = 0;
+//                        x = 0;
+//                        break;
+//                }
+//                fprintf(fp, "\tdb\t$%02x,$%02x\n", j, x);
+//            }
+//        }
+//        // パラメータ書き込み
+//        fprintf(fp, "%s_wave_table:\n", str);
+//        if (max != 0) {
+//            for (i = 0; i < max; i++) {
+//                if (tbl[i][0] != 0) {
+//                    fprintf(fp, "\tdw\t%s_wave_%03d\n", str, i);
+//                } else {
+//                    fprintf(fp, "\tdw\t0\n");
+//                }
+//            }
+//        }
+//        if (max != 0) {
+//            for (i = 0; i < max; i++) {
+//                if (tbl[i][0] != 0) {
+//                    fprintf(fp, "%s_wave_%03d:\n", str, i);
+//                    fprintf(fp, "\tdb\t");
+//                    for (j = 0; j < tbl[i][0] / 2 - 1; j++) {
+//                        fprintf(fp, "$%02x,", (tbl[i][2 + (j * 2) + 1] << 4) + tbl[i][2 + (j * 2) + 0]);
+//                    }
+//                    fprintf(fp, "$%02x\n", (tbl[i][2 + (j * 2) + 1] << 4) + tbl[i][2 + (j * 2) + 0]);
+//                }
+//            }
+//        }
+//        fprintf(fp, "\n\n");
+//    }
 
-    //    /**
-    //        N106音色の書き込み
-    //     Input:
+//    /**
+//     * DPCMテーブルの書き込み
+//     * Input:
+//     * <p>
+//     * Output:
+//     * 無し
+//     */
+//    void writeDPCM(FILE*fp, DPCMTBL dpcm_tbl[_DPCM_MAX], char*str, int max) {
+//        int i;
+//        int freq, adr, size, delta_init;
+//        char*fname;
+//
+//        fprintf(fp, "%s:\n", str);
+//        for (i = 0; i < max; i++) {
+//            if (dpcm_tbl[i].flag != 0) {
+//                    /*
+//                         $4013 * 16 + 1 = size
+//                         $4013 = (size - 1) / 16
+//                         $4012 * 64 = adr
+//                         adr = $4012 / 64
+//                    */
+//                freq = dpcm_tbl[i].freq;
+//                size = (dpcm_tbl[i].size - 1) / 16;
+//                delta_init = dpcm_tbl[i].delta_init;
+//                if (dpcm_tbl[i].index == -1) {
+//                    adr = dpcm_tbl[i].start_adr / 64;
+//                    fname = dpcm_tbl[i].fname;
+//                } else {
+//                    adr = dpcm_tbl[dpcm_tbl[i].index].start_adr / 64;
+//                    fname = dpcm_tbl[dpcm_tbl[i].index].fname;
+//                }
+//                fprintf(fp, "\tdb\t$%02x,$%02x,$%02x,$%02x\t;%s\n", freq, delta_init, adr % 0x100, size, fname);
+//            } else {
+//                fprintf(fp, "\tdb\t$00,$00,$00,$00\t;unused\n");
+//            }
+//        }
+//
+//        if (dpcm_bankswitch) {
+//            fprintf(fp, "%s_bank:\n", str);
+//            for (i = 0; i < max; i++) {
+//                int bank_ofs = 0;
+//                if (dpcm_tbl[i].flag != 0) {
+//                    if (dpcm_tbl[i].index == -1) {
+//                        bank_ofs = dpcm_tbl[i].bank_ofs;
+//                        fname = dpcm_tbl[i].fname;
+//                    } else {
+//                        bank_ofs = dpcm_tbl[dpcm_tbl[i].index].bank_ofs;
+//                        fname = dpcm_tbl[dpcm_tbl[i].index].fname;
+//                    }
+//                    if (bank_ofs == 0) {
+//                        fprintf(fp, "\tdb\t2*2\t;%s\n", fname);
+//                    } else {
+//                        bank_ofs -= 1;
+//                        fprintf(fp, "\tdb\t(DPCM_EXTRA_BANK_START + %d*2)*2\t;%s\n", bank_ofs, fname);
+//                    }
+//                } else {
+//                    fprintf(fp, "\tdb\t0\t;unused\n");
+//                }
+//            }
+//        }
+//
+//        fprintf(fp, "\n");
+//    }
 
-    //     Output:
-    //        無し
-    //     */
-    //    void writeToneN106(FILE* fp, int tbl[_N106_TONE_MAX][2+64], char* str, int max)
-    //    {
-    //        int i, j, x;
+//    void writeXPCM(FILE*fp, DPCMTBL xpcm_tbl[_DPCM_MAX], char*str, int max) {
+//        int i;
+//        int freq, adr, size;
+//        //	int		cur_bank=0;
+//
+//        fprintf(fp, "%s:\n", str);
+//        if (max != 0) {
+//            for (i = 0; i < max; i++) {
+//                if (xpcm_tbl[i].flag != 0) {
+//                    freq = xpcm_tbl[i].freq;
+//                    size = xpcm_tbl[i].size;
+//                    if (xpcm_tbl[i].index == -1) {
+//                        fprintf(fp, "\tdw\t_xpcm%03d,$%04x\n", i, size);
+//                        fprintf(fp, "\tdb\tbank(_xpcm%03d),$00,$00,$00\n", i);
+//                    } else {
+//                        fprintf(fp, "\tdw\t_xpcm%03d,$%04x\n", xpcm_tbl[i].index, size);
+//                        fprintf(fp, "\tdb\tbank(_xpcm%03d),$00,$00,$00\n", xpcm_tbl[i].index);
+//                    }
+//
+//                    //				fprintf( fp, "\tdb\t$%02x,$%02x,$%02x,$%02x\n", freq, 0, adr, size );
+//                } else {
+//                    fprintf(fp, "\tdw\t$0000,$0000\n\tdb\t$00,$00,$00,$00\n");
+//                    //				fprintf( fp, "\tdb\t$00,$00,$00,$00\n", freq, 0, adr, size );
+//                }
+//            }
+//
+//            if (xpcm_size != 0) {
+//                fprintf(fp, "\n\t.bank\tDATA_BANK+%1d\n", curr_bank);
+//                fprintf(fp, "\t.org\t$%04x\n\n", 0x6000);
+//                adr = 0;
+//                for (i = 0; i < max; i++) {
+//                    if (xpcm_tbl[i].flag != 0 && xpcm_tbl[i].index == -1) {
+//                        if (adr + xpcm_tbl[i].size > 0x1FFF) {
+//                            curr_bank++;
+//                            fprintf(fp, "\t.bank\tDATA_BANK+%1d\n", curr_bank);
+//                            fprintf(fp, "\t.org\t$%04x\n\n", 0x6000);
+//                            adr = 0;
+//                        }
+//                        fprintf(fp, "_xpcm%03d:\n", i);
+//                        fprintf(fp, "\t.incbin \"%s\"\n", xpcm_tbl[i].fname);
+//                        adr += xpcm_tbl[i].size;
+//                    }
+//                }
+//                fprintf(fp, "\n\t.bank\tCONST_BANK\n");
+//                curr_bank++;
+//            }
+//        }
+//        fprintf(fp, "\n\n");
+//    }
 
-    //        // 使用チャンネル書き込み
-    //        fprintf(fp, "%s_channel:\n", str);
-    //        fprintf(fp, "\tdb\t%d\n", n106_track_num);
-    //        // パラメータ書き込み
-    //        fprintf(fp, "%s_wave_init:\n", str);
-    //        if (max != 0)
-    //        {
-    //            for (i = 0; i < max; i++)
-    //            {
-    //                switch (tbl[i][0])
-    //                {
-    //                    case 2 * 2 + 1: j = 7; x = tbl[i][1] * 2 * 2; break;
-    //                    case 4 * 2 + 1: j = 6; x = tbl[i][1] * 4 * 2; break;
-    //                    case 6 * 2 + 1: j = 5; x = tbl[i][1] * 6 * 2; break;
-    //                    case 8 * 2 + 1: j = 4; x = tbl[i][1] * 8 * 2; break;
-    //                    case 10 * 2 + 1: j = 3; x = tbl[i][1] * 10 * 2; break;
-    //                    case 12 * 2 + 1: j = 2; x = tbl[i][1] * 12 * 2; break;
-    //                    case 14 * 2 + 1: j = 1; x = tbl[i][1] * 14 * 2; break;
-    //                    case 16 * 2 + 1: j = 0; x = tbl[i][1] * 16 * 2; break;
-    //                    default: j = 0; x = 0; break;
-    //                }
-    //                fprintf(fp, "\tdb\t$%02x,$%02x\n", j, x);
-    //            }
-    //        }
-    //        // パラメータ書き込み
-    //        fprintf(fp, "%s_wave_table:\n", str);
-    //        if (max != 0)
-    //        {
-    //            for (i = 0; i < max; i++)
-    //            {
-    //                if (tbl[i][0] != 0)
-    //                {
-    //                    fprintf(fp, "\tdw\t%s_wave_%03d\n", str, i);
-    //                }
-    //                else
-    //                {
-    //                    fprintf(fp, "\tdw\t0\n");
-    //                }
-    //            }
-    //        }
-    //        if (max != 0)
-    //        {
-    //            for (i = 0; i < max; i++)
-    //            {
-    //                if (tbl[i][0] != 0)
-    //                {
-    //                    fprintf(fp, "%s_wave_%03d:\n", str, i);
-    //                    fprintf(fp, "\tdb\t");
-    //                    for (j = 0; j < tbl[i][0] / 2 - 1; j++)
-    //                    {
-    //                        fprintf(fp, "$%02x,", (tbl[i][2 + (j * 2) + 1] << 4) + tbl[i][2 + (j * 2) + 0]);
-    //                    }
-    //                    fprintf(fp, "$%02x\n", (tbl[i][2 + (j * 2) + 1] << 4) + tbl[i][2 + (j * 2) + 0]);
-    //                }
-    //            }
-    //        }
-    //        fprintf(fp, "\n\n");
-    //    }
-
-
-    //    /**
-    //        DPCMテーブルの書き込み
-    //     Input:
-
-    //     Output:
-    //        無し
-    //     */
-    //    void writeDPCM(FILE* fp, DPCMTBL dpcm_tbl[_DPCM_MAX], char* str, int max)
-    //    {
-    //        int i;
-    //        int freq, adr, size, delta_init;
-    //        char* fname;
-
-    //        fprintf(fp, "%s:\n", str);
-    //        for (i = 0; i < max; i++)
-    //        {
-    //            if (dpcm_tbl[i].flag != 0)
-    //            {
-    //                /*
-    //                     $4013 * 16 + 1 = size
-    //                     $4013 = (size - 1) / 16
-    //                     $4012 * 64 = adr
-    //                     adr = $4012 / 64
-    //                */
-    //                freq = dpcm_tbl[i].freq;
-    //                size = (dpcm_tbl[i].size - 1) / 16;
-    //                delta_init = dpcm_tbl[i].delta_init;
-    //                if (dpcm_tbl[i].index == -1)
-    //                {
-    //                    adr = dpcm_tbl[i].start_adr / 64;
-    //                    fname = dpcm_tbl[i].fname;
-    //                }
-    //                else
-    //                {
-    //                    adr = dpcm_tbl[dpcm_tbl[i].index].start_adr / 64;
-    //                    fname = dpcm_tbl[dpcm_tbl[i].index].fname;
-    //                }
-    //                fprintf(fp, "\tdb\t$%02x,$%02x,$%02x,$%02x\t;%s\n", freq, delta_init, adr % 0x100, size, fname);
-    //            }
-    //            else
-    //            {
-    //                fprintf(fp, "\tdb\t$00,$00,$00,$00\t;unused\n");
-    //            }
-    //        }
-
-    //        if (dpcm_bankswitch)
-    //        {
-    //            fprintf(fp, "%s_bank:\n", str);
-    //            for (i = 0; i < max; i++)
-    //            {
-    //                int bank_ofs = 0;
-    //                if (dpcm_tbl[i].flag != 0)
-    //                {
-    //                    if (dpcm_tbl[i].index == -1)
-    //                    {
-    //                        bank_ofs = dpcm_tbl[i].bank_ofs;
-    //                        fname = dpcm_tbl[i].fname;
-    //                    }
-    //                    else
-    //                    {
-    //                        bank_ofs = dpcm_tbl[dpcm_tbl[i].index].bank_ofs;
-    //                        fname = dpcm_tbl[dpcm_tbl[i].index].fname;
-    //                    }
-    //                    if (bank_ofs == 0)
-    //                    {
-    //                        fprintf(fp, "\tdb\t2*2\t;%s\n", fname);
-    //                    }
-    //                    else
-    //                    {
-    //                        bank_ofs -= 1;
-    //                        fprintf(fp, "\tdb\t(DPCM_EXTRA_BANK_START + %d*2)*2\t;%s\n", bank_ofs, fname);
-    //                    }
-    //                }
-    //                else
-    //                {
-    //                    fprintf(fp, "\tdb\t0\t;unused\n");
-    //                }
-    //            }
-    //        }
-
-    //        fprintf(fp, "\n");
-    //    }
-
-
-    //    void writeXPCM(FILE* fp, DPCMTBL xpcm_tbl[_DPCM_MAX], char* str, int max)
-    //    {
-    //        int i;
-    //        int freq, adr, size;
-    //        //	int		cur_bank=0;
-
-    //        fprintf(fp, "%s:\n", str);
-    //        if (max != 0)
-    //        {
-    //            for (i = 0; i < max; i++)
-    //            {
-    //                if (xpcm_tbl[i].flag != 0)
-    //                {
-    //                    freq = xpcm_tbl[i].freq;
-    //                    size = xpcm_tbl[i].size;
-    //                    if (xpcm_tbl[i].index == -1)
-    //                    {
-    //                        fprintf(fp, "\tdw\t_xpcm%03d,$%04x\n", i, size);
-    //                        fprintf(fp, "\tdb\tbank(_xpcm%03d),$00,$00,$00\n", i);
-    //                    }
-    //                    else
-    //                    {
-    //                        fprintf(fp, "\tdw\t_xpcm%03d,$%04x\n", xpcm_tbl[i].index, size);
-    //                        fprintf(fp, "\tdb\tbank(_xpcm%03d),$00,$00,$00\n", xpcm_tbl[i].index);
-    //                    }
-
-    //                    //				fprintf( fp, "\tdb\t$%02x,$%02x,$%02x,$%02x\n", freq, 0, adr, size );
-    //                }
-    //                else
-    //                {
-    //                    fprintf(fp, "\tdw\t$0000,$0000\n\tdb\t$00,$00,$00,$00\n");
-    //                    //				fprintf( fp, "\tdb\t$00,$00,$00,$00\n", freq, 0, adr, size );
-    //                }
-    //            }
-
-    //            if (xpcm_size != 0)
-    //            {
-    //                fprintf(fp, "\n\t.bank\tDATA_BANK+%1d\n", curr_bank);
-    //                fprintf(fp, "\t.org\t$%04x\n\n", 0x6000);
-    //                adr = 0;
-    //                for (i = 0; i < max; i++)
-    //                {
-    //                    if (xpcm_tbl[i].flag != 0 && xpcm_tbl[i].index == -1)
-    //                    {
-    //                        if (adr + xpcm_tbl[i].size > 0x1FFF)
-    //                        {
-    //                            curr_bank++;
-    //                            fprintf(fp, "\t.bank\tDATA_BANK+%1d\n", curr_bank);
-    //                            fprintf(fp, "\t.org\t$%04x\n\n", 0x6000);
-    //                            adr = 0;
-    //                        }
-    //                        fprintf(fp, "_xpcm%03d:\n", i);
-    //                        fprintf(fp, "\t.incbin \"%s\"\n", xpcm_tbl[i].fname);
-    //                        adr += xpcm_tbl[i].size;
-    //                    }
-    //                }
-    //                fprintf(fp, "\n\t.bank\tCONST_BANK\n");
-    //                curr_bank++;
-    //            }
-    //        }
-    //        fprintf(fp, "\n\n");
-    //    }
-
-
-    //    /**
-
-    //     */
-    //    static void writeDPCMSampleSub(FILE* fp)
-    //    {
-
-    //        fprintf(fp, "\t.org\t$FFFA\n");
-    //        fprintf(fp, "\t.dw\tDMC_NMI\n");
-    //        fprintf(fp, "\t.dw\tDMC_RESET\n");
-    //        fprintf(fp, "\t.dw\tDMC_IRQ\n");
-    //    }
-
-    //    /**
-    //        DPCMデータの書き込み
-    //     Input:
-
-    //     Output:
-    //        無し
-    //     */
-    //    void writeDPCMSample(FILE* fp)
-    //    {
-    //        int i;
-    //        int nes_bank = 1; //8KB
-    //        int bank_ofs = 0; //16KB
-
-    //        fprintf(fp, "; begin DPCM samples\n");
-    //        for (i = 0; i < dpcm_size; i++)
-    //        {
-    //            if (i % 0x2000 == 0)
-    //            {
-    //                nes_bank++;
-    //                if (nes_bank == 4)
-    //                {
-    //                    nes_bank = 2;
-    //                    bank_ofs++;
-    //                }
-    //                if (bank_ofs == 0)
-    //                {
-    //                    fprintf(fp, "\t.bank\t%1d\n", nes_bank);
-    //                    putBankOrigin(fp, nes_bank);
-    //                }
-    //                else
-    //                {
-    //                    fprintf(fp, "\t.bank\tDPCM_EXTRA_BANK_START + %d*2 + %d - 2\n", bank_ofs - 1, nes_bank);
-    //                    dpcm_extra_bank_num++;
-    //                    fprintf(fp, "\t.org\t$%04x\n", 0x8000 + 0x2000 * nes_bank);
-    //                }
-    //            }
-    //            if ((i & 0x0f) == 0x00)
-    //            {
-    //                fprintf(fp, "\tdb\t$%02x", dpcm_data[i]);
-    //            }
-    //            else if ((i & 0x0f) != 0x0f)
-    //            {
-    //                fprintf(fp, ",$%02x", dpcm_data[i]);
-    //            }
-    //            else
-    //            {
-    //                fprintf(fp, ",$%02x\n", dpcm_data[i]);
-    //            }
-    //            if (bank_ofs == 0)
-    //            {
-    //                bank_usage[nes_bank]++;
-    //            }
-    //        }
-    //        fprintf(fp, "\n");
-    //        fprintf(fp, "; end DPCM samples\n\n");
-
-    //        if (dpcm_extra_bank_num)
-    //        {
-    //            int x;
-    //            fprintf(fp, "; begin DPCM vectors\n");
-    //            fprintf(fp, "\t.bank\t3\n");
-    //            writeDPCMSampleSub(fp);
-    //            for (x = 2; x <= dpcm_extra_bank_num; x += 2)
-    //            {
-    //                fprintf(fp, "\t.bank\tDPCM_EXTRA_BANK_START + %d\n", x - 1);
-    //                writeDPCMSampleSub(fp);
-    //            }
-    //            fprintf(fp, "; end DPCM vectors\n");
-    //        }
-    //        fprintf(fp, "\n");
-    //    }
-
+//    /**
+//     *
+//     */
+//    static void writeDPCMSampleSub(FILE*fp) {
+//
+//        fprintf(fp, "\t.org\t$FFFA\n");
+//        fprintf(fp, "\t.dw\tDMC_NMI\n");
+//        fprintf(fp, "\t.dw\tDMC_RESET\n");
+//        fprintf(fp, "\t.dw\tDMC_IRQ\n");
+//    }
+//
+//    /**
+//     * DPCMデータの書き込み
+//     * Input:
+//     * <p>
+//     * Output:
+//     * 無し
+//     */
+//    void writeDPCMSample(FILE*fp) {
+//        int i;
+//        int nes_bank = 1; //8KB
+//        int bank_ofs = 0; //16KB
+//
+//        fprintf(fp, "; begin DPCM samples\n");
+//        for (i = 0; i < dpcm_size; i++) {
+//            if (i % 0x2000 == 0) {
+//                nes_bank++;
+//                if (nes_bank == 4) {
+//                    nes_bank = 2;
+//                    bank_ofs++;
+//                }
+//                if (bank_ofs == 0) {
+//                    fprintf(fp, "\t.bank\t%1d\n", nes_bank);
+//                    putBankOrigin(fp, nes_bank);
+//                } else {
+//                    fprintf(fp, "\t.bank\tDPCM_EXTRA_BANK_START + %d*2 + %d - 2\n", bank_ofs - 1, nes_bank);
+//                    dpcm_extra_bank_num++;
+//                    fprintf(fp, "\t.org\t$%04x\n", 0x8000 + 0x2000 * nes_bank);
+//                }
+//            }
+//            if ((i & 0x0f) == 0x00) {
+//                fprintf(fp, "\tdb\t$%02x", dpcm_data[i]);
+//            } else if ((i & 0x0f) != 0x0f) {
+//                fprintf(fp, ",$%02x", dpcm_data[i]);
+//            } else {
+//                fprintf(fp, ",$%02x\n", dpcm_data[i]);
+//            }
+//            if (bank_ofs == 0) {
+//                bank_usage[nes_bank]++;
+//            }
+//        }
+//        fprintf(fp, "\n");
+//        fprintf(fp, "; end DPCM samples\n\n");
+//
+//        if (dpcm_extra_bank_num) {
+//            int x;
+//            fprintf(fp, "; begin DPCM vectors\n");
+//            fprintf(fp, "\t.bank\t3\n");
+//            writeDPCMSampleSub(fp);
+//            for (x = 2; x <= dpcm_extra_bank_num; x += 2) {
+//                fprintf(fp, "\t.bank\tDPCM_EXTRA_BANK_START + %d\n", x - 1);
+//                writeDPCMSampleSub(fp);
+//            }
+//            fprintf(fp, "; end DPCM vectors\n");
+//        }
+//        fprintf(fp, "\n");
+//    }
 
     /**
      * タイトル/作曲者/メーカー/打ち込み者をコメントとして書き込み
@@ -4509,7 +4383,6 @@ on_error:
         }
         fp.add(new MmlDatum2("\n", -1));
     }
-
 
     /**
      * Input: 文字列データをdbとしてmaxバイト出力(終端以降は0で埋める)
@@ -4554,7 +4427,6 @@ on_error:
             fp.add(new MmlDatum2(String.format("\tdb\t%s\n", sDes[i]), aryInt.get(i)));
         }
     }
-
 
     /**
      * タイトル/作曲者/メーカーをmacroとして書き込み
@@ -4606,9 +4478,7 @@ on_error:
             t = "\t.endm";
             fp.add(new MmlDatum2(String.format("%d\n", t), -4, t));
         }
-
     }
-
 
     /**
      * パラメータがn個のコマンドの処理
@@ -4634,9 +4504,7 @@ on_error:
                 }
                 ptr += cnt;
 
-                if (i < n - 1) // nが2個以上のときは","の処理が入る
-                {
-
+                if (i < n - 1) { // nが2個以上のときは","の処理が入る
                     ptr = str.skipSpace(buf, ptr);
                     if (ptr < buf.length() && buf.charAt(ptr) == ',') {
                         ptr++;
@@ -4664,7 +4532,6 @@ on_error:
 
         return ptr;
     }
-
 
     /**
      * 音長パラメータの取得
@@ -4721,7 +4588,6 @@ on_error:
         return ptr;
     }
 
-
     /**
      * 音長取得
      * Output:
@@ -4743,7 +4609,6 @@ on_error:
         }
         return ptr;
     }
-
 
     /**
      * パラメータが1個(音長)のコマンドの処理
@@ -4768,7 +4633,6 @@ on_error:
 
         return ptr;
     }
-
 
     /**
      * パラメータが1個(音階/音長)のコマンドの処理
@@ -4892,7 +4756,6 @@ on_error:
         return ptr;
     }
 
-
     /**
      * パラメータが1個(音階(直接指定)/音長)のコマンドの処理
      * Input:
@@ -4945,7 +4808,6 @@ on_error:
         return ptr;
     }
 
-
     /**
      * パラメータが1個(周波数(直接指定)/音長)のコマンドの処理
      * Input:
@@ -4996,7 +4858,6 @@ on_error:
         return ptr;
     }
 
-
     /**
      * パラメータが1個(休符/音長)のコマンドの処理
      * Input:
@@ -5023,7 +4884,6 @@ on_error:
         return ptr;
     }
 
-
     /**
      * パラメータが1個(キーオフ/音長)のコマンドの処理
      * Input:
@@ -5049,7 +4909,6 @@ on_error:
 
         return ptr;
     }
-
 
     /**
      * Input:
@@ -5298,7 +5157,7 @@ on_error:
                                 case _VOL_PLUS:     /* 音量指定 */
                                     ptr = setCommandBuf(1, cmd, cmdPtr, mml[i].num, buf, ptr, line, mml[i].check.apply(trk));
                                     if ((mml[i].check.apply(trk)) != 0) {
-                                        if ((int) cmd[cmdPtr].param[0] == PARAM_OMITTED) {
+                                        if (cmd[cmdPtr].param[0] == PARAM_OMITTED) {
                                             cmd[cmdPtr].param[0] = 1;
                                         }
                                         if ((0 <= volume_flag && volume_flag <= MAX_VOLUME)) {
@@ -5323,7 +5182,7 @@ on_error:
                                 case _VOL_MINUS:        /* 音量指定 */
                                     ptr = setCommandBuf(1, cmd, cmdPtr, mml[i].num, buf, ptr, line, mml[i].check.apply(trk));
                                     if ((mml[i].check.apply(trk)) != 0) {
-                                        if ((int) cmd[cmdPtr].param[0] == PARAM_OMITTED) {
+                                        if (cmd[cmdPtr].param[0] == PARAM_OMITTED) {
                                             cmd[cmdPtr].param[0] = 1;
                                         }
                                         if ((0 <= volume_flag && volume_flag <= MAX_VOLUME)) {
@@ -5399,23 +5258,23 @@ on_error:
                                     }
                                     break;
 //#if false
-//                        case _SHUFFLE_QUONTIZE:    /* シャッフルクオンタイズ設定 */
-//                            ptr = setCommandBuf(3, cmd, mml[i].num, ptr, line, mml[i].check.apply(trk));
-//                            if ((mml[i].check.apply(trk)) != 0) {
-//                                if (cmd[cmdPtr].param[0] <= 0
-//                                        || cmd[cmdPtr].param[1] <= 0
-//                                        || cmd[cmdPtr].param[2] <= 0
-//                                        || cmd[cmdPtr].param[0] == PARAM_OMITTED
-//                                        || cmd[cmdPtr].param[1] == PARAM_OMITTED
-//                                        || cmd[cmdPtr].param[2] == PARAM_OMITTED) {
-//                                    dispError(enmErrNum.ABNORMAL_SHUFFLE_QUANTIZE_VALUE.ordinal(), lptr[line].filename, line);
-//                                    cmd[cmdPtr].cmd = enmMML._NOP.v;
-//                                    cmd[cmdPtr].line = 0;
-//                                }
-//                            } else {
-//                                dispError(enmErrNum.UNUSE_COMMAND_IN_THIS_TRACK.ordinal(), lptr[line].filename, line);
-//                            }
-//                            break;
+//                                case _SHUFFLE_QUONTIZE:    /* シャッフルクオンタイズ設定 */
+//                                    ptr = setCommandBuf(3, cmd, mml[i].num, ptr, line, mml[i].check.apply(trk));
+//                                    if ((mml[i].check.apply(trk)) != 0) {
+//                                        if (cmd[cmdPtr].param[0] <= 0
+//                                                || cmd[cmdPtr].param[1] <= 0
+//                                                || cmd[cmdPtr].param[2] <= 0
+//                                                || cmd[cmdPtr].param[0] == PARAM_OMITTED
+//                                                || cmd[cmdPtr].param[1] == PARAM_OMITTED
+//                                                || cmd[cmdPtr].param[2] == PARAM_OMITTED) {
+//                                            dispError(enmErrNum.ABNORMAL_SHUFFLE_QUANTIZE_VALUE.ordinal(), lptr[line].filename, line);
+//                                            cmd[cmdPtr].cmd = enmMML._NOP.v;
+//                                            cmd[cmdPtr].line = 0;
+//                                        }
+//                                    } else {
+//                                        dispError(enmErrNum.UNUSE_COMMAND_IN_THIS_TRACK.ordinal(), lptr[line].filename, line);
+//                                    }
+//                                    break;
 //#endif
                                 case _LFO_ON:           /* ソフトＬＦＯ */
                                     ptr = setCommandBuf(1, cmd, cmdPtr, mml[i].num, buf, ptr, line, mml[i].check.apply(trk));
@@ -5436,7 +5295,7 @@ on_error:
                                     ptr = setCommandBuf(1, cmd, cmdPtr, mml[i].num, buf, ptr, line, mml[i].check.apply(trk));
                                     if ((mml[i].check.apply(trk)) != 0) {
                                         if (cmd[cmdPtr].param[0] < 0 || cmd[cmdPtr].param[0] > 255) {
-                                            dispError((int) enmErrNum.FMLFO_PARAM_IS_WRONG.ordinal(), lptr[line].filename, line);
+                                            dispError(enmErrNum.FMLFO_PARAM_IS_WRONG.ordinal(), lptr[line].filename, line);
                                             cmd[cmdPtr].cmd = 0;
                                             cmd[cmdPtr].line = 0;
                                         }
@@ -5448,7 +5307,7 @@ on_error:
                                     ptr = setCommandBuf(1, cmd, cmdPtr, mml[i].num, buf, ptr, line, mml[i].check.apply(trk));
                                     if ((mml[i].check.apply(trk)) != 0) {
                                         if (cmd[cmdPtr].param[0] < 0 || cmd[cmdPtr].param[0] > 255) {
-                                            dispError((int) enmErrNum.FMLFO_PARAM_IS_WRONG.ordinal(), lptr[line].filename, line);
+                                            dispError(enmErrNum.FMLFO_PARAM_IS_WRONG.ordinal(), lptr[line].filename, line);
                                             cmd[cmdPtr].cmd = 0;
                                             cmd[cmdPtr].line = 0;
                                         }
@@ -5995,7 +5854,6 @@ on_error:
 //    }
 //#endif
 
-
     /**
      * ループ/連符の展開
      * Input:
@@ -6183,7 +6041,6 @@ on_error:
         }
     }
 
-
     /**
      * Input:
      * <p>
@@ -6289,23 +6146,22 @@ on_error:
      * 無し
      */
     private int double2int(double d) {
-        return (int) Math.round(d); //(d + 0.5);
+        return (int) Math.round(d); // (d + 0.5);
     }
 
-
-    /*******************************************************
+    /*
      *
-     *↓発音					 ↓キーオフ
-     *		_									_
-     *	 | ＼							 | ＼ 次の音(とかイベント)
-     *	|		＼_________	 |		＼_________
-     * |								＼|								＼
-     * |									|									＼
+     * ↓発音			   ↓キーオフ
+     *   _			        _
+     *  | ＼		       | ＼   次の音(とかイベント)
+     * |	＼_________    |	＼_________
+     * |			   	＼ |			   ＼
+     * |		          |			         ＼
      * <------------------> delta_time 発音から次のイベントまで
-     * <--------------->		gate_time	発音からキーオフまで
-     *									<-> left_time	キーオフから次のイベントまでの残り時間
+     * <--------------->	gate_time  発音からキーオフまで
+     *					<-> left_time  キーオフから次のイベントまでの残り時間
      *
-     *******************************************************/
+     */
 
     /**
      * スラー・タイを考慮したデルタタイムを得る
@@ -6327,9 +6183,9 @@ on_error:
                 delta += (cmd[(cmdPtr + 1)].lfrm - cmd[cmdPtr].lfrm);
             }
             cmdPtr++;
-                /* if( cmd->cmd == _SLAR && allow_slur) {
-                    cmd++;
-                } else */
+//            if (cmd -> cmd == _SLAR && allow_slur) {
+//                cmd++;
+//            } else
             if (cmd[cmdPtr].cmd != enmMML._TIE.v) {
                 break;
             }
@@ -6400,8 +6256,7 @@ on_error:
         }
     }
 
-
-    public class PLAYSTATE {
+    public static class PLAYSTATE {
 
         public GATE_Q gate_q;
         public int env;            // 現在の通常の(キーオンのときの)エンベロープ番号or音量
@@ -6474,7 +6329,6 @@ on_error:
         }
     }
 
-
     private void doNewBank(List<MmlDatum2> fp, int trk, /* ref */ CMD cmd) {
         int banktemp = curr_bank;
         if (cmd.param[0] == (int) PARAM_OMITTED) {
@@ -6519,7 +6373,6 @@ on_error:
         return;
     }
 
-
     private int isCmdNotOutput(CMD[] cmd, int cmdPtr) {
         switch (enmMML.values()[cmd[cmdPtr].cmd]) {
             case _NOP:
@@ -6545,7 +6398,6 @@ on_error:
         return 0;
     }
 
-
     // 音色設定時にVOPを設定する
     private void putVOPData(List<MmlDatum2> fp, int trk, int param) {
         int opl3_head = opl4_track_num;
@@ -6564,7 +6416,6 @@ on_error:
         putAsm(fp, enmMCK.MDR_REVERB.v);
         putAsm(fp, vop & 0xff);
     }
-
 
     /**
      * Input:
@@ -6717,7 +6568,7 @@ on_error:
                             rcount_t += cmd[cmdPtr].len;
                             frame_p = rframe;
                             rframe = double2int(rcount_t * tbase);
-                            ;// (rcount_t * tbase);
+                            // (rcount_t * tbase);
                             frame_d = rframe - frame_p;
                             count += cmd[cmdPtr].len;
                             frame += frame_d;
@@ -6775,7 +6626,7 @@ on_error:
                     count_t = count_t * tbase_p / tbase;
                 } else if (cmd[cmdPtr].cmd == enmMML._TEMPO2.v) {
                     tbase_p = tbase;
-                    tbase = (double) cmd[cmdPtr].param[0] * (double) cmd[cmdPtr].param[1] / (double) _BASE;
+                    tbase = (double) cmd[cmdPtr].param[0] * (double) cmd[cmdPtr].param[1] / _BASE;
                     count_t = count_t * tbase_p / tbase;
                 } else if (cmd[cmdPtr].cmd == enmMML._SONG_LOOP.v) {
                     loop_flag = 1;
@@ -6820,15 +6671,13 @@ on_error:
                 putAsm(fp, 0x01);
                 use_jump = 0;
             }
-            //#if !HUSIC_EXT
-            //                // 三角波/ノイズトラック対策
-            //                if ((trk == BTRACK(2)) || (trk == BTRACK(3)))
-            //                {
-            //                    putAsm(fp, enmMCK.MCK_SET_TONE.v);
-            //                    putAsm(fp, 0x8f);
-            //                }
-            //#endif
-
+//#if !HUSIC_EXT
+//                // 三角波/ノイズトラック対策
+//                if ((trk == BTRACK(2)) || (trk == BTRACK(3))) {
+//                    putAsm(fp, enmMCK.MCK_SET_TONE.v);
+//                    putAsm(fp, 0x8f);
+//                }
+//#endif
 
             do {
                 int cmdtempPtr = cmdPtr; //各switch内でcmdポインタが進む可能性があるので一旦保存
@@ -6965,7 +6814,7 @@ on_error:
                             }
                             putAsm(fp, enmMCK.MDR_DRUM_BIT.v);
                             putAsm(fp, (param & 0x1f) | 0x80);
-                            putLengthAndWait(fp, (int) enmMCK.MCK_WAIT.v, delta_time, /* ref */ cmd[cmdtempPtr]);
+                            putLengthAndWait(fp, enmMCK.MCK_WAIT.v, delta_time, /* ref */ cmd[cmdtempPtr]);
                         }
                     }
                     break;
@@ -7479,21 +7328,16 @@ on_error:
         }
     }
 
-
-    /// *--------------------------------------------------------------
-
-    // */
+    /** */
     private void setSongLabel() {
         songlabel = String.format("song_{0:d03}", mml_idx);
     }
-
 
     /**
      * リザルト表示ルーチン
      * i:trk number
      * trk: track symbol
      */
-
     private void display_counts_sub(int i, char trk) {
         String msg = "";
         msg = String.format("   %d   |", trk);
@@ -7509,7 +7353,6 @@ on_error:
         }
         logger.log(Level.INFO, msg);
     }
-
 
     /**
      * データ作成ルーチン
@@ -7547,7 +7390,6 @@ on_error:
             dpcm_tbl[i].flag = 0;
             dpcm_tbl[i].index = -1;
         }
-
 
         /* 全てのMMLからエフェクトを読み込み */
         for (mml_idx = 0; mml_idx < wk.mml_num; mml_idx++) {
@@ -7601,13 +7443,10 @@ on_error:
         //    sortDPCM(dpcm_tbl);					// 音色のダブりを削除
         //    dpcm_size = checkDPCMSize(dpcm_tbl);
         //    //printf("dpcmsize $%x\n",dpcm_size);
-        //    if (!allow_bankswitching && (dpcm_size > _DPCM_TOTAL_SIZE))
-        //    {	// サイズをチェック
+        //    if (!allow_bankswitching && (dpcm_size > _DPCM_TOTAL_SIZE)) {	// サイズをチェック
         //        dispError(DPCM_FILE_TOTAL_SIZE_OVER, NULL, 0);
         //        dpcm_size = 0;
-        //    }
-        //    else
-        //    {
+        //    } else {
         //        dpcm_data = malloc(dpcm_size);
         //        readDPCM(dpcm_tbl);
         //    }
@@ -7625,10 +7464,7 @@ on_error:
             }
         }
 
-
         {
-
-
             /* 音色書き込み */
             writeTone(efFp, tone_tbl, "dutyenve", tone_max);
             /* エンベロープ書き込み */
@@ -7686,13 +7522,9 @@ on_error:
                 t = String.format("\t.include\t\"%d\"", wk.out_name);
                 efFp.add(new MmlDatum2(t, -4, t));
             }
-
         }
 
-
-
-
-        /* MML->ASMデータ変換 */
+        // MML->ASMデータ変換
 
         /* 出力ファイルにタイトル/作曲者/打ち込み者の情報をコメントとして書き込み */
         writeSongInfo(oufp);
@@ -7718,8 +7550,8 @@ on_error:
             track_ptr += opl3_track_num;
         }
 
-        oufp.add(new MmlDatum2(String.format("\t.if TOTAL_SONGS > 1\n"), -4, ".if TOTAL_SONGS > 1"));
-        oufp.add(new MmlDatum2(String.format("song_addr_table:\n"), -2, "song_addr_table:"));
+        oufp.add(new MmlDatum2("\t.if TOTAL_SONGS > 1\n", -4, ".if TOTAL_SONGS > 1"));
+        oufp.add(new MmlDatum2("song_addr_table:\n", -2, "song_addr_table:"));
         for (mml_idx = 0; mml_idx < wk.mml_num; mml_idx++) {
             setSongLabel();
             t = String.format("%d_track_table", songlabel);

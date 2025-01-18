@@ -60,7 +60,7 @@ public class Mck {
                                 {
                                     logger.log(Level.INFO,
                                         @"Usage:mmckc [switch] InputFile.mml [OutputFile.h]
-                      or :mmckc [switch] -u InputFile1.mml InputFile2.mml ... 
+                      or :mmckc [switch] -u InputFile1.mml InputFile2.mml ...
                         [switch]
                         -h -?    : Display this help message
                         -i       : Including song data in tone/envelope file

@@ -528,7 +528,6 @@ public class Assemble {
 
             if (dicLabel.containsKey(label)) {
                 MmlDatum2 md = dicLabel.get(label);
-                ;
                 md.args.add(currentBank);
                 md.args.add(currentAddress);
                 ptr[0] += 2;
@@ -616,7 +615,6 @@ public class Assemble {
         dest.get(bank).get(adr).linePos = src.linePos;
         dest.get(bank).get(adr).type = src.type;
         if (adr > 0x9b84) {
-            ;
         }
         logger.log(Level.TRACE, String.format("%02x:%04d:%02x", bank, adr, dat));
     }
@@ -746,7 +744,7 @@ public class Assemble {
     }
 
     private int GetInt(String v) {
-        if (v == null || v.length() < 1) {
+        if (v == null || v.isEmpty()) {
             throw new IllegalArgumentException("integer parse error");
         }
         if (v.charAt(0) == '$') {

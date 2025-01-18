@@ -6,7 +6,7 @@ class Version {
     public static final String hogereleasestr = "ppmck release 9 by h7";
     public static final String moon_verstr = "Extended for MoonDriver ver 0.4";
 
-    //#if ENGLISH
+//#if ENGLISH
     public static final int LANGUAGE = 1;            // 0だとデフォルトで日本語 1だと英語
 //#else
 //        public final int LANGUAGE = 0;
