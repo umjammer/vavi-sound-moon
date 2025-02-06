@@ -448,7 +448,7 @@ public class Program {
 //                return rsc;
 //                case 2: // SCCI存在チェック
 //                    nScci = new NScci.NScci();
-//                    iCount = nScci.NSoundInterfaceManager_.getInterfaceCount();
+//                    iCount = NScci.NSoundInterfaceManager().getInterfaceCount();
 //                    if (iCount == 0) {
 //                        nScci.Dispose();
 //                        nScci = null;
@@ -458,8 +458,8 @@ public class Program {
 //                    }
 //scciExit:
 //                    for (int i = 0; i < iCount; i++) {
-//                        NSoundInterface iIntfc = nScci.NSoundInterfaceManager_.getInterface(i);
-//                        NSCCI_INTERFACE_INFO iInfo = nScci.NSoundInterfaceManager_.getInterfaceInfo(i);
+//                        NSoundInterface iIntfc = NScci.NSoundInterfaceManager().getInterface(i);
+//                        NSCCI_INTERFACE_INFO iInfo = NScci.NSoundInterfaceManager().getInterfaceInfo(i);
 //                        int sCount = iIntfc.getSoundChipCount();
 //                        for (int s = 0; s < sCount; s++) {
 //                            NSoundChip sc = iIntfc.getSoundChip(s);
@@ -596,8 +596,8 @@ public class Program {
 //
 //                    break;
 //                case 2: // SCCI
-//                    nScci.NSoundInterfaceManager_.sendData();
-//                    while (!nScci.NSoundInterfaceManager_.isBufferEmpty()) {
+//                    NScci.NSoundInterfaceManager().sendData();
+//                    while (!NScci.NSoundInterfaceManager().isBufferEmpty()) {
 //                        Thread.Sleep(0);
 //                    }
 //                    break;
