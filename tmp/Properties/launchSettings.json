@@ -1,8 +1,0 @@
-{
-  "profiles": {
-    "MoonDriverDotNETConsole": {
-      "commandName": "Project",
-      "commandLineArgs": "-SRC -i C:\\test\\ff5_203.MDL "
-    }
-  }
-}

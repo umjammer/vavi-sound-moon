@@ -23,7 +23,7 @@ public class PcmPack {
     private static final String PRG_VER = "Ver 0.1";
     private static final String PRG_AUTHOR = "BouKiCHi";
 
-    // MDRファイル定義
+    // MDR File Definition
     private static class _mdr {
 
         public int fp;
@@ -39,16 +39,16 @@ public class PcmPack {
         // actual size = (pcm_banks * 0x2000) + (pcm_lastsize * 0x100)
     }
 
-    // MDRファイル読み出し
+    // MDR file reading
     private int readMDRHeader(List<MmlDatum2> destBuf, String file, /* ref */ _mdr m) {
         try {
             m.size = destBuf.size();
 
-            // PCM文字列位置
+            // PCM String Position
             m.pcmname = "";
             int pcmpos = destBuf.get(m.header + 0x2c).dat + destBuf.get(m.header + 0x2d).dat * 0x100;
 
-            // PCM位置
+            // PCM Position
             if (pcmpos == 0x8040) {
                 byte[] fn = new byte[0x40];
                 for (int i = 0; i < 0x40; i++) {
@@ -58,7 +58,7 @@ public class PcmPack {
                 m.pcmname = enc.GetStringFromSjisArray(fn);
             }
 
-            // PCM設定値
+            // PCM setting value
             m.pcm_packed = destBuf.get(m.header + 0x2a).dat;
             m.pcm_startadrs = destBuf.get(m.header + 0x30).dat;
             m.pcm_startbank = destBuf.get(m.header + 0x31).dat;
@@ -71,9 +71,9 @@ public class PcmPack {
         }
     }
 
-    // MDRヘッダ再構築
+    // MDR Header Reconstruction
     private void writeMDRHeader(List<MmlDatum2> destBuf, _mdr m) {
-        // PCM設定値
+        // PCM setting value
         destBuf.get(m.header + 0x2a).dat = m.pcm_packed;
         destBuf.get(m.header + 0x30).dat = m.pcm_startadrs;
         destBuf.get(m.header + 0x31).dat = m.pcm_startbank;
@@ -83,7 +83,7 @@ public class PcmPack {
 
     private static final int BANK_SIZE = 0x2000;
 
-    // MDRファイル読み出し
+    // MDR file reading
     private List<MmlDatum2> packPCMintoMDR(List<MmlDatum2> destBuf, String file, String pcm, /* ref */ _mdr m) {
         if (StringUtilities.isNullOrEmpty(file)) return destBuf;
         if (StringUtilities.isNullOrEmpty(pcm)) return destBuf;
@@ -93,7 +93,7 @@ public class PcmPack {
 
         int start_pos = m.size;
 
-        // パックされている場合はPCM先頭バングから計算する
+        // If packed, calculate from the first bang of the PCM
         if (m.pcm_packed != 0) {
             start_pos = m.pcm_startbank * BANK_SIZE;
         }
@@ -111,7 +111,7 @@ public class PcmPack {
             return null;
         }
 
-        // PCMデータ出力位置
+        // PCM data output position
         logger.log(Level.INFO, String.format("PCM Start:%08xh", start_pos));
         m.fp = start_pos;
 
@@ -132,10 +132,10 @@ public class PcmPack {
         if (pcmBuf.length > 0 && block_len == 0) pcm_blocks--;
 
         m.pcm_packed = 1;
-        m.pcm_startadrs = 0x20; // SRAM開始アドレス
-        m.pcm_startbank = start_pos / BANK_SIZE; // 開始バンク
-        m.pcm_banks = pcm_blocks - 1; // ブロック数
-        m.pcm_lastsize = (block_len + 0xff) / 0x100; // 最後のブロックサイズ
+        m.pcm_startadrs = 0x20; // SRAM Start Address
+        m.pcm_startbank = start_pos / BANK_SIZE; // Starting Bank
+        m.pcm_banks = pcm_blocks - 1; // Number of blocks
+        m.pcm_lastsize = (block_len + 0xff) / 0x100; // Last block size
 
         logger.log(Level.INFO, String.format("PCM StartAdrs:%02xh", m.pcm_startadrs));
         logger.log(Level.INFO, String.format("PCM StartBank:%02xh", m.pcm_startbank));
@@ -152,7 +152,7 @@ public class PcmPack {
         String pcmfile = null;
         String mdrfile;
 
-        // タイトル
+        // title
         logger.log(Level.INFO, String.format("%s %s by %s", PRG_NAME, PRG_VER, PRG_AUTHOR));
 
         mdrfile = mdrFn;
@@ -178,7 +178,7 @@ public class PcmPack {
 
         logger.log(Level.INFO, String.format("PCM File:%s", pcmfile));
 
-        // PCMを詰め込む
+        // Stuffing the PCM
         return packPCMintoMDR(destBuf, mdrfile, pcmfile, /* ref */ m);
     }
 }

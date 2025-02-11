@@ -84,7 +84,7 @@ public class MoonDriver {
                 WriteMemory((short) (0x8000 + (i % 0x4000)), vgmBuf[i] == null ? new MmlDatum() : vgmBuf[i]);
             }
         } catch (Exception ex) {
-            throw new IllegalStateException("Driverの初期化に失敗しました。", ex);
+            throw new IllegalStateException("Driver initialization failed.", ex);
         }
 
         a = 0;
@@ -95,7 +95,7 @@ public class MoonDriver {
                 d = 0x05;
                 e = 0x03;
                 moon_fm2_out();
-                //memory write mode
+                // memory write mode
                 d = 0x02;
                 e = 0x11;
                 moon_wave_out();
@@ -115,18 +115,18 @@ public class MoonDriver {
                     moon_wave_out();
                 }
 
-                //normal mode
+                // normal mode
                 d = 0x02;
                 e = 0x10;
                 moon_wave_out();
 
             }
         } else {
-            //LoadPackedPCM
+            // LoadPackedPCM
             EntryPoints((short) 0x4013);
         }
 
-        //Driverの初期化
+        // Initializing the Driver
         EntryPoints((short) 0x4000);
 
         return true;

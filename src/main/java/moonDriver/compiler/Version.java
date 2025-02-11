@@ -7,7 +7,7 @@ class Version {
     public static final String moon_verstr = "Extended for MoonDriver ver 0.4";
 
 //#if ENGLISH
-    public static final int LANGUAGE = 1;            // 0だとデフォルトで日本語 1だと英語
+    public static final int LANGUAGE = 1;            // 0 is default Japanese, 1 is English
 //#else
 //        public final int LANGUAGE = 0;
 //#endif

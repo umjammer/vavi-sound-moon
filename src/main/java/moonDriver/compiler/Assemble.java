@@ -35,7 +35,7 @@ public class Assemble {
     private boolean assembleBlockLatest = false;
 
     public List<List<MmlDatum2>> build(Work wk, List<MmlDatum2> efFp, List<MmlDatum2> ouFp, List<MmlDatum2> inFp) {
-        // とりあえず積んでおく
+        // I'll put it aside for now
         assembleBlockStack.push(false);
         UpdateAssembleBlockLatest();
 
@@ -45,19 +45,19 @@ public class Assemble {
         this.ouFp = ouFp;
         this.inFp = inFp;
 
-        // インクルードを参照し、各リストを一つにまとめる
+        // Referencing includes and combining each list into one
         Step1_Append();
-        // マクロのブロックを収集する
+        // Collecting blocks of macros
         Step2_GetMacro();
-        // マクロのブロックを置換する
+        // Replace a block of macros
         Step3_ReplaceMacro();
-        // 定数を収集する
+        // Collect constants
         Step4_GetDefine();
-        // ラベルを収集する
+        // Collect labels
         Step5_GetLabel();
-        // アセンブル
+        // Assemble
         assemble();
-        // ラベル参照展開
+        // Label reference expansion
         SetLabel();
 
         return dest;
@@ -396,7 +396,7 @@ public class Assemble {
                 continue;
             }
 
-            md.dat = i; // 行数を入れてみる
+            md.dat = i; // Try adding the number of lines
             dicLabel.put((String) md.args.get(1), md);
 
         }
@@ -463,13 +463,13 @@ public class Assemble {
         } else if (args.get(ptr[0] + 1) instanceof Integer) {
             byte n = (byte) (int) args.get(ptr[0] + 1);
             ptr[0] += 2;
-            Poke(currentBank, currentAddress++, n, asm); // int であってもbyte扱いです
+            Poke(currentBank, currentAddress++, n, asm); // Even if it is an int, it is treated as a byte.
         } else if (args.get(ptr[0] + 1) instanceof Character) {
             byte n = (byte) (char) args.get(ptr[0] + 1);
             ptr[0] += 2;
             Poke(currentBank, currentAddress++, n, asm);
         } else if (args.get(ptr[0] + 1) instanceof String) {
-            //複合型
+            // Composite type
             String sen = (String) args.get(ptr[0] + 1);
             List<Byte> wd = new ArrayList<>();
             for (int i = 0; i < sen.length(); i++) {
@@ -637,10 +637,10 @@ public class Assemble {
                 currentAddress = n;
                 break;
             case ".code":
-                // 無視
+                // ignore
                 break;
             case ".if":
-                assembleBlockStack.push(!anaCondition(macros)); // ブロックするかどうかのフラグなので判定結果を反転させたものがセットされる
+                assembleBlockStack.push(!anaCondition(macros)); // This is a flag to determine whether to block, so the inverse of the result is set.
                 UpdateAssembleBlockLatest();
                 break;
             case ".else":
@@ -664,13 +664,13 @@ public class Assemble {
         List<Integer> op = new ArrayList<>();
         int con = -1000;
         for (int i = 1; i < macros.length; i++) {
-            //とりあえず(は無視する
+            // For now, ignore (
             if (macros[i].charAt(0) == '(')
                 macros[i] = macros[i].substring(1);
             if (macros[i].charAt(macros[i].length() - 1) == ')')
                 macros[i] = macros[i].substring(0, macros[i].length() - 1);
 
-            //定数かな
+            // Is it a constant?
             if (dicDefine.containsKey(macros[i].toLowerCase())) {
                 op.add(GetInt(dicDefine.get(macros[i].toLowerCase()).code));
             } else if (macros[i].equals("=")) {
@@ -722,7 +722,7 @@ public class Assemble {
             if (a.get(i) instanceof String) {
                 String s = String.valueOf(a.add(i)).toLowerCase();
 
-                //定数かな
+                // Is it a constant?
                 if (dicDefine.containsKey(s)) {
                     n = GetInt(dicDefine.get(s).code);
                     flg = true;
@@ -748,7 +748,7 @@ public class Assemble {
             throw new IllegalArgumentException("integer parse error");
         }
         if (v.charAt(0) == '$') {
-            //16進数
+            // Hexadecimal
             return Integer.parseInt(v.substring(1), 16);
         } else {
             return Integer.parseInt(v);
