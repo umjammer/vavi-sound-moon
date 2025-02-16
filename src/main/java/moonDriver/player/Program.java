@@ -28,7 +28,7 @@ import dotnet4j.util.compat.TriFunction;
 import dotnet4j.util.compat.Tuple;
 import mdsound.Instrument;
 import mdsound.MDSound;
-import mdsound.instrument.YmF278bInst;
+import mdsound.instrument.YmF278BInst;
 import moonDriver.common.Common;
 import moonDriver.common.Environment;
 import moonDriver.driver.Driver;
@@ -165,7 +165,7 @@ public class Program {
                     break;
             }
 
-            Instrument ymf278b = Instrument.getInstrument(YmF278bInst.class);
+            Instrument ymf278b = Instrument.getInstrument(YmF278BInst.class);
             MDSound.Chip chip = new MDSound.Chip();
             chip.id = 0;
             chip.instrument = ymf278b;
@@ -174,7 +174,7 @@ public class Program {
             chip.volume = 0;
             chip.option = new Object[] {getApplicationFolder()};
 
-            mds = new MDSound(SamplingRate, samplingBuffer, new MDSound.Chip[] {chip});
+            mds = new MDSound(SamplingRate, samplingBuffer, List.of(chip));
             //ppz8em = new PPZ8em(SamplingRate);
             //ppsdrv = new PPSDRV(SamplingRate);
 
@@ -563,7 +563,7 @@ public class Program {
 
         switch (device) {
             case 0:
-                mds.write(YmF278bInst.class, 0, (byte) dat.port, (byte) dat.address, (byte) dat.data);
+                mds.write(YmF278BInst.class, 0, (byte) dat.port, (byte) dat.address, (byte) dat.data);
                 break;
             case 1:
             case 2:
