@@ -5,6 +5,8 @@
 
 # vavi-sound-moon
 
+<img alt="duke sings moondriver" src="https://github.com/user-attachments/assets/31aa504c-931a-4d1a-855f-5cbe7bc1ddc6" width="100" />
+
 Java version of MoonDriver.
 
 this is a fork of [MoonDriverDotNET](https://github.com/kuma4649/MoonDriverDotNET)
