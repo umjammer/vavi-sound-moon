@@ -8,10 +8,13 @@ import java.lang.System.Logger.Level;
 
 import dotnet4j.io.Path;
 import musicDriverInterface.CompilerInfo;
+import vavi.sound.ymfm.YmFm.Output;
+import vavi.util.win32.WAVE.data;
 
 import static java.lang.System.getLogger;
 
 
+// TODO resource bundle
 public class Mck {
 
     private static final Logger logger = getLogger(Mck.class.getName());
@@ -31,15 +34,11 @@ public class Mck {
     //char* mml_names[MML_MAX];
     //char* mml_short_names[MML_MAX];
     //extern int data_make(void );
-    //extern int message_flag;            // 表示メッセージの出力設定( 0:Jp 1:En )
+    //extern int message_flag;            // Display message output setting (0:Jp 1:En)
 
-    /// *--------------------------------------------------------------
-    //    ヘルプ表示
-    // Input:
-
-    // Output:
-
-    //--------------------------------------------------------------*/
+    /**
+     * Help display
+     */
     private void dispHelpMessage() {
         if (wk.message_flag == 0) {
 
@@ -52,15 +51,12 @@ public class Mck {
                         -m<num> : エラー/ワーニング表示の選択(0:Jpn 1:Eng)
                         -o<str> : 音色/エンベロープファイルのファイル名を<str>にする
                         -w      : Warningメッセージを表示しません
-                        -u      : 複数曲登録NSF作成"
-                                        );
-                    
-                                }
-                                else
-                                {
-                                    logger.log(Level.INFO,
-                                        @"Usage:mmckc [switch] InputFile.mml [OutputFile.h]
-                      or :mmckc [switch] -u InputFile1.mml InputFile2.mml ... 
+                        -u      : 複数曲登録NSF作成"""
+            );
+        } else {
+            logger.log(Level.INFO, """
+                      Usage:mmckc [switch] InputFile.mml [OutputFile.h]
+                      or :mmckc [switch] -u InputFile1.mml InputFile2.mml ...
                         [switch]
                         -h -?    : Display this help message
                         -i       : Including song data in tone/envelope file
@@ -74,15 +70,7 @@ public class Mck {
         //exit(1);
     }
 
-
-    /*--------------------------------------------------------------
-        メインルーチン
-     Input:
-        int	argc		: コマンドライン引数の個数
-        char *argv[]	: コマンドライン引数のポインタ
-     Output:
-        0:正常終了 0:以外以上終了
-    --------------------------------------------------------------*/
+    /** entry point */
     public MmlDatum2[] main(Compiler compiler, String[] mckArgs, Work work, String[] env) {
         this.compiler = compiler;
         wk = work;
@@ -93,25 +81,25 @@ public class Mck {
 
         _in = _out = 0;
 
-        // タイトル表示
-        logger.log(Level.INFO, String.format("MML to MCK Data Converter Ver %d.{1:d02} by Manbow-J",
-                (work.VersionNo / 100), (work.VersionNo % 100)));
+        // Title Display
+        logger.log(Level.INFO, "MML to MCK Data Converter Ver %d.%02d by Manbow-J".formatted(
+                (Work.VersionNo / 100), (Work.VersionNo % 100)));
 
-        // サブタイトル表示
-        logger.log(Level.INFO, String.format("%d", Version.moon_verstr));
-        //printf("patches by [OK] and 2ch mck thread people\n");
-        logger.log(Level.INFO, String.format("DATE: %d", "2020/11/27"));// __DATE__);
-        logger.log(Level.INFO, String.format("%d", Version.patchstr));
-        logger.log(Level.INFO, String.format("%d", Version.hogereleasestr));
+        // Subtitle Display
+        logger.log(Level.INFO, String.format("%s", Version.moon_verstr));
+        //logger.log(Level.INFO, "patches by [OK] and 2ch mck thread people");
+        logger.log(Level.INFO, String.format("DATE: %s", "2020/11/27")); // __DATE__);
+        logger.log(Level.INFO, String.format("%s", Version.patchstr));
+        logger.log(Level.INFO, String.format("%s", Version.hogereleasestr));
 
-        // コマンドライン解析
+        // Command Line Parsing
         if (mckArgs == null || mckArgs.length < 1) {
             dispHelpMessage();
             return null;
         }
 
         for (i = 0; i < mckArgs.length; i++) {
-            // スイッチ？
+            // switch?
             if (mckArgs[i].charAt(0) == '-') {
                 switch (mckArgs[i].toUpperCase().charAt(1)) {
                     case 'H':
@@ -207,10 +195,10 @@ public class Mck {
         }
         logger.log(Level.INFO, String.format("%d -> %d", wk.mml_names[i], wk.out_name));
 
-        // コンバート
+        // Convert
         datamake = new DataMaker(compiler, wk);
         int ret = datamake.data_make();
-        // 終了
+        // end
 
         for (i = 0; i < _in; i++)
             wk.mml_short_names[i] = "";

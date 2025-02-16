@@ -37,7 +37,7 @@ public class Common {
     }
 
     /**
-     * ストリームから一括でバイナリを読み込む
+     * Read binary from a stream in bulk
      */
     public static byte[] readAllBytes(Stream stream) {
         if (stream == null) return null;

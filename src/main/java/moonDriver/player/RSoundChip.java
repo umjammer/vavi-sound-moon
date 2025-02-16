@@ -49,12 +49,12 @@ public class RSoundChip {
 
         @Override
         public void init() {
-//            NSoundInterface nsif = scci.NSoundInterfaceManager_.getInterface(BusID);
+//            NSoundInterface nsif = Scci.NSoundInterfaceManager().getInterface(BusID);
 //            NSoundChip nsc = nsif.getSoundChip(SoundChip);
 //            realChip = nsc;
 //            dClock = (int) nsc.getSoundChipClock();
 
-            //chipの種類ごとに初期化コマンドを送りたい場合
+            // If you want to send initialization commands for each chip type
 //            switch (nsc.getSoundChipType()) {
 //                case (int) EnmRealChipType.YM2608:
 //                    //setRegister(0x2d, 00);
@@ -81,14 +81,15 @@ public class RSoundChip {
             return false;
         }
 
-        /// <summary>
-        /// マスタークロックの設定
-        /// </summary>
-        /// <param name="mClock">設定したい値</param>
-        /// <returns>実際設定された値</returns>
+        /**
+         * Master Clock Settings
+         *
+         * @param mClock The value you want to set
+         * @return The actual value set
+         */
         @Override
         public int SetMasterClock(int mClock) {
-            //SCCIはクロックの変更不可
+            // SCCI cannot change the clock
 
 //            return (int) realChip.getSoundChipClock();
             return 0;
@@ -96,7 +97,7 @@ public class RSoundChip {
 
         @Override
         public void setSSGVolume(byte vol) {
-            //SCCIはSSG音量の変更不可
+            // SCCI cannot change SSG volume
         }
     }
 
@@ -141,11 +142,12 @@ public class RSoundChip {
             return true;
         }
 
-        /// <summary>
-        /// マスタークロックの設定
-        /// </summary>
-        /// <param name="mClock">設定したい値</param>
-        /// <returns>実際設定された値</returns>
+        /**
+         * Master Clock Settings
+         *
+         * @param mClock The value you want to set
+         * @return The actual value set
+         */
         @Override
         public int SetMasterClock(int mClock) {
 //            NIGimic2 gm = realChip.QueryInterface();

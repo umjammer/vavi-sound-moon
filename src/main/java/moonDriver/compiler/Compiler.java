@@ -35,7 +35,7 @@ public class Compiler implements ICompiler {
     public boolean doPackPCM = false;
     public String pcmFileName = "";
 
-    //内部
+    // internal
     private String srcBuf = null;
     public String origpath = null;
     private boolean isIDE = false;
@@ -94,7 +94,7 @@ public class Compiler implements ICompiler {
 
         MmlDatum2[] dest = mck.main(this, args, work, env);
         if (dest == null || dest.length < 1) return null;
-        // ほしいのは mmlDatumn なのでキャスト(?)して作り直す
+        // What we want is mmlDatumn, so we cast(?) it and recreate it.
         for (MmlDatum2 md2 : dest) {
             ret.add(md2 == null ? null : md2.ToMmlDatumn());
         }
@@ -138,23 +138,23 @@ public class Compiler implements ICompiler {
 
             if (!(prm instanceof String)) continue;
 
-            if (((String) prm).equals("SRC")) {
+            if (prm.equals("SRC")) {
                 this.isSrc = true;
             }
 
-            // PCMPACK指定の場合は単独で指定する必要あり
-            if (((String) prm).equals("PCMPACK")) {
+            // Must be specified alone when PCMPACK is specified
+            if (prm.equals("PCMPACK")) {
                 this.doPackPCM = true;
                 this.pcmFileName = (String) param[1];
                 return;
             }
 
-            // IDEフラグオン
-            if (((String) prm).equals("IDE")) {
+            // IDE Flag On
+            if (prm.equals("IDE")) {
                 this.isIDE = true;
             }
 
-            // スキップ再生指定
+            // Skip playback specification
             if (((String) prm).indexOf("SkipPoint=") == 0) {
                 try {
                     String[] p = ((String) prm).split("=")[1].split(":");
@@ -166,7 +166,7 @@ public class Compiler implements ICompiler {
                 }
             }
 
-            // オリジナルファイルの所在
+            // Original file location
             if (((String) prm).indexOf("ORIGPATH=") == 0) {
                 try {
                     this.origpath = ((String) prm).split("=")[1];
@@ -175,7 +175,7 @@ public class Compiler implements ICompiler {
                 }
             }
 
-            // MoonDriver自体のオプション
+            // MoonDriver itself options
             if (((String) prm).indexOf("MoonDriverOption=") == 0) {
                 try {
                     String p = ((String) prm).split("=")[1];

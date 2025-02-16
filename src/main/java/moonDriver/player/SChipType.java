@@ -1,6 +1,6 @@
 package moonDriver.player;
 
-public class SChipType {
+public class SChipType implements Cloneable {
 
     public boolean getUseEmu() {
         return _UseEmu;
@@ -252,7 +252,8 @@ public class SChipType {
 
     private int _LatencyForScci = 0;
 
-    public SChipType Copy() {
+    @Override
+    public SChipType clone() {
         SChipType ct = new SChipType();
         ct._UseEmu = this._UseEmu;
         ct._UseEmu2 = this._UseEmu2;

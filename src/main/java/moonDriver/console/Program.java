@@ -66,7 +66,7 @@ class Program {
 
     private static void Compile(String[] args, int argIndex) {
         try {
-            //mc向け引数のリストを作る
+            // Create a list of arguments for mc
             List<String> lstArg = new ArrayList<>();
             for (int i = argIndex; i < args.length; i++)
                 lstArg.add(args[i]);
@@ -83,7 +83,7 @@ class Program {
 //            env.AddEnv("moondriver");
             compiler.env = env.GetEnv();
 
-            //各種ファイルネームを得る
+            // Get various file names
             int s = 0;
             for (String arg : compiler.args) {
                 if (StringUtilities.isNullOrEmpty(arg)) continue;
@@ -99,7 +99,7 @@ class Program {
             }
 
 
-            //DotNETオプションの設定
+            // Setting DotNET Options
             if (isSrc) compiler.setCompileSwitch("SRC");
             if (doPackPcm) compiler.setCompileSwitch("PCMPACK", pcmFileName);
 //#if DEBUG
@@ -108,7 +108,7 @@ class Program {
 //#endif
 
             if (!isXml) {
-                //デフォルトはソースファイル名の拡張子を.MDRに変更したものにする
+                // The default is the source file name with the extension changed to .MDR.
                 String destFileName = "";
                 if (!StringUtilities.isNullOrEmpty(srcFile)) {
                     destFileName = Path.combine(Path.getDirectoryName(Path.getFullPath(srcFile))
@@ -125,7 +125,7 @@ class Program {
                 compiler.work.ef_name = Path.combine(Path.getDirectoryName(Path.getFullPath(srcFile)), compiler.work.ef_name);
                 compiler.work.inc_name = Path.combine(Path.getDirectoryName(Path.getFullPath(srcFile)), compiler.work.inc_name);
 
-                //TagからFilenameを得る
+                // Get Filename from Tag
                 String srcText;
                 try (FileStream sourceMML = new FileStream(srcFile, FileMode.Open, FileAccess.Read, FileShare.Read)) {
                     try (StreamReader sr = new StreamReader(sourceMML, Charset.forName("Shift_JIS"))) {
@@ -140,21 +140,21 @@ class Program {
 //#if DEBUG
                         logger.log(Level.TRACE, String.format("%s\t: %s", tag.getItem1(), tag.getItem2()));
 //#endif
-                        //出力ファイル名を得る
-                        //if (tag.getItem1().toUpperCase().indexOf("#FI") != 0) continue; // mcは3文字まで判定している為
+                        // Get the output file name
+                        //if (tag.getItem1().toUpperCase().indexOf("#FI") != 0) continue; // Because mc is judged up to three characters
                         //outFileName = tag.getItem2();
                     }
                 }
 
-                //TagにFileName指定がある場合はそちらを適用する
+                // If the tag specifies a FileName, that is applied.
                 if (!StringUtilities.isNullOrEmpty(outFileName)) {
                     if (outFileName.charAt(0) != '.') {
-                        //ファイル名指定の場合
+                        // When specifying a file name
                         destFileName = Path.combine(
                                 Path.getDirectoryName(Path.getFullPath(srcFile))
                                 , outFileName);
                     } else {
-                        //拡張子のみの指定の場合
+                        // When specifying the extension only
                         destFileName = Path.combine(
                                 Path.getDirectoryName(Path.getFullPath(srcFile))
                                 , String.format("%s%s"
@@ -163,7 +163,7 @@ class Program {
                     }
                 }
 
-                //最終的にdesFileの指定がある場合は、そちらを優先する
+                // If desFile is specified finally, it takes precedence.
                 if (desFile != null) {
                     destFileName = desFile;
                 }
@@ -194,7 +194,7 @@ class Program {
                 }
                 MmlDatum[] dest = null;
 
-                // xmlの時はIDEモードでコンパイル
+                // When using xml, compile in IDE mode
                 compiler.setCompileSwitch("IDE");
 
                 try (FileStream sourceMML = new FileStream(srcFile, FileMode.Open, FileAccess.Read, FileShare.Read)) {
@@ -212,20 +212,13 @@ class Program {
 
     private static Stream appendFileReaderCallback(String arg) {
 
-        String fn;
-        fn = Path.combine(
-                Path.getDirectoryName(srcFile)
-                , arg
-        );
+        String fn = Path.combine(Path.getDirectoryName(srcFile), arg);
 
         String[] envPaths = env.GetEnvVal("moondriver");
         if (envPaths != null) {
             int i = 0;
             while (!File.exists(fn) && i < envPaths.length) {
-                fn = Path.combine(
-                        envPaths[i++]
-                        , arg
-                );
+                fn = Path.combine(envPaths[i++], arg);
             }
         }
 

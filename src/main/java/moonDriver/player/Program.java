@@ -28,7 +28,7 @@ import dotnet4j.util.compat.TriFunction;
 import dotnet4j.util.compat.Tuple;
 import mdsound.Instrument;
 import mdsound.MDSound;
-import mdsound.instrument.YmF278bInst;
+import mdsound.instrument.YmF278BInst;
 import moonDriver.common.Common;
 import moonDriver.common.Environment;
 import moonDriver.driver.Driver;
@@ -127,14 +127,14 @@ public class Program {
         }
 
         if (mIndex < 0) {
-            logger.log(Level.INFO, String.format("引数(%dファイル)１個欲しいよぉ...", Common.objExtension));
+            logger.log(Level.INFO, String.format("at least one argument is needed (%d file)...", Common.objExtension));
             return -1;
         }
 
         srcFile = args[mIndex];
 
         if (!File.exists(args[mIndex])) {
-            logger.log(Level.ERROR, String.format("ファイル[%d]が見つかりません", args[mIndex]));
+            logger.log(Level.ERROR, String.format("File [%d] not found", args[mIndex]));
             return -1;
         }
 
@@ -165,7 +165,7 @@ public class Program {
                     break;
             }
 
-            Instrument ymf278b = Instrument.getInstrument(YmF278bInst.class);
+            Instrument ymf278b = Instrument.getInstrument(YmF278BInst.class);
             MDSound.Chip chip = new MDSound.Chip();
             chip.id = 0;
             chip.instrument = ymf278b;
@@ -174,7 +174,7 @@ public class Program {
             chip.volume = 0;
             chip.option = new Object[] {getApplicationFolder()};
 
-            mds = new MDSound(SamplingRate, samplingBuffer, new MDSound.Chip[] {chip});
+            mds = new MDSound(SamplingRate, samplingBuffer, List.of(chip));
             //ppz8em = new PPZ8em(SamplingRate);
             //ppsdrv = new PPSDRV(SamplingRate);
 
@@ -226,14 +226,14 @@ public class Program {
                     , Program::appendFileReaderCallback
             );
 
-//            //AUTO指定の場合に構成が変わるので、構成情報を受け取ってから音量設定を行う
+//            // When AUTO is specified, the configuration will change, so the volume will be set after receiving the configuration information.
 //            isNRM = dop.isNRM;
 //            isSPB = dop.isSPB;
 //            isVA = dop.isVA;
 //            usePPS = dop.usePPS;
 //            usePPZ = dop.usePPZ;
 //            String[] pmdOptionVol = SetVolume();
-//            //ユーザーがコマンドラインでDオプションを指定していない場合はpmdVolを適用させる
+//            // Apply pmdVol if user does not specify D option on command line
 //            if (!pmdvolFound && pmdOptionVol != null && pmdOptionVol.length > 0) {
 //                ((Driver.Driver) drv).resetOption(pmdOptionVol);//
 //            }
@@ -262,23 +262,23 @@ public class Program {
                     break;
             }
 
-            logger.log(Level.INFO, "演奏を終了する場合は何かキーを押してください(実chip時は特に。)");
+            logger.log(Level.INFO, "To end the playback, press any key (especially when playing a real chip).");
 
             while (true) {
                 Thread.sleep(1);
                 if (KeyboardHook.kbhit()) {
                     break;
                 }
-                //ステータスが0(終了)又は0未満(エラー)の場合はループを抜けて終了
+                // If the status is 0 (finished) or less than 0 (error), exit the loop and
                 if (drv.getStatus() <= 0) {
                     if (drv.getStatus() == 0) {
-                        Thread.sleep((int) (latency * 2.0)); // 実際の音声が発音しきるまでlatency*2の分だけ待つ
+                        Thread.sleep((int) (latency * 2.0)); // Wait for latency*2 until the actual voice is fully pronounced
                     }
                     break;
                 }
 
                 if (loop != 0 && drv.getNowLoopCounter() > loop) {
-                    Thread.sleep((int) (latency * 2.0)); // 実際の音声が発音しきるまでlatency*2の分だけ待つ
+                    Thread.sleep((int) (latency * 2.0)); // Wait for latency*2 until the actual voice is fully pronounced
                     break;
                 }
             }
@@ -289,10 +289,10 @@ public class Program {
 //        } catch (MoonDriverException pe) {
 //            logger.log(Level.ERROR, pe.getMessage());
         } catch (Exception ex) {
-            logger.log(Level.ERROR, "演奏失敗: " + ex.getMessage(), ex);
+            logger.log(Level.ERROR, "Failed to play: " + ex.getMessage(), ex);
         } finally {
             if (((Driver) drv).renderingException != null) {
-                logger.log(Level.ERROR, "演奏失敗: " + ((Driver) drv).renderingException.getMessage(), ((Driver) drv).renderingException);
+                logger.log(Level.ERROR, "Failed to play: " + ((Driver) drv).renderingException.getMessage(), ((Driver) drv).renderingException);
             }
 
             if (audioOutput != null) {
@@ -380,7 +380,7 @@ public class Program {
             i++;
         }
 
-        if (device == 3 && loop == 0) loop = 1; // wave出力の場合、無限ループは1に変更
+        if (device == 3 && loop == 0) loop = 1; // For wave output, change infinite loop to 1
         return i;
     }
 
@@ -389,7 +389,7 @@ public class Program {
 //        int iCount = 0;
 //
 //        switch (device) {
-//            case 1: { //GIMIC存在チェック
+//            case 1: { // GIMIC existence check
 //                nc86ctl = new Nc86ctl.Nc86ctl();
 //                try {
 //                    nc86ctl.initialize();
@@ -446,9 +446,9 @@ public class Program {
 //                    //rsc.setSSGVolume(63); // PC-8801
 //                }
 //                return rsc;
-//                case 2: // SCCI存在チェック
+//                case 2: // SCCI Presence Check
 //                    nScci = new NScci.NScci();
-//                    iCount = nScci.NSoundInterfaceManager_.getInterfaceCount();
+//                    iCount = NScci.NSoundInterfaceManager().getInterfaceCount();
 //                    if (iCount == 0) {
 //                        nScci.Dispose();
 //                        nScci = null;
@@ -458,8 +458,8 @@ public class Program {
 //                    }
 //scciExit:
 //                    for (int i = 0; i < iCount; i++) {
-//                        NSoundInterface iIntfc = nScci.NSoundInterfaceManager_.getInterface(i);
-//                        NSCCI_INTERFACE_INFO iInfo = nScci.NSoundInterfaceManager_.getInterfaceInfo(i);
+//                        NSoundInterface iIntfc = NScci.NSoundInterfaceManager().getInterface(i);
+//                        NSCCI_INTERFACE_INFO iInfo = NScci.NSoundInterfaceManager().getInterfaceInfo(i);
 //                        int sCount = iIntfc.getSoundChipCount();
 //                        for (int s = 0; s < sCount; s++) {
 //                            NSoundChip sc = iIntfc.getSoundChip(s);
@@ -523,7 +523,7 @@ public class Program {
 //
 //                    double el1 = sw.ElapsedTicks / swFreq;
 //                    if (el1 - o >= step) {
-//                        if (el1 - o >= step * SamplingRate / 100.0) // 閾値10ms
+//                        if (el1 - o >= step * SamplingRate / 100.0) // Threshold 10ms
 //                        {
 //                            do {
 //                                o += step;
@@ -563,7 +563,7 @@ public class Program {
 
         switch (device) {
             case 0:
-                mds.write(YmF278bInst.class, 0, (byte) dat.port, (byte) dat.address, (byte) dat.data);
+                mds.write(YmF278BInst.class, 0, (byte) dat.port, (byte) dat.address, (byte) dat.data);
                 break;
             case 1:
             case 2:
@@ -578,11 +578,11 @@ public class Program {
 //                    return;
 //                case 1: // GIMIC
 //
-//                    //サイズと経過時間から、追加でウエイトする。
-//                    int m = Math.max((int) (size / 20 - elapsed), 0); // 20 閾値(magic number)
+//                    // Add additional weight based on size and elapsed time.
+//                    int m = Math.max((int) (size / 20 - elapsed), 0); // 20 Threshold(magic number)
 //                    Thread.Sleep(m);
 //
-//                    //ポートも一応見る
+//                    // Check the port as well
 //                    int n = nc86ctl.getNumberOfChip();
 //                    for (int i = 0; i < n; i++) {
 //                        NIRealChip rc = nc86ctl.getChipInterface(i);
@@ -596,8 +596,8 @@ public class Program {
 //
 //                    break;
 //                case 2: // SCCI
-//                    nScci.NSoundInterfaceManager_.sendData();
-//                    while (!nScci.NSoundInterfaceManager_.isBufferEmpty()) {
+//                    NScci.NSoundInterfaceManager().sendData();
+//                    while (!NScci.NSoundInterfaceManager().isBufferEmpty()) {
 //                        Thread.Sleep(0);
 //                    }
 //                    break;

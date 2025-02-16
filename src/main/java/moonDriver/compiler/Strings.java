@@ -5,13 +5,13 @@ package moonDriver.compiler;
  */
 public class Strings {
 
-    /*--------------------------------------------------------------
-        スペース／タブのスキップ
-     Input:
-        char	*ptr		:データ格納ポインタ
-     Output:
-        char	*ptr		;スキップ後のポインタ
-    --------------------------------------------------------------*/
+    /**
+     * Skip spaces/tabs
+     * Input:
+     * char	*ptr		:Data Storage Pointer
+     * Output:
+     * char	*ptr		;Pointer after skip
+     */
     public int skipSpaceOld(String buf, int ptr) {
         while (ptr < buf.length() && buf.charAt(ptr) != '\0') {
             if (buf.charAt(ptr) != ' ' && buf.charAt(ptr) != '\t') {
@@ -22,9 +22,9 @@ public class Strings {
         return ptr;
     }
 
-    /*--------------------------------------------------------------
-        文字列のスキップ
-    --------------------------------------------------------------*/
+    /**
+     * Skip a string
+     */
     public int skipQuote(String buf, int ptr) {
         if (buf.charAt(ptr) != 0 &&
                 buf.charAt(ptr) == '\"') {
@@ -43,9 +43,9 @@ public class Strings {
         return ptr;
     }
 
-    /*--------------------------------------------------------------
-        コメント文字のチェック
-    --------------------------------------------------------------*/
+    /**
+     * Check for comment characters
+     */
     public boolean isComment(String buf, int ptr) {
         if (buf.charAt(ptr) != 0 &&
                 (buf.charAt(ptr) == ';' ||
@@ -56,9 +56,9 @@ public class Strings {
         return false;
     }
 
-    /*--------------------------------------------------------------
-        コメントのスキップ
-    --------------------------------------------------------------*/
+    /**
+     * Skip comments
+     */
     public int skipComment(String buf, int ptr) {
         if (isComment(buf, ptr)) {
             while (true) {
@@ -71,10 +71,9 @@ public class Strings {
         return ptr;
     }
 
-
-    /*--------------------------------------------------------------
-        スペース／タブのスキップ(行コメントも飛ばす)
-    --------------------------------------------------------------*/
+    /**
+     * Skip spaces/tabs (also skip line comments)
+     */
     public int skipSpace(String buf, int ptr) {
         while (true) {
             if (ptr == buf.length()) break; //EOL or EOF
@@ -93,52 +92,44 @@ public class Strings {
         return ptr;
     }
 
+//    /**
+//     * Check if the character is a Kanji
+//     * Input:
+//     * char	c	: character
+//     * Return:
+//     * 0: Non-Kanji 1: Kanji code
+//     */
+//    int checkKanji(unsigned char c) {
+//        if (0x81 <= c && c <= 0x9f) return 1;
+//        if (0xe0 <= c && c <= 0xef) return 1;
+//        return 0;
+//    }
 
-    //		/*----------------------------------------------------------
-    //			文字が漢字かどうかのチェック
-    //		 Input:
-    //			char	c	: 文字
-    //		 Return:
-    //			0:漢字以外 1: 漢字コード
-    //		----------------------------------------------------------*/
-    //		int checkKanji(unsigned char c)
-    //		{
-    //			if (0x81 <= c && c <= 0x9f) return 1;
-    //			if (0xe0 <= c && c <= 0xef) return 1;
-    //			return 0;
-    //		}
+//    /**
+//     * Make a string uppercase (Kanji compatible version)
+//     * Input:
+//     * char *ptr	: A pointer to a string
+//     * Output:
+//     * none
+//     */
+//    void strupper(String[] ptr) {
+//        while (ptr != '\0') {
+//            if (checkKanji((unsigned char) *ptr) ==0 ){
+//    					*ptr = toupper(( int)*ptr);
+//            ptr++;
+//        } else {
+//                // Processing when using Kanji
+//                ptr += 2;
+//            }
+//        }
+//    }
 
-
-    //		/*----------------------------------------------------------
-    //			文字列を大文字にする(漢字対応版)
-    //		 Input:
-    //			char *ptr	: 文字列へのポインタ
-    //		 Output:
-    //			none
-    //		----------------------------------------------------------*/
-    //		void strupper(char* ptr)
-    //		{
-    //			while (*ptr != '\0')
-    //			{
-    //				if (checkKanji((unsigned char) * ptr) == 0 ) {
-    //					*ptr = toupper((int)*ptr);
-    //					ptr++;
-    //				} else
-    //				{
-    //					/* 漢字の時の処理 */
-    //					ptr += 2;
-    //				}
-    //			}
-    //		}
-
-
-    /*--------------------------------------------------------------
-        文字列を数値に変換
-     Input:
-
-     Output:
-
-    --------------------------------------------------------------*/
+    /**
+     * Convert string to number
+     * Input:
+     * <p>
+     * Output:
+     */
     public int Asc2Int(String buf, int ptr, /* ref */ int cnt) {
         int num;
         char c;
@@ -153,7 +144,7 @@ public class Strings {
             cnt++;
         }
         switch (buf.charAt(ptr)) {
-            /* 16進数 */
+            // Hexadecimal
             case 'x':
             case '$':
                 ptr++;
@@ -171,7 +162,7 @@ public class Strings {
                     ptr++;
                 }
                 break;
-            /* 2進数 */
+            // Binary numbers
             case '%':
                 ptr++;
                 cnt++;
@@ -185,7 +176,7 @@ public class Strings {
                     ptr++;
                 }
                 break;
-            /* 10進数 */
+            // Decimal
             default:
                 while (true) {
                     if ('0' <= buf.charAt(ptr) && buf.charAt(ptr) <= '9') {
