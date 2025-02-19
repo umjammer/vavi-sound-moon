@@ -3,6 +3,7 @@ package moonDriver.compiler;
 
 import java.lang.System.Logger;
 import java.lang.System.Logger.Level;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
@@ -10,11 +11,11 @@ import java.util.function.Function;
 import dotnet4j.io.File;
 import dotnet4j.io.Path;
 import dotnet4j.util.compat.StringUtilities;
-import moonDriver.common.MyEncoding;
 import musicDriverInterface.CompilerInfo;
 import net.sf.saxon.functions.Count;
 
 import static java.lang.System.getLogger;
+import static moonDriver.common.Common.charset;
 
 
 public class DataMaker {
@@ -4312,8 +4313,7 @@ on_error:
      * Output:
      */
     private void printStrDb(List<MmlDatum2> fp, String str, int max) {
-        MyEncoding enc = new MyEncoding();
-        byte[] ary = enc.GetSjisArrayFromString(str);
+        byte[] ary = str.getBytes(charset);
 
         String des = "";
         List<Integer> lstInt = new ArrayList<>();

@@ -29,6 +29,7 @@ import musicDriverInterface.MmlDatum;
 import vavi.util.serdes.Serdes;
 
 import static java.lang.System.getLogger;
+import static moonDriver.common.Common.charset;
 
 
 class Program {
@@ -71,7 +72,7 @@ class Program {
             for (int i = argIndex; i < args.length; i++)
                 lstArg.add(args[i]);
 
-            Compiler compiler = new Compiler(null);
+            Compiler compiler = new Compiler();
             compiler.init();
             compiler.args = lstArg.toArray(String[]::new);
 
@@ -128,7 +129,7 @@ class Program {
                 // Get Filename from Tag
                 String srcText;
                 try (FileStream sourceMML = new FileStream(srcFile, FileMode.Open, FileAccess.Read, FileShare.Read)) {
-                    try (StreamReader sr = new StreamReader(sourceMML, Charset.forName("Shift_JIS"))) {
+                    try (StreamReader sr = new StreamReader(sourceMML, charset)) {
                         srcText = sr.readToEnd();
                     }
                 }

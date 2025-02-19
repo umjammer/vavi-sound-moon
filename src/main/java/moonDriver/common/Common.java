@@ -19,6 +19,8 @@ public class Common {
 
     private static final Logger logger = getLogger(Common.class.getName());
 
+    public static Charset charset = Charset.forName("ms932");
+
     public static final String mmlExtension = ".mdm";
     public static final String objExtension = ".mdr";
 
@@ -64,7 +66,7 @@ public class Common {
                 lst.add((byte) buf[index[0]].dat);
             }
 
-            String n = new String(ByteUtil.toByteArray(lst), Charset.forName("cp932"));
+            String n = new String(ByteUtil.toByteArray(lst), charset);
             index[0]++;
 
             return n;
