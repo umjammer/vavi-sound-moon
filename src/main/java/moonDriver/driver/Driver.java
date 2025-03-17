@@ -19,8 +19,6 @@ import dotnet4j.io.Stream;
 import dotnet4j.util.compat.StringUtilities;
 import dotnet4j.util.compat.Tuple;
 import moonDriver.common.Common;
-import moonDriver.common.IEncoding;
-import moonDriver.common.MyEncoding;
 import musicDriverInterface.ChipAction;
 import musicDriverInterface.ChipDatum;
 import musicDriverInterface.GD3Tag;
@@ -31,18 +29,12 @@ import vavi.util.serdes.Serdes;
 
 public class Driver implements IDriver {
 
-    private IEncoding enc = null;
     public Exception renderingException = null;
     private MoonDriver md = null;
     static MmlDatum[] srcBuf = null;
     private Consumer<ChipDatum> WriteOPL4;
 
     public Driver() {
-        this(null);
-    }
-
-    public Driver(IEncoding enc /* = null */) {
-        this.enc = enc != null ? enc : MyEncoding.Default();
     }
 
     public void fadeOut() {

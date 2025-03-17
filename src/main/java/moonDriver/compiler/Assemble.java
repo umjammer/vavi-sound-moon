@@ -2,6 +2,7 @@ package moonDriver.compiler;
 
 import java.lang.System.Logger;
 import java.lang.System.Logger.Level;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -9,9 +10,9 @@ import java.util.Map;
 import java.util.Stack;
 
 import dotnet4j.util.compat.Tuple3;
-import moonDriver.common.MyEncoding;
 
 import static java.lang.System.getLogger;
+import static moonDriver.common.Common.charset;
 
 
 public class Assemble {
@@ -490,8 +491,7 @@ public class Assemble {
                     }
                     i = j;
 
-                    MyEncoding enc = new MyEncoding();
-                    byte[] ary = enc.GetSjisArrayFromString(x);
+                    byte[] ary = x.getBytes(charset);
                     for (byte b : ary) wd.add(b);
                     continue;
                 }

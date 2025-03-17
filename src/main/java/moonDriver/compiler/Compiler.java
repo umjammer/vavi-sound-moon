@@ -16,17 +16,17 @@ import dotnet4j.io.SeekOrigin;
 import dotnet4j.io.Stream;
 import dotnet4j.io.StreamReader;
 import dotnet4j.util.compat.Tuple;
-import moonDriver.common.IEncoding;
-import moonDriver.common.MyEncoding;
+import moonDriver.common.Common;
 import musicDriverInterface.CompilerInfo;
 import musicDriverInterface.GD3Tag;
 import musicDriverInterface.ICompiler;
 import musicDriverInterface.MmlDatum;
 
+import static moonDriver.common.Common.charset;
+
 
 public class Compiler implements ICompiler {
 
-    public IEncoding enc = null;
     public String[] args = null;
     public String[] env;
     private String[] getEnv() { return env; }
@@ -45,11 +45,6 @@ public class Compiler implements ICompiler {
     public Mck mck = null;
 
     public Compiler() {
-        this(null);
-    }
-
-    public Compiler(IEncoding enc /* = null */) {
-        this.enc = enc == null ? MyEncoding.Default() : enc;
     }
 
     public void init() {
@@ -72,7 +67,7 @@ public class Compiler implements ICompiler {
             }
             ms.seek(0, SeekOrigin.Begin);
 
-            try (StreamReader sr = new StreamReader(ms, Charset.forName("Shift_JIS"))) {
+            try (StreamReader sr = new StreamReader(ms, charset)) {
                 srcBuf = sr.readToEnd();
             } catch (IOException e) {
                 throw new dotnet4j.io.IOException(e);

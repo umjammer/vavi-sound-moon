@@ -2,14 +2,15 @@ package moonDriver.compiler;
 
 import java.lang.System.Logger;
 import java.lang.System.Logger.Level;
+import java.nio.charset.Charset;
 import java.util.List;
 
 import dotnet4j.io.File;
 import dotnet4j.io.Path;
 import dotnet4j.util.compat.StringUtilities;
-import moonDriver.common.MyEncoding;
 
 import static java.lang.System.getLogger;
+import static moonDriver.common.Common.charset;
 
 
 public class PcmPack {
@@ -54,8 +55,7 @@ public class PcmPack {
                 for (int i = 0; i < 0x40; i++) {
                     fn[i] = (byte) destBuf.get(m.header + i).dat;
                 }
-                MyEncoding enc = new MyEncoding();
-                m.pcmname = enc.GetStringFromSjisArray(fn);
+                m.pcmname = new String(fn, charset);
             }
 
             // PCM setting value
