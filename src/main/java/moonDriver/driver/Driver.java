@@ -156,11 +156,11 @@ public class Driver implements IDriver {
         //if (!StringUtilities.isNullOrEmpty(pmd.pw.ppz1File) || !StringUtilities.isNullOrEmpty(pmd.pw.ppz2File)) pmd.pcmload.ppz_load(pmd.pw.ppz1File, pmd.pw.ppz2File);
     }
 
-    public void init(String fileName
-            , Consumer<ChipDatum> chipWriteRegister
-            , BiConsumer<Long, Integer> chipWaitSend
-            , MmlDatum[] srcBuf
-            , Object additionalOption) {
+    public void init(String fileName,
+                     Consumer<ChipDatum> chipWriteRegister,
+                     BiConsumer<Long, Integer> chipWaitSend,
+                     MmlDatum[] srcBuf,
+                     Object additionalOption) {
         if (srcBuf == null || srcBuf.length < 1) return;
 
         Driver.srcBuf = srcBuf;

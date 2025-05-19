@@ -112,17 +112,14 @@ class Program {
                 // The default is the source file name with the extension changed to .MDR.
                 String destFileName = "";
                 if (!StringUtilities.isNullOrEmpty(srcFile)) {
-                    destFileName = Path.combine(Path.getDirectoryName(Path.getFullPath(srcFile))
-                            , String.format("%s%s"
-                                    , Path.getFileNameWithoutExtension(srcFile)
-                                    , Common.objExtension)
+                    destFileName = Path.combine(Path.getDirectoryName(Path.getFullPath(srcFile)),
+                            String.format("%s%s", Path.getFileNameWithoutExtension(srcFile), Common.objExtension)
                     );
                 }
 
                 compiler.work.in_name = srcFile;
-                compiler.work.out_name = Path.combine(Path.getDirectoryName(Path.getFullPath(srcFile)), String.format("%s%s"
-                        , Path.getFileNameWithoutExtension(srcFile)
-                        , ".h"));
+                compiler.work.out_name = Path.combine(Path.getDirectoryName(Path.getFullPath(srcFile)),
+                        String.format("%s%s", Path.getFileNameWithoutExtension(srcFile), ".h"));
                 compiler.work.ef_name = Path.combine(Path.getDirectoryName(Path.getFullPath(srcFile)), compiler.work.ef_name);
                 compiler.work.inc_name = Path.combine(Path.getDirectoryName(Path.getFullPath(srcFile)), compiler.work.inc_name);
 
@@ -151,16 +148,12 @@ class Program {
                 if (!StringUtilities.isNullOrEmpty(outFileName)) {
                     if (outFileName.charAt(0) != '.') {
                         // When specifying a file name
-                        destFileName = Path.combine(
-                                Path.getDirectoryName(Path.getFullPath(srcFile))
-                                , outFileName);
+                        destFileName = Path.combine(Path.getDirectoryName(Path.getFullPath(srcFile)), outFileName);
                     } else {
                         // When specifying the extension only
                         destFileName = Path.combine(
-                                Path.getDirectoryName(Path.getFullPath(srcFile))
-                                , String.format("%s%s"
-                                        , Path.getFileNameWithoutExtension(srcFile)
-                                        , outFileName));
+                                Path.getDirectoryName(Path.getFullPath(srcFile)),
+                                String.format("%s%s", Path.getFileNameWithoutExtension(srcFile), outFileName));
                     }
                 }
 
@@ -189,7 +182,8 @@ class Program {
                     }
                 }
             } else {
-                String destFileName = Path.combine(Path.getDirectoryName(Path.getFullPath(srcFile)), String.format("%d.xml", Path.getFileNameWithoutExtension(srcFile)));
+                String destFileName = Path.combine(Path.getDirectoryName(Path.getFullPath(srcFile)),
+                        String.format("%s.xml", Path.getFileNameWithoutExtension(srcFile)));
                 if (desFile != null) {
                     destFileName = desFile;
                 }

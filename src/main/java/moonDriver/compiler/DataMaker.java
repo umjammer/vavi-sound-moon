@@ -3816,23 +3816,23 @@ on_error:
                         fp.add(new MmlDatum2(String.format("\tdw\t${0:x04}\n", s), -1, (byte) s, -1, (byte) (s >> 8)));
                         s = (short) (tbl[i][k + 3] & 0xffff);
                         fp.add(new MmlDatum2(String.format("\tdw\t%d\n", s), -1, (byte) s, -1, (byte) (s >> 8)));
-                        fp.add(new MmlDatum2(String.format("\tdb\t%02x,%02x,%02x,%02x,%02x\n"
-                                , tbl[i][k + 4] & 0xff
-                                , tbl[i][k + 5] & 0xff
-                                , tbl[i][k + 6] & 0xff
-                                , tbl[i][k + 7] & 0xff
-                                , tbl[i][k + 8] & 0xff
-                        )
-                                , -1
-                                , tbl[i][k + 4] & 0xff
-                                , -1
-                                , tbl[i][k + 5] & 0xff
-                                , -1
-                                , tbl[i][k + 6] & 0xff
-                                , -1
-                                , tbl[i][k + 7] & 0xff
-                                , -1
-                                , tbl[i][k + 8] & 0xff
+                        fp.add(new MmlDatum2(String.format("\tdb\t%02x,%02x,%02x,%02x,%02x\n",
+                                tbl[i][k + 4] & 0xff,
+                                tbl[i][k + 5] & 0xff,
+                                tbl[i][k + 6] & 0xff,
+                                tbl[i][k + 7] & 0xff,
+                                tbl[i][k + 8] & 0xff
+                        ),
+                                -1,
+                                tbl[i][k + 4] & 0xff,
+                                -1,
+                                tbl[i][k + 5] & 0xff,
+                                -1,
+                                tbl[i][k + 6] & 0xff,
+                                -1,
+                                tbl[i][k + 7] & 0xff,
+                                -1,
+                                tbl[i][k + 8] & 0xff
                         ));
                     }
                 }
@@ -3977,13 +3977,13 @@ on_error:
         for (int i = 0; i < max; i++) {
             byte b1 = (byte) tbl[i][1];
             byte b2 = (byte) (tbl[i][3] | 0x80);
-            fp.add(new MmlDatum2(String.format("\tdb\t%02x,$84,%02x,$85,$00,$87,$80,$88\n", b1, b2)
-                    , -1, b1, -1, 0x84, -1, b2, -1, 0x85, -1, 0x00, -1, 0x87, -1, 0x80, -1, 0x88));
+            fp.add(new MmlDatum2(String.format("\tdb\t%02x,$84,%02x,$85,$00,$87,$80,$88\n", b1, b2),
+                    -1, b1, -1, 0x84, -1, b2, -1, 0x85, -1, 0x00, -1, 0x87, -1, 0x80, -1, 0x88));
             b1 = (byte) tbl[i][4];
             b2 = (byte) (tbl[i][2] & 0x00ff);
             byte b3 = (byte) ((tbl[i][2] % 0x0f00) >> 8);
-            fp.add(new MmlDatum2(String.format("\tdb\t%02x,$86,%02x,$87,%02x,$ff,$00,$00\n", b1, b2, b3)
-                    , -1, b1, -1, 0x86, -1, b2, -1, 0x87, -1, b3, -1, 0xff, -1, 0x00, -1, 0x00));
+            fp.add(new MmlDatum2(String.format("\tdb\t%02x,$86,%02x,$87,%02x,$ff,$00,$00\n", b1, b2, b3),
+                    -1, b1, -1, 0x86, -1, b2, -1, 0x87, -1, b3, -1, 0xff, -1, 0x00, -1, 0x00));
         }
     }
 
@@ -4019,8 +4019,8 @@ on_error:
             } else {
                 // Output dummy data
                 for (int j = 0; j < 4; j++) {
-                    fp.add(new MmlDatum2("\tdb\t$00,$00,$00,$00,$00,$00,$00,$00\n"
-                            , -1, 0x00, -1, 0x00, -1, 0x00, -1, 0x00, -1, 0x00, -1, 0x00, -1, 0x00, -1, 0x00));
+                    fp.add(new MmlDatum2("\tdb\t$00,$00,$00,$00,$00,$00,$00,$00\n",
+                            -1, 0x00, -1, 0x00, -1, 0x00, -1, 0x00, -1, 0x00, -1, 0x00, -1, 0x00, -1, 0x00));
                 }
             }
         }
@@ -7393,8 +7393,8 @@ on_error:
                         byte b2 = (byte) pitch_mod_tbl[i][2];
                         byte b3 = (byte) pitch_mod_tbl[i][3];
                         byte b4 = (byte) pitch_mod_tbl[i][4];
-                        efFp.add(new MmlDatum2(String.format("\tdb\t$%02x,$%02x,$%02x,$%02x\n", b1, b2, b3, b4)
-                                , -1, b1, -1, b2, -1, b3, -1, b4));
+                        efFp.add(new MmlDatum2(String.format("\tdb\t$%02x,$%02x,$%02x,$%02x\n", b1, b2, b3, b4),
+                                -1, b1, -1, b2, -1, b3, -1, b4));
                     } else {
                         efFp.add(new MmlDatum2("\tdb\t$00,$00,$00,$00\n", -1, 0x00, -1, 0x00, -1, 0x00, -1, 0x00));
                     }

@@ -218,12 +218,12 @@ public class Program {
             logger.log(Level.INFO, "");
 
             ((Driver) drv).init(
-                    srcFile
-                    , Program::OPL4Write
-                    , SamplingRate
-                    , dop
-                    , pop.toArray(String[]::new)
-                    , Program::appendFileReaderCallback
+                    srcFile,
+                    Program::OPL4Write,
+                    SamplingRate,
+                    dop,
+                    pop.toArray(String[]::new),
+                    Program::appendFileReaderCallback
             );
 
 //            // When AUTO is specified, the configuration will change, so the volume will be set after receiving the configuration information.
@@ -242,13 +242,13 @@ public class Program {
             if (tags != null) {
                 for (Tuple<String, String> tag : tags) {
                     if (Objects.equals(tag.getItem1(), "")) continue;
-                    logger.log(Level.INFO, String.format("{0,-16} : %d", tag.getItem1(), tag.getItem2()), 16 + 3);
+                    logger.log(Level.INFO, "%-16s : %s".formatted(tag.getItem1(), tag.getItem2()), 16 + 3);
                 }
             }
 
             logger.log(Level.INFO, "");
 
-            drv.startRendering((int) SamplingRate, new Tuple[] {new Tuple<>("YMF278B", opl4MasterClock)});
+            drv.startRendering(SamplingRate, new Tuple<>("YMF278B", opl4MasterClock));
 
             drv.startMusic(0);
 
@@ -332,19 +332,12 @@ public class Program {
     }
 
     private static Stream appendFileReaderCallback(String arg) {
-        String fn;
-        fn = Path.combine(
-                Path.getDirectoryName(srcFile)
-                , arg
-        );
+        String fn = Path.combine(Path.getDirectoryName(srcFile), arg);
 
         if (envMoonDriver != null) {
             int i = 0;
             while (!File.exists(fn) && i < envMoonDriver.length) {
-                fn = Path.combine(
-                        envMoonDriver[i++]
-                        , arg
-                );
+                fn = Path.combine(envMoonDriver[i++], arg);
             }
         }
 
@@ -549,10 +542,7 @@ public class Program {
         if (dat != null && dat.additionalData != null) {
             MmlDatum md = (MmlDatum) dat.additionalData;
             if (md.linePos != null) {
-                logger.log(Level.TRACE, String.format("! r%d c%d"
-                        , md.linePos.row
-                        , md.linePos.col
-                ));
+                logger.log(Level.TRACE, "! r%d c%d".formatted(md.linePos.row, md.linePos.col));
             }
         }
 
