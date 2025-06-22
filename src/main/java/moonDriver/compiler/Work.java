@@ -23,9 +23,6 @@ public class Work {
     public int include_flag = 0;
     public int mml_num = 0;
 
-    // Moved from version.c
-    public int message_flag = Version.LANGUAGE; // Display message output setting (0:Jp 1:En)
-
     String srcBuf;
 
     public String getSrcBuf() {

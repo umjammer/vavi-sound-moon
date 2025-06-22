@@ -868,9 +868,6 @@ public class DataMaker {
      */
     private void dispError(int no, String file, int line) {
         no = no * 2;
-        if (wk.message_flag != 0) {
-            no++;
-        }
         if (!StringUtilities.isNullOrEmpty(file)) {
             logger.log(Level.ERROR, "%d {1:D6}: %d\r\n", file, line, ErrorlMessage[no]);
         } else {
@@ -890,9 +887,6 @@ public class DataMaker {
     private void dispWarning(int no, String file, int line) {
         if (wk.warning_flag != 0) {
             no = no * 2;
-            if (wk.message_flag != 0) {
-                no++;
-            }
             if (!StringUtilities.isNullOrEmpty(file)) {
                 logger.log(Level.WARNING, "%d {1:D6}: %d\r\n", file, line, WarningMessage[no]);
             } else {
@@ -938,7 +932,7 @@ public class DataMaker {
             }
         }
         if (within_com != 0) {
-            logger.log(Level.WARNING, wk.message_flag != 0 ? "Reached EOF in comment" : "End of file reached with unclosed comment");
+            logger.log(Level.WARNING, "Reached EOF in comment");
         }
 
         buf = sb.toString();
@@ -7522,11 +7516,7 @@ on_error:
             for (i = 0; i < _TRACK_MAX; i++) {
                 if (bank_sel[i] != -1 && auto_bankswitch == 0) {
                     if (trk_flag[i] == 0) {
-                        if (wk.message_flag == 0) {
-                            logger.log(Level.WARNING, String.format("Warning: #SETBANK for unused track (%c) ignored", str_track.charAt(i)));
-                        } else {
-                            logger.log(Level.WARNING, String.format("Warning: Ignored #SETBANK on unused track(%c)", str_track.charAt(i)));
-                        }
+                        logger.log(Level.WARNING, "#SETBANK for unused track (%c) ignored".formatted(str_track.charAt(i)));
                     } else if ((bank_sel[i] == 2 || bank_sel[i] == 3) && dpcm_bankswitch != 0) {
                         dispError(enmErrNum.CANT_USE_BANK_2_OR_3_WITH_DPCMBANKSWITCH.ordinal(), null, 0);
                     } else {
