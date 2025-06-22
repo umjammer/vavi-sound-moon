@@ -9,6 +9,7 @@ import java.util.function.Function;
 
 import dotnet4j.io.MemoryStream;
 import dotnet4j.io.Stream;
+import mpg.MPGLib.buf;
 import musicDriverInterface.MmlDatum;
 import vavi.util.ByteUtil;
 
@@ -64,6 +65,25 @@ public class Common {
             List<Byte> lst = new ArrayList<>();
             for (; buf[index[0]].dat != 0; index[0]++) {
                 lst.add((byte) buf[index[0]].dat);
+            }
+
+            String n = new String(ByteUtil.toByteArray(lst), charset);
+            index[0]++;
+
+            return n;
+        } catch (Exception e) {
+            logger.log(Level.ERROR, e.getMessage(), e);
+        }
+        return "";
+    }
+
+    public static String getNRDString(byte[]buf, /* ref */ int[] index) {
+        if (buf == null || buf.length < 1 || index[0] < 0 || index[0] >= buf.length) return "";
+
+        try {
+            List<Byte> lst = new ArrayList<>();
+            for (; buf[index[0]] != 0; index[0]++) {
+                lst.add((byte) buf[index[0]]);
             }
 
             String n = new String(ByteUtil.toByteArray(lst), charset);
