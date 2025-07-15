@@ -112,7 +112,7 @@ public class Program {
     private static String[] envMoonDriverOpt = null;
     private static String srcFile = null;
 
-    static int Main(String[] args) {
+    public static void main(String[] args) {
         int fnIndex = analyzeOption(args);
         int mIndex = -1;
 
@@ -127,15 +127,15 @@ public class Program {
         }
 
         if (mIndex < 0) {
-            logger.log(Level.INFO, String.format("at least one argument is needed (%d file)...", Common.objExtension));
-            return -1;
+            System.err.printf("at least one argument is needed (%s file)...".formatted(Common.objExtension));
+            System.exit(-1);
         }
 
         srcFile = args[mIndex];
 
         if (!File.exists(args[mIndex])) {
-            logger.log(Level.ERROR, String.format("File [%d] not found", args[mIndex]));
-            return -1;
+            System.err.printf("File [%s] not found".formatted(args[mIndex]));
+            System.exit(-1);
         }
 
 //        rsc = CheckDevice();
@@ -320,7 +320,7 @@ public class Program {
 //            }
         }
 
-        return 0;
+        System.exit(0);
     }
 
     public static String getApplicationFolder() {
@@ -498,7 +498,7 @@ public class Program {
 
             }
         } catch (Exception ex) {
-            logger.log(Level.ERROR, String.format("%d %d", ex.getMessage(), ex.getStackTrace()));
+            logger.log(Level.ERROR, "%d %d".formatted(ex.getMessage(), ex.getStackTrace()));
         }
 
         return count;
@@ -548,7 +548,7 @@ public class Program {
 
 //#if DEBUG
         //if (dat.address == 0x29)
-        logger.log(Level.INFO, String.format("FM P%d Out:Adr[{0:x02}] val[{1:x02}]", (int) dat.address, (int) dat.data, dat.port));
+        logger.log(Level.INFO, "FM P%d Out:Adr[{0:x02}] val[{1:x02}]".formatted((int) dat.address, (int) dat.data, dat.port));
 //#endif
 
         switch (device) {

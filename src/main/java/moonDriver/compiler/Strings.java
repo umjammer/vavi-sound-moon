@@ -7,10 +7,9 @@ public class Strings {
 
     /**
      * Skip spaces/tabs
-     * Input:
-     * char	*ptr		:Data Storage Pointer
-     * Output:
-     * char	*ptr		;Pointer after skip
+     *
+     * @param buf Data Storage Pointer
+     * @return Pointer after skip
      */
     public int skipSpaceOld(String buf, int ptr) {
         while (ptr < buf.length() && buf.charAt(ptr) != '\0') {
@@ -126,29 +125,26 @@ public class Strings {
 
     /**
      * Convert string to number
-     * Input:
-     * <p>
-     * Output:
      */
-    public int Asc2Int(String buf, int ptr, /* ref */ int cnt) {
+    public int asc2Int(String buf, int ptr, /* ref */ int[] cnt) {
         int num;
         char c;
         int minus_flag = 0;
 
         num = 0;
-        cnt = 0;
+        cnt[1] = 0;
 
         if (buf.charAt(ptr) == '-') {
             minus_flag = 1;
             ptr++;
-            cnt++;
+            cnt[0]++;
         }
         switch (buf.charAt(ptr)) {
             // Hexadecimal
             case 'x':
             case '$':
                 ptr++;
-                cnt++;
+                cnt[0]++;
                 while (true) {
                     c = String.valueOf(Character.toUpperCase(buf.charAt(ptr))).charAt(0);
                     if ('0' <= c && c <= '9') {
@@ -158,21 +154,21 @@ public class Strings {
                     } else {
                         break;
                     }
-                    cnt++;
+                    cnt[0]++;
                     ptr++;
                 }
                 break;
             // Binary numbers
             case '%':
                 ptr++;
-                cnt++;
+                cnt[0]++;
                 while (true) {
                     if ('0' <= buf.charAt(ptr) && buf.charAt(ptr) <= '1') {
                         num = num * 2 + (buf.charAt(ptr) - '0');
                     } else {
                         break;
                     }
-                    cnt++;
+                    cnt[0]++;
                     ptr++;
                 }
                 break;
@@ -184,7 +180,7 @@ public class Strings {
                     } else {
                         break;
                     }
-                    cnt++;
+                    cnt[0]++;
                     ptr++;
                 }
                 break;

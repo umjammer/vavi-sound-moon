@@ -108,7 +108,10 @@ public class Driver implements IDriver {
                      MoonDriverJavaOption dop, String[] vs, Function<String, Stream> appendFileReaderCallback) {
         if (!Path.getExtension(fileName).equalsIgnoreCase(".xml")) {
             byte[] srcBuf = File.readAllBytes(fileName);
-            if (srcBuf == null || srcBuf.length < 1) return;
+            if (srcBuf == null || srcBuf.length < 1) {
+                logger.log(Level.WARNING, "empty source");
+                return;
+            }
             init(fileName, srcBuf, oPNAWrite, sampleRate,
                     dop, vs,
                     appendFileReaderCallback == null ? createAppendFileReaderCallback(Path.getDirectoryName(fileName)) : appendFileReaderCallback
@@ -127,8 +130,8 @@ public class Driver implements IDriver {
 
     @Override
     public void init(List<ChipAction> list, MmlDatum[] mmlData, Function<String, Stream> function, Object... objects) {
-        if (srcBuf != null && srcBuf.length >= 1) {
-            Driver.srcBuf = srcBuf;
+        if (mmlData != null && mmlData.length >= 1) {
+            Driver.srcBuf = mmlData;
             writeOPL4 = list.get(0)::writeRegister;
             String path = (String) objects[0];
             double sampleRate = (double) objects[1];
@@ -164,7 +167,7 @@ logger.log(Level.WARNING, "empty source");
             return;
         }
         List<MmlDatum> bl = new ArrayList<>();
-        for (byte b : srcBuf) bl.add(new MmlDatum(b));
+        for (byte b : srcBuf) bl.add(new MmlDatum(b & 0xff));
         init(fileName, bl.toArray(MmlDatum[]::new), opnaWrite, sampleRate,
                 additionalPMDDotNETOption, additionalPMDOption, appendFileReaderCallback);
     }

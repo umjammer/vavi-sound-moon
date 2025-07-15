@@ -3,16 +3,15 @@ package moonDriver.compiler;
 
 import java.lang.System.Logger;
 import java.lang.System.Logger.Level;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.ResourceBundle;
 import java.util.function.Function;
 
 import dotnet4j.io.File;
 import dotnet4j.io.Path;
 import dotnet4j.util.compat.StringUtilities;
 import musicDriverInterface.CompilerInfo;
-import net.sf.saxon.functions.Count;
 
 import static java.lang.System.getLogger;
 import static moonDriver.common.Common.charset;
@@ -21,6 +20,8 @@ import static moonDriver.common.Common.charset;
 public class DataMaker {
 
     private static final Logger logger = getLogger(DataMaker.class.getName());
+
+    ResourceBundle rb = ResourceBundle.getBundle("lang/message");
 
     private final Compiler compiler;
     private final Work wk;
@@ -295,80 +296,6 @@ public class DataMaker {
         COMMAND_REDUNDANT,
     }
 
-    // Error String
-    // TODO make it resource bundle, vavi created properties already, see src/main/resources/lang
-    private String[] ErrorlMessage = {
-            "指定のコマンドはありません", "Command not defined",
-            "ループ深度が0以外でデータが終了しました", "Data ended by loop depth except 0",
-            "設定に誤りがあります", "Definition is wrong",
-            "PSG音色設定に誤りがあります", "PSG Tone definition is wrong",
-            "エンベロープ設定に誤りがあります", "Envelope definition is wrong",
-            "ピッチエンベロープ設定に誤りがあります", "Pitch envelope definition is wrong",
-            "ノートエンベロープ設定に誤りがあります", "Note envelope definition is wrong",
-            "LFO設定に誤りがあります", "LFO definition is wrong",
-            "DPCM設定に誤りがあります", "DPCM definition is wrong",
-            "DPCM設定のパラメータが足りません", "DPCM parameter is lacking",
-            "FM音色設定に誤りがあります", "FM tone definition is wrong",
-            "FM用音色のパラメータが異常です", "Abnormal parameters of FM tone",
-            "namco106音色設定に誤りがあります", "namco106 tone definition is wrong",
-            "namco106用音色のパラメータが異常です", "Abnormal parameters of namco106 tone",
-            "繰り返し回数の値が異常です", "Abnormal value of repeat count",
-            "音色番号が異常です", "Abnormal tone number",
-            "エンベロープ番号が異常です", "Abnormal envelope number",
-            "エンベロープの値が異常です", "Abnormal envelope value",
-            "ピッチエンベロープ番号の値が異常です", "Abnormal pitch envelope number",
-            "ノートエンベロープ番号の値が異常です", "Abnormal note envelope number",
-            "LFO番号の値が異常です", "Abnormal LFO number",
-            "音程の値が異常です", "Abnormal pitch value",
-            "音量の値が異常です", "Abnormal volume value",
-            "テンポの値が異常です", "Abnormal tempo value",
-            "クォンタイズの値が異常です", "Abnormal quantize value",
-            "シャッフルクォンタイズの値が異常です", "Abnormal shuffle quantize value",
-            "スイープの値が異常です", "Abnormal sweep value",
-            "ディチューンの値が異常です", "Abnormal detune value",
-            "ピッチシフト量の値が異常です", "Abnormal pitch shift amount value",
-
-            "コマンド後のノートが異常です", "Abnormal note after command",
-
-            "音量が指定されていない状態で相対音量を使用しました", "Relative volume was used without specifying volume",
-            "相対音量(+)で音量の範囲を超えました", "Volume range over(+) of relative volume",
-            "相対音量(-)で音量の範囲を超えました", "Volume range under(-) of relative volume",
-            "連符処理の途中でデータが終了しました", "Data ended by Continuation note",
-            "DPCMファイルがありません", "DPCM file not found",
-            "DPCMデータのサイズが4081byteを超えました", "DPCM file size over",
-            "DPCMデータのサイズが規定のサイズを超えました", "DPCM file total size over",
-            "指定のトラックヘッダは無効です", "Invalid track header",
-            "ハードウェアエフェクト設定に誤りがあります。", "Hardware effect definition is wrong",
-            "エフェクト波形設定に誤りがあります。", "Effect wavetable definition is wrong",
-            "ハードウェアエフェクト番号の値が異常です。", "Abnormal hardware effect number",
-            "トランスポーズの値が異常です", "Abnormal transpose value",
-            "連符の{}の中に音符がありません", "Tuplet {} empty",
-            "バンクが範囲を超えました", "Bank index out of range",
-            "音長が負の値です(unexpected error)", "Frame length is negative value (unexpected error)",
-            "音長の値が異常です", "Abnormal note length value",
-            "設定のパラメータが足りません", "Parameter is lacking",
-            "セルフディレイの値が異常です", "Abnormal self-delay value",
-            "DPCMサイズが0x4000を超える場合はバンク2と3は使用できません", "Cannot use bank 2 or 3 if DPCM size is greater than 0x4000",
-            "#PITCH-CORRECTIONを指定しない限りピッチシフト量コマンドは使用できません", "Cannot use SA<num> without #PITCH-CORRECTION",
-            "このトラックでは使用できないコマンドです", "Unuse command in this track",
-
-            "WaveTable音色設定に誤りがあります", "WaveTable tone definition is wrong",
-            "WaveTable用音色のパラメータが異常です", "Abnormal parameters of WaveTable tone",
-            "XPCM設定に誤りがあります", "XPCM definition is wrong",
-            "XPCM設定のパラメータが足りません", "XPCM parameter is lacking",
-            "XPCMファイルがありません", "XPCM file not found",
-            "XPCMデータのサイズが8192byteを超えました", "XPCM file size over",
-            "XPCMデータのサイズが規定のサイズを超えました", "XPCM file total size over",
-            "FMLFOパラメータに誤りがあります", "FMLFO parameter is wrong",
-
-            "ToneTable設定に誤りがあります", "ToneTable definition is wrong",
-            "ToneTableパラメータが異常です", "Abnormal parameters of ToneTable",
-
-            "パラメータが異常です", "Abnormal parameters",
-
-            "コマンドが重複しています", "Command is redundant",
-    };
-
     private enum enmSys {
         TOO_MANY_INCLUDE_FILES,
         FRAME_LENGTH_IS_0,
@@ -379,12 +306,6 @@ public class DataMaker {
     }
 
     private String[] WarningMessage = new String[] {
-            "インクルードファイルの数が多すぎます", "Too many include files",
-            "フレーム音長が0になりました。", "frame length is 0",
-            "リピート2のフレーム誤差が3フレームを超えています。", "Repeat2 frame error over 3 frames",
-            "#BANK-CHANGE使用時は#SETBANK, NBは無視します", "Ignoring #SETBANK and NB if #BANK-CHANGE used",
-            "定義番号が重複しています", "This definition number is already used",
-            "DPCMサイズ mod 16 が1ではありません", "DPCM size mod 16 is not 1",
     };
 
     /**
@@ -869,13 +790,12 @@ public class DataMaker {
     private void dispError(int no, String file, int line) {
         no = no * 2;
         if (!StringUtilities.isNullOrEmpty(file)) {
-            logger.log(Level.ERROR, "%d {1:D6}: %d\r\n", file, line, ErrorlMessage[no]);
+            logger.log(Level.ERROR, "%s %6d: %s".formatted(file, line, rb.getString("error." + no)));
         } else {
-            logger.log(Level.ERROR, "%d\n", ErrorlMessage[no]);
+            logger.log(Level.ERROR, "%s".formatted(rb.getString("error." + no)));
         }
         error_flag = 1;
     }
-
 
     /**
      * Warning Display
@@ -888,20 +808,17 @@ public class DataMaker {
         if (wk.warning_flag != 0) {
             no = no * 2;
             if (!StringUtilities.isNullOrEmpty(file)) {
-                logger.log(Level.WARNING, "%d {1:D6}: %d\r\n", file, line, WarningMessage[no]);
+                logger.log(Level.WARNING, "%s %6d: %s".formatted(file, line, rb.getString("warn." + no)));
             } else {
-                logger.log(Level.WARNING, "%d\r\n", WarningMessage[no]);
+                logger.log(Level.WARNING, "%s".formatted(rb.getString("warn." + no)));
             }
         }
     }
 
-
     /**
      * Removed C-type remarks
-     * Input:
-     * char	*ptr		:Data Storage Pointer
-     * Output:
-     * none
+     *
+     * @param buf Data Storage Pointer
      */
     private void deleteCRemark(/* ref */ String buf) {
         StringBuilder sb = new StringBuilder(buf);
@@ -941,10 +858,8 @@ public class DataMaker {
 
     /**
      * Count the number of lines in a file
-     * Input:
-     * char	*data		:Data Storage Pointer
-     * Output:
-     * none
+     *
+     * @param buf Data Storage Pointer
      */
     private int getLineCount(/* ref */ int ptr, String buf) {
         int line;
@@ -969,7 +884,7 @@ public class DataMaker {
         int line_count;
         int i;
         String filestr;
-        filestr = wk.srcBuf; // System.IO.File.ReadAllText(fname);
+        filestr = wk.srcBuf; // Files.readAllText(fname);
 
         if (StringUtilities.isNullOrEmpty(filestr)) {
             error_flag = 1;
@@ -980,12 +895,12 @@ public class DataMaker {
         deleteCRemark(/* ref */ filestr);
 
         line_count = getLineCount(/* ref */ filestrPtr, filestr);
-        lbuf = new LINE[(line_count + 1)];  /* Allocate a line buffer */
+        lbuf = new LINE[(line_count + 1)]; // Allocate a line buffer
 
         lbuf[0] = new LINE();
-        lbuf[0].status = _HEADER;       /* LINE status[0] was malloc'd	*/
-        lbuf[0].str = filestr;      /* The pointer and size are stored */
-        lbuf[0].ostr = filestr;      /* The pointer and size are stored */
+        lbuf[0].status = _HEADER; // LINE status[0] was malloc'd
+        lbuf[0].str = filestr; // The pointer and size are stored
+        lbuf[0].ostr = filestr; // The pointer and size are stored
         lbuf[0].line = line_count;
         lbuf[0].filename = fname;
         lbuf[0].shortname = fname_short;
@@ -1007,26 +922,32 @@ public class DataMaker {
         return lbuf;
     }
 
-    //typedef struct st_line
+    // struct st_line
     public static class LINE {
 
-        public String filename;/* File name */
-        public String shortname;/* Short file name */
-        public int line;        /* Line number */
-        public int status;      /* Line status (see define below) */
-        public int param;       /* Parameter (tone/track number etc.) */
-        public String str;      /* Line String */
-        public LINE[] inc_ptr;    /* Include File Data Pointer */
+        /** File name */
+        public String filename;
+        /** Short file name */
+        public String shortname;
+        /** Line number */
+        public int line;
+        /** Line status (see define below) */
+        public int status;
+        /** Parameter (tone/track number etc.) */
+        public int param;
+        /** Line String */
+        public String str;
+        /** Include File Data Pointer */
+        public LINE[] inc_ptr;
 
-        public String ostr;     /* Original line string */
+        /** Original line string */
+        public String ostr;
     }
 
     /**
      * Set newline/EOF to 0 (NULL) (split buffer into lines)
-     * Input:
-     * char	*ptr	:Data Storage Pointer
-     * Output:
-     * none
+     *
+     * @param buf Data Storage Pointer
      */
     private int changeNULL(int ptr, /* ref */ String buf) {
         StringBuilder sb = new StringBuilder(buf);
@@ -1051,21 +972,22 @@ public class DataMaker {
      * @HOGE¥s*(¥d+)¥s*(=|)¥s*{.*?(}.*|)$
      */
     private int setEffectSub(LINE[] lptr, int line, /* ref */ int ptr_status_end_flag, int min, int max, int error_no) {
-        int param, cnt = 0;
+        int param;
+        int[] cnt = new int[] {0};
         String temp;
         int tempPtr = 0;
         temp = lptr[line].str;
         tempPtr = str.skipSpace(lptr[line].str, 0);
-        param = str.Asc2Int(temp, tempPtr, /* ref */ cnt);
+        param = str.asc2Int(temp, tempPtr, /* ref */ cnt);
 on_error:
         {
-            if (cnt == 0)
+            if (cnt[0] == 0)
                 break on_error;
             if (param < min || max <= param)
                 break on_error;
 
             lptr[line].param = param;
-            tempPtr = str.skipSpace(temp, tempPtr + cnt);
+            tempPtr = str.skipSpace(temp, tempPtr + cnt[0]);
 
             if (temp.charAt(tempPtr) == '=') {
                 tempPtr++;
@@ -1125,14 +1047,13 @@ on_error:
 
     /**
      * Request a header
-     * Input:
-     * char	*ptr	:Data Storage Pointer
-     * Output:
-     * none
+     *
+     * @param lbuf Data Storage Pointer
      */
     private void getLineStatus(LINE[] lbuf, int inc_nest) {
 
-        int line, i, param, cnt, track_flag, status_end_flag, bank, bank_ch;
+        int line, i, param, track_flag, status_end_flag, bank, bank_ch;
+        int[] cnt = new int[] {0};
         String temp, temp2;
         int tempPtr;
         int temp2Ptr;
@@ -1306,7 +1227,6 @@ on_error:
                         opl4_track_num = 0;
                         break;
 
-
 //                    // Namco106 sound source
 //                    case _SET_N106_TONE:
 //                        setEffectSub(lptr, line, & status_end_flag, 0, _N106_TONE_MAX, N106_TONE_DEFINITION_IS_WRONG.ordinal());
@@ -1380,9 +1300,9 @@ on_error:
                     case _AUTO_BANKSWITCH:
                         temp = lbuf[lptr + line].str;
                         tempPtr = str.skipSpaceOld(lbuf[line].str, lptr); // Try not to skip the '/'
-                        cnt = 0;
-                        param = str.Asc2Int(temp, tempPtr, /* ref */ cnt);
-                        if (cnt != 0 && (0 <= param && param <= 8192)) {
+                        cnt[0] = 0;
+                        param = str.asc2Int(temp, tempPtr, /* ref */ cnt);
+                        if (cnt[0] != 0 && (0 <= param && param <= 8192)) {
                             // Only activate the first time
                             if (auto_bankswitch == 0) {
                                 bank_usage[0] = 8192 - param;
@@ -1568,7 +1488,7 @@ on_error:
                         tempPtr = str.skipSpaceOld(lbuf[line].str, lptr);
                         temp = temp.substring(tempPtr).trim().toUpperCase();
                         pcm_pack = false;
-                        if (temp == "ON") {
+                        if (temp.equals("ON")) {
                             pcm_pack = true;
                         }
                         break;
@@ -1577,9 +1497,9 @@ on_error:
                     case _OCTAVE_REV:
                         temp = lbuf[line].str;
                         tempPtr = str.skipSpace(lbuf[line].str, lptr);
-                        cnt = 0;
-                        param = str.Asc2Int(temp, tempPtr, /* ref */ cnt);
-                        if (cnt != 0) {
+                        cnt[0] = 0;
+                        param = str.asc2Int(temp, tempPtr, /* ref */ cnt);
+                        if (cnt[0] != 0) {
                             if (param == 0) {
                                 octave_flag = 0;
                             } else {
@@ -1593,9 +1513,9 @@ on_error:
                     case _GATE_DENOM:
                         temp = lbuf[line].str;
                         tempPtr = str.skipSpace(lbuf[line].str, lptr);
-                        cnt = 0;
-                        param = str.Asc2Int(temp, tempPtr, /* ref */ cnt);
-                        if (cnt != 0 && param > 0) {
+                        cnt[0] = 0;
+                        param = str.asc2Int(temp, tempPtr, /* ref */ cnt);
+                        if (cnt[0] != 0 && param > 0) {
                             gate_denom = param;
                         } else {
                             dispError(enmErrNum.DEFINITION_IS_WRONG.ordinal(), lbuf[lptr + line].filename, line);
@@ -1629,17 +1549,16 @@ on_error:
 
     /**
      * Acquiring a tone
-     * Input:
-     * <p>
-     * Output:
-     * none
+     *
+     * @param lptr
      */
     private void getTone(LINE[] lptr) {
-        int line, i, no, end_flag, offset, num, cnt;
+        int line, i, no, end_flag, offset, num;
+        int[] cnt = new int[1];
         String ptrs;
         int ptr;
 
-        cnt = 0;
+        cnt[0] = 0;
 
         for (line = 1; line < lptr.length; line++) { // lptr[line].line; line++)
             // It's a tone definition, but an error occurs when using _SAME_LINE.
@@ -1704,13 +1623,13 @@ on_error:
                         }
                         break;
                     default:
-                        num = str.Asc2Int(ptrs, ptr, /* ref */ cnt);
+                        num = str.asc2Int(ptrs, ptr, /* ref */ cnt);
                         // Remove restrictions for vrc6 (built-in square wave, MMC5 up to 3)
                         //if( cnt != 0 && (0 <= num && num <= 3) ) {
-                        if (cnt != 0 && (0 <= num && num <= 7)) {
+                        if (cnt[0] != 0 && (0 <= num && num <= 7)) {
                             tone_tbl[no][i] = num;
                             tone_tbl[no][0]++;
-                            ptr += cnt;
+                            ptr += cnt[0];
                             i++;
                         } else {
                             dispError(enmErrNum.TONE_DEFINITION_IS_WRONG.ordinal(), lptr[line + offset].filename, line);
@@ -1729,17 +1648,16 @@ on_error:
 
     /**
      * Obtaining an envelope
-     * Input:
-     * <p>
-     * Output:
-     * none
+     *
+     * @param lptr
      */
     void getEnvelope(LINE[] lptr) {
-        int line, i, no, end_flag, offset, num, cnt;
+        int line, i, no, end_flag, offset, num;
+        int[] cnt = new int[1];
         String buf;
         int ptr;
 
-        cnt = 0;
+        cnt[0] = 0;
 
         for (line = 1; line < lptr.length; line++) {
             // Envelope definition, but _SAME_LINE causes an error
@@ -1802,11 +1720,11 @@ on_error:
                             }
                             break;
                         default:
-                            num = str.Asc2Int(buf, ptr, /* ref */ cnt);
-                            if (cnt != 0 && (0 <= num && num <= 127)) {
+                            num = str.asc2Int(buf, ptr, /* ref */ cnt);
+                            if (cnt[0] != 0 && (0 <= num && num <= 127)) {
                                 envelope_tbl[no][i] = num;
                                 envelope_tbl[no][0]++;
-                                ptr += cnt;
+                                ptr += cnt[0];
                                 i++;
                             } else {
                                 dispError(enmErrNum.ENVELOPE_DEFINITION_IS_WRONG.ordinal(), lptr[line + offset].filename, line);
@@ -1833,11 +1751,12 @@ on_error:
      * none
      */
     private void getPitchEnv(LINE[] lptr) {
-        int line, i, no, end_flag, offset, num, cnt;
+        int line, i, no, end_flag, offset, num;
+        int[] cnt = new int[1];
         String buf;
         int ptr;
 
-        cnt = 0;
+        cnt[0] = 0;
 
         for (line = 1; line < lptr.length; line++) {
             // Pitch envelope definition, but _SAME_LINE causes an error
@@ -1903,16 +1822,16 @@ on_error:
                         }
                         break;
                     default:
-                        num = str.Asc2Int(buf, ptr, /* ref */ cnt);
+                        num = str.asc2Int(buf, ptr, /* ref */ cnt);
 
                         // Pitch direction correction
                         if (pitch_correction != 0)
                             num = 0 - num;
 
-                        if (cnt != 0 && (-127 <= num && num <= 126)) {
+                        if (cnt[0] != 0 && (-127 <= num && num <= 126)) {
                             pitch_env_tbl[no][i] = num;
                             pitch_env_tbl[no][0]++;
-                            ptr += cnt;
+                            ptr += cnt[0];
                             i++;
                         } else {
                             dispError(enmErrNum.PITCH_ENVELOPE_DEFINITION_IS_WRONG.ordinal(), lptr[line + offset].filename, line);
@@ -1940,11 +1859,12 @@ on_error:
      * none
      */
     private void getPitchMod(LINE[] lptr) {
-        int line, i, no, end_flag, offset, num, cnt;
+        int line, i, no, end_flag, offset, num;
+        int[] cnt = new int[1];
         String buf;
         int ptr;
 
-        cnt = 0;
+        cnt[0] = 0;
 
         for (line = 1; line < lptr.length; line++) {
             // It's a tone definition, but an error occurs when using _SAME_LINE.
@@ -1998,8 +1918,8 @@ on_error:
                             }
                             break;
                         default:
-                            num = str.Asc2Int(buf, ptr, /* ref */ cnt);
-                            if (cnt != 0) {
+                            num = str.asc2Int(buf, ptr, /* ref */ cnt);
+                            if (cnt[0] != 0) {
                                 switch (i) {
                                     case 1:
                                     case 2:
@@ -2007,7 +1927,7 @@ on_error:
                                         if (0 <= num && num <= 255) {
                                             pitch_mod_tbl[no][i] = num;
                                             pitch_mod_tbl[no][0]++;
-                                            ptr += cnt;
+                                            ptr += cnt[0];
                                             i++;
                                         } else {
                                             dispError(enmErrNum.LFO_DEFINITION_IS_WRONG.ordinal(), lptr[line + offset].filename, line);
@@ -2019,7 +1939,7 @@ on_error:
                                         if (0 <= num && num <= 255) {
                                             pitch_mod_tbl[no][i] = num;
                                             pitch_mod_tbl[no][0]++;
-                                            ptr += cnt;
+                                            ptr += cnt[0];
                                             i++;
                                         } else {
                                             dispError(enmErrNum.LFO_DEFINITION_IS_WRONG.ordinal(), lptr[line + offset].filename, line);
@@ -2058,11 +1978,12 @@ on_error:
      * none
      */
     private void getArpeggio(LINE[] lptr) {
-        int line, i, no, end_flag, offset, num, cnt;
+        int line, i, no, end_flag, offset, num;
+        int[] cnt = new int[1];
         String buf;
         int ptr;
 
-        cnt = 0;
+        cnt[0] = 0;
 
         for (line = 1; line < lptr.length; line++) {
             // Arpeggio data found?
@@ -2113,15 +2034,15 @@ on_error:
                             }
                             break;
                         default:
-                            num = str.Asc2Int(buf, ptr, /* ref */ cnt);
-                            if (cnt != 0) {
+                            num = str.asc2Int(buf, ptr, /* ref */ cnt);
+                            if (cnt[0] != 0) {
                                 if (num >= 0) {
                                     arpeggio_tbl[no][i] = num;
                                 } else {
                                     arpeggio_tbl[no][i] = (-num) | 0x80;
                                 }
                                 arpeggio_tbl[no][0]++;
-                                ptr += cnt;
+                                ptr += cnt[0];
                                 i++;
                             } else {
                                 dispError(enmErrNum.NOTE_ENVELOPE_DEFINITION_IS_WRONG.ordinal(), lptr[line + offset].filename, line);
@@ -2675,11 +2596,12 @@ on_error:
      * none
      */
     void getToneTable(LINE[] lptr) {
-        int line, i, no, end_flag, offset, num, cnt;
+        int line, i, no, end_flag, offset, num;
+        int[] cnt = new int[1];
         String buf;
         int ptr;
 
-        cnt = 0;
+        cnt[0] = 0;
 
         for (line = 1; line < lptr.length; line++) {
             // Tone data found?
@@ -2717,11 +2639,11 @@ on_error:
                             }
                             break;
                         default:
-                            num = str.Asc2Int(buf, ptr, /* ref */ cnt);
-                            if (cnt != 0) {
+                            num = str.asc2Int(buf, ptr, /* ref */ cnt);
+                            if (cnt[0] != 0) {
                                 tonetbl_tbl[no][i] = num;
                                 tonetbl_tbl[no][0]++;
-                                ptr += cnt;
+                                ptr += cnt[0];
                                 i++;
                                 if (i > 1024 + 1) {
                                     dispError(enmErrNum.ABNORMAL_PARAMETERS_OF_TONETBL.ordinal(), lptr[line + offset].filename, line + offset);
@@ -2771,11 +2693,12 @@ on_error:
      * none
      */
     void getOPL3tbl(LINE[] lptr) {
-        int line, i, no, end_flag, offset, num, cnt;
+        int line, i, no, end_flag, offset, num;
+        int[] cnt = new int[1];
         String buf;
         int ptr;
 
-        cnt = 0;
+        cnt[0] = 0;
 
         int op_flag = 0;
 
@@ -2838,11 +2761,11 @@ on_error:
                         }
                         break;
                     default:
-                        num = str.Asc2Int(buf, ptr, /* ref */ cnt);
-                        if (cnt != 0) {
+                        num = str.asc2Int(buf, ptr, /* ref */ cnt);
+                        if (cnt[0] != 0) {
                             opl3op_tbl[no][i] = num;
                             opl3op_tbl[no][0]++;
-                            ptr += cnt;
+                            ptr += cnt[0];
                             i++;
                             if (i > 1024 + 1) {
                                 dispError(enmErrNum.ABNORMAL_PARAMETERS_OF_FM_TONE.ordinal(), lptr[line + offset].filename, line + offset);
@@ -3115,11 +3038,12 @@ on_error:
      * none
      */
     private void getHardEffect(LINE[] lptr) {
-        int line, i, no, end_flag, offset, num, cnt;
+        int line, i, no, end_flag, offset, num;
+        int[] cnt = new int[1];
         String buf;
         int ptr;
 
-        cnt = 0;
+        cnt[0] = 0;
 
         for (line = 1; line < lptr.length; line++) {
             // Tone data found?
@@ -3163,14 +3087,14 @@ on_error:
                             }
                             break;
                         default:
-                            num = str.Asc2Int(buf, ptr, /* ref */ cnt);
-                            if (cnt != 0) {
+                            num = str.asc2Int(buf, ptr, /* ref */ cnt);
+                            if (cnt[0] != 0) {
                                 switch (i) {
                                     case 1:
                                         if (0 <= num && num <= 255) {
                                             hard_effect_tbl[no][i] = num;
                                             hard_effect_tbl[no][0]++;
-                                            ptr += cnt;
+                                            ptr += cnt[0];
                                             i++;
                                         } else {
                                             dispError(enmErrNum.LFO_DEFINITION_IS_WRONG.ordinal(), lptr[line + offset].filename, line);
@@ -3182,7 +3106,7 @@ on_error:
                                         if (0 <= num && num <= 4095) {
                                             hard_effect_tbl[no][i] = num;
                                             hard_effect_tbl[no][0]++;
-                                            ptr += cnt;
+                                            ptr += cnt[0];
                                             i++;
                                         } else {
                                             dispError(enmErrNum.LFO_DEFINITION_IS_WRONG.ordinal(), lptr[line + offset].filename, line);
@@ -3194,7 +3118,7 @@ on_error:
                                         if (0 <= num && num <= 255) {
                                             hard_effect_tbl[no][i] = num;
                                             hard_effect_tbl[no][0]++;
-                                            ptr += cnt;
+                                            ptr += cnt[0];
                                             i++;
                                         } else {
                                             dispError(enmErrNum.LFO_DEFINITION_IS_WRONG.ordinal(), lptr[line + offset].filename, line);
@@ -3206,7 +3130,7 @@ on_error:
                                         if (0 <= num && num <= 7) {
                                             hard_effect_tbl[no][i] = num;
                                             hard_effect_tbl[no][0]++;
-                                            ptr += cnt;
+                                            ptr += cnt[0];
                                             i++;
                                         } else {
                                             dispError(enmErrNum.LFO_DEFINITION_IS_WRONG.ordinal(), lptr[line + offset].filename, line);
@@ -3251,11 +3175,12 @@ on_error:
      * none
      */
     private void getEffectWave(LINE[] lptr) {
-        int line, i, no, end_flag, offset, num, cnt;
+        int line, i, no, end_flag, offset, num;
+        int[] cnt = new int[1];
         String buf;
         int ptr;
 
-        cnt = 0;
+        cnt[0] = 0;
 
         for (line = 1; line < lptr.length; line++) {
             // Tone data found?
@@ -3300,11 +3225,11 @@ on_error:
                             }
                             break;
                         default:
-                            num = str.Asc2Int(buf, ptr, /* ref */ cnt);
-                            if (cnt != 0 && (0 <= num && num <= 7)) {
+                            num = str.asc2Int(buf, ptr, /* ref */ cnt);
+                            if (cnt[0] != 0 && (0 <= num && num <= 7)) {
                                 effect_wave_tbl[no][i] = num;
                                 effect_wave_tbl[no][0]++;
-                                ptr += cnt;
+                                ptr += cnt[0];
                                 i++;
                                 if (i > 33) {
                                     dispError(enmErrNum.EFFECT_WAVE_DEFINITION_IS_WRONG.ordinal(), lptr[line + offset].filename, line + offset);
@@ -3641,28 +3566,28 @@ on_error:
         int i, j, x;
         String t;
 
-        t = String.format("%d_table:", str);
+        t = "%d_table:".formatted(str);
         fp.add(new MmlDatum2(t + "\n", -2, t));
 
         if (max != 0) {
             for (i = 0; i < max; i++) {
                 if (tbl[i][0] != 0) {
-                    t = String.format("%d_%03d", str, i);
-                    fp.add(new MmlDatum2(String.format("\tdw\t%d\n", t), -3, t));
+                    t = "%d_%03d".formatted(str, i);
+                    fp.add(new MmlDatum2("\tdw\t%d\n".formatted(t), -3, t));
                 } else {
                     fp.add(new MmlDatum2("\tdw\t0\n", -1, 0, -1, 0));
                 }
             }
         }
 
-        t = String.format("%d_lp_table:", str);
+        t = "%d_lp_table:".formatted(str);
         fp.add(new MmlDatum2(t + "\n", -2, t));
 
         if (max != 0) {
             for (i = 0; i < max; i++) {
                 if (tbl[i][0] != 0) {
-                    t = String.format("%d_lp_%03d", str, i);
-                    fp.add(new MmlDatum2(String.format("\tdw\t%d\n", t), -3, t));
+                    t = "%d_lp_%03d".formatted(str, i);
+                    fp.add(new MmlDatum2("\tdw\t%d\n".formatted(t), -3, t));
                 } else {
                     fp.add(new MmlDatum2("\tdw\t0\n", -1, 0, -1, 0));
                 }
@@ -3670,23 +3595,23 @@ on_error:
 
             for (i = 0; i < max; i++) {
                 if (tbl[i][0] != 0) {
-                    t = String.format("%d_%03d:", str, i);
-                    fp.add(new MmlDatum2(String.format("\n%d\n", t), -2, t));
+                    t = "%d_%03d:".formatted(str, i);
+                    fp.add(new MmlDatum2("\n%d\n".formatted(t), -2, t));
                     x = 0;
                     for (j = 1; j <= tbl[i][0]; j++) {
                         if (tbl[i][j] == enmEFTBL.LOOP.v) {
                             if (x != 0) fp.add(new MmlDatum2("\n", 0));
-                            t = String.format("%d_lp_%03d:", str, i);
-                            fp.add(new MmlDatum2(String.format("%d\n", t), -2, t));
+                            t = "%d_lp_%03d:".formatted(str, i);
+                            fp.add(new MmlDatum2("%d\n".formatted(t), -2, t));
                             x = 0;
                         } else if (x == 0) {
-                            fp.add(new MmlDatum2(String.format("\tdb\t%02x", tbl[i][j] & 0xff), -1, tbl[i][j] & 0xff));
+                            fp.add(new MmlDatum2("\tdb\t%02x".formatted(tbl[i][j] & 0xff), -1, tbl[i][j] & 0xff));
                             x++;
                         } else if (x == 7) {
-                            fp.add(new MmlDatum2(String.format(",%02x\n", tbl[i][j] & 0xff), -1, tbl[i][j] & 0xff));
+                            fp.add(new MmlDatum2(",%02x\n".formatted(tbl[i][j] & 0xff), -1, tbl[i][j] & 0xff));
                             x = 0;
                         } else {
-                            fp.add(new MmlDatum2(String.format(",%02x", tbl[i][j] & 0xff), -1, tbl[i][j] & 0xff));
+                            fp.add(new MmlDatum2(",%02x".formatted(tbl[i][j] & 0xff), -1, tbl[i][j] & 0xff));
                             x++;
                         }
                     }
@@ -3785,13 +3710,13 @@ on_error:
      * none
      */
     private void writeToneTable(List<MmlDatum2> fp, int[][] tbl, String str, int max) { // [_TONETBL_MAX][1024+2]
-        String t = String.format("%d_data_table:", str);
-        fp.add(new MmlDatum2(String.format("%d\n", t), -2, t));
+        String t = "%d_data_table:".formatted(str);
+        fp.add(new MmlDatum2("%d\n".formatted(t), -2, t));
         if (max != 0) {
             for (int i = 0; i < max; i++) {
                 if (tbl[i][0] != 0) {
-                    t = String.format("%d_%03d", str, i);
-                    fp.add(new MmlDatum2(String.format("\tdw\t%d\n", t), -3, t));
+                    t = "%d_%03d".formatted(str, i);
+                    fp.add(new MmlDatum2("\tdw\t%d\n".formatted(t), -3, t));
                 } else {
                     fp.add(new MmlDatum2("\tdw\t0\n", -1, 0, -1, 0));
                 }
@@ -3799,17 +3724,17 @@ on_error:
 
             for (int i = 0; i < max; i++) {
                 if (tbl[i][0] != 0) {
-                    t = String.format("%d_%03d:", str, i);
-                    fp.add(new MmlDatum2(String.format("\n%d\n", t), -2, t));
+                    t = "%d_%03d:".formatted(str, i);
+                    fp.add(new MmlDatum2("\n%d\n".formatted(t), -2, t));
                     int x = 0;
                     for (int j = 0, k = 1; j < tbl[i][0] / 9; k += 9, j++) {
                         byte b = (byte) (tbl[i][k] & 0xff);
                         byte b2 = (byte) (tbl[i][k + 1] & 0xff);
-                        fp.add(new MmlDatum2(String.format("\tdb\t%02x,%02x\n", b, b2), -1, b, -1, b2));
+                        fp.add(new MmlDatum2("\tdb\t%02x,%02x\n".formatted(b, b2), -1, b, -1, b2));
                         short s = (short) (tbl[i][k + 2] & 0xffff);
-                        fp.add(new MmlDatum2(String.format("\tdw\t${0:x04}\n", s), -1, (byte) s, -1, (byte) (s >> 8)));
+                        fp.add(new MmlDatum2("\tdw\t${0:x04}\n".formatted(s), -1, (byte) s, -1, (byte) (s >> 8)));
                         s = (short) (tbl[i][k + 3] & 0xffff);
-                        fp.add(new MmlDatum2(String.format("\tdw\t%d\n", s), -1, (byte) s, -1, (byte) (s >> 8)));
+                        fp.add(new MmlDatum2("\tdw\t%d\n".formatted(s), -1, (byte) s, -1, (byte) (s >> 8)));
                         fp.add(new MmlDatum2(String.format("\tdb\t%02x,%02x,%02x,%02x,%02x\n",
                                 tbl[i][k + 4] & 0xff,
                                 tbl[i][k + 5] & 0xff,
@@ -3844,13 +3769,13 @@ on_error:
      * none
      */
     private void writeOPL3tbl(List<MmlDatum2> fp, String str, int max) {
-        String t = String.format("%d_data_table:", str);
-        fp.add(new MmlDatum2(String.format("%d\n", t), -2, t));
+        String t = "%d_data_table:".formatted(str);
+        fp.add(new MmlDatum2("%d\n".formatted(t), -2, t));
         if (max != 0) {
             for (int i = 0; i < max; i++) {
                 if (opl3op_tbl[i][0] != 0) {
-                    t = String.format("%d_%03d", str, i);
-                    fp.add(new MmlDatum2(String.format("\tdw\t%d\n", t), -3, t));
+                    t = "%d_%03d".formatted(str, i);
+                    fp.add(new MmlDatum2("\tdw\t%d\n".formatted(t), -3, t));
                 } else {
                     fp.add(new MmlDatum2("\tdw\t0\n", -1, 0, -1, 0));
                 }
@@ -3858,8 +3783,8 @@ on_error:
 
             for (int i = 0; i < max; i++) {
                 if (opl3op_tbl[i][0] != 0) {
-                    t = String.format("%d_%03d:", str, i);
-                    fp.add(new MmlDatum2(String.format("\n%d\n", t), -2, t));
+                    t = "%d_%03d:".formatted(str, i);
+                    fp.add(new MmlDatum2("\n%d\n".formatted(t), -2, t));
                     int x = 0;
 
                     int cnt_val = opl3op_tbl[i][2] & 0x03;
@@ -3872,11 +3797,11 @@ on_error:
 
                     // Reg.$C0
                     byte b = (byte) (((opl3op_tbl[i][1] & 0x07) << 1) | ((cnt_val & 0x01)));
-                    fp.add(new MmlDatum2(String.format("\tdb\t%02x\n", b), -1, b));
+                    fp.add(new MmlDatum2("\tdb\t%02x\n".formatted(b), -1, b));
 
                     // Reg.$C0 + 3
                     b = (byte) ((cnt_val & 0x02) >> 1);
-                    fp.add(new MmlDatum2(String.format("\tdb\t%02x\n", b), -1, b));
+                    fp.add(new MmlDatum2("\tdb\t%02x\n".formatted(b), -1, b));
 
                     // Reg.$BD
                     fp.add(new MmlDatum2("\tdb\t$00\n\n", -1, (byte) 0));
@@ -3888,26 +3813,26 @@ on_error:
                                 ((opl3op_tbl[i][k + 2] & 0x1) << 5) |
                                 ((opl3op_tbl[i][k + 3] & 0x1) << 4) |
                                 (opl3op_tbl[i][k + 4] & 0xf));
-                        fp.add(new MmlDatum2(String.format("\tdb\t%02x\n", b), -1, b));
+                        fp.add(new MmlDatum2("\tdb\t%02x\n".formatted(b), -1, b));
 
                         // Reg.$40
                         b = (byte) (((opl3op_tbl[i][k + 5] & 0x3) << 6) |
                                 ((opl3op_tbl[i][k + 6] & 0x3f)));
-                        fp.add(new MmlDatum2(String.format("\tdb\t%02x\n", b), -1, b));
+                        fp.add(new MmlDatum2("\tdb\t%02x\n".formatted(b), -1, b));
 
                         // Reg.$60
                         b = (byte) (((opl3op_tbl[i][k + 7] & 0x0f) << 4) |
                                 ((opl3op_tbl[i][k + 8] & 0x0f)));
-                        fp.add(new MmlDatum2(String.format("\tdb\t%02x\n", b), -1, b));
+                        fp.add(new MmlDatum2("\tdb\t%02x\n".formatted(b), -1, b));
 
                         // Reg.$80
                         b = (byte) (((opl3op_tbl[i][k + 9] & 0x0f) << 4) |
                                 ((opl3op_tbl[i][k + 10] & 0x0f)));
-                        fp.add(new MmlDatum2(String.format("\tdb\t%02x\n", b), -1, b));
+                        fp.add(new MmlDatum2("\tdb\t%02x\n".formatted(b), -1, b));
 
                         // Reg.$E0
                         b = (byte) (opl3op_tbl[i][k + 11] & 0x07);
-                        fp.add(new MmlDatum2(String.format("\tdb\t%02x\n\n", b), -1, b));
+                        fp.add(new MmlDatum2("\tdb\t%02x\n\n".formatted(b), -1, b));
 
                     }
                 }
@@ -3966,8 +3891,8 @@ on_error:
      * none
      */
     private void writeHardEffect(List<MmlDatum2> fp, int[][] tbl, String str, int max) { // [_HARD_EFFECT_MAX][5]
-        String t = String.format("%d_effect_select:", str);
-        fp.add(new MmlDatum2(String.format("%d\n", t), -2, t));
+        String t = "%d_effect_select:".formatted(str);
+        fp.add(new MmlDatum2("%d\n".formatted(t), -2, t));
         for (int i = 0; i < max; i++) {
             byte b1 = (byte) tbl[i][1];
             byte b2 = (byte) (tbl[i][3] | 0x80);
@@ -3989,8 +3914,8 @@ on_error:
      * none
      */
     private void writeEffectWave(List<MmlDatum2> fp, int[][] tbl, String str, int max) { // [_EFFECT_WAVE_MAX][33]
-        String t = String.format("%d_4088_data:", str);
-        fp.add(new MmlDatum2(String.format("%d\n", t), -2, t));
+        String t = "%d_4088_data:".formatted(str);
+        fp.add(new MmlDatum2("%d\n".formatted(t), -2, t));
         for (int i = 0; i < max; i++) {
             if (tbl[i][0] != 0) {
                 int x = 0;
@@ -3998,15 +3923,15 @@ on_error:
                     byte b1;
                     if (x == 0) {
                         b1 = (byte) (tbl[i][j] & 0xff);
-                        fp.add(new MmlDatum2(String.format("\tdb\t%02x", b1), -1, b1));
+                        fp.add(new MmlDatum2("\tdb\t%02x".formatted(b1), -1, b1));
                         x++;
                     } else if (x == 7) {
                         b1 = (byte) (tbl[i][j] & 0xff);
-                        fp.add(new MmlDatum2(String.format(",%02x\n", b1), -1, b1));
+                        fp.add(new MmlDatum2(",%02x\n".formatted(b1), -1, b1));
                         x = 0;
                     } else {
                         b1 = (byte) (tbl[i][j] & 0xff);
-                        fp.add(new MmlDatum2(String.format(",%02x", b1), -1, b1));
+                        fp.add(new MmlDatum2(",%02x".formatted(b1), -1, b1));
                         x++;
                     }
                 }
@@ -4291,12 +4216,12 @@ on_error:
      * none
      */
     private void writeSongInfo(List<MmlDatum2> fp) {
-        fp.add(new MmlDatum2(String.format("; Title: %d\n", song_name), -1));
-        fp.add(new MmlDatum2(String.format("; Composer: %d\n", composer), -1));
-        fp.add(new MmlDatum2(String.format("; Maker: %d\n", maker), -1));
+        fp.add(new MmlDatum2("; Title: %d\n".formatted(song_name), -1));
+        fp.add(new MmlDatum2("; Composer: %d\n".formatted(composer), -1));
+        fp.add(new MmlDatum2("; Maker: %d\n".formatted(maker), -1));
 
         if (programer != null) {
-            fp.add(new MmlDatum2(String.format("; Programer: %d\n", programer), -1));
+            fp.add(new MmlDatum2("; Programer: %d\n".formatted(programer), -1));
         }
         fp.add(new MmlDatum2("\n", -1));
     }
@@ -4315,7 +4240,7 @@ on_error:
 
         for (int i = 0; i < max; i++) {
             if (i < ary.length) {
-                des += String.format("%02x", ary[i]);
+                des += "%02x".formatted(ary[i]);
                 lstInt.add(-1);
                 lstInt.add(ary[i] & 0xff);
             } else {
@@ -4340,7 +4265,7 @@ on_error:
 
         for (int i = 0; i < sDes.length; i++) {
 
-            fp.add(new MmlDatum2(String.format("\tdb\t%s\n", sDes[i]), aryInt.get(i)));
+            fp.add(new MmlDatum2("\tdb\t%s\n".formatted(sDes[i]), aryInt.get(i)));
         }
     }
 
@@ -4353,46 +4278,46 @@ on_error:
      */
     private void writeSongInfoMacro(List<MmlDatum2> fp) {
         String t = "TITLE\t.macro";
-        fp.add(new MmlDatum2(String.format("%d\n", t), -4, t));
+        fp.add(new MmlDatum2("%d\n".formatted(t), -4, t));
         printStrDb(fp, song_name, 32);
         t = "\t.endm";
-        fp.add(new MmlDatum2(String.format("%d\n", t), -4, t));
+        fp.add(new MmlDatum2("%d\n".formatted(t), -4, t));
         t = "COMPOSER\t.macro";
-        fp.add(new MmlDatum2(String.format("%d\n", t), -4, t));
+        fp.add(new MmlDatum2("%d\n".formatted(t), -4, t));
         printStrDb(fp, composer, 32);
         t = "\t.endm";
-        fp.add(new MmlDatum2(String.format("%d\n", t), -4, t));
+        fp.add(new MmlDatum2("%d\n".formatted(t), -4, t));
         t = "MAKER\t.macro";
-        fp.add(new MmlDatum2(String.format("%d\n", t), -4, t));
+        fp.add(new MmlDatum2("%d\n".formatted(t), -4, t));
         printStrDb(fp, maker, 32);
         t = "\t.endm";
-        fp.add(new MmlDatum2(String.format("%d\n", t), -4, t));
+        fp.add(new MmlDatum2("%d\n".formatted(t), -4, t));
 
         // text
         t = "TITLE_TEXT\t.macro";
-        fp.add(new MmlDatum2(String.format("%d\n", t), -4, t));
-        fp.add(new MmlDatum2(String.format("\tdb\t\"%d\",$00\n", song_name), -1, String.format("\"%d\",$00", song_name)));
+        fp.add(new MmlDatum2("%d\n".formatted(t), -4, t));
+        fp.add(new MmlDatum2("\tdb\t\"%d\",$00\n".formatted(song_name), -1, String.format("\"%d\",$00", song_name)));
         t = "\t.endm";
-        fp.add(new MmlDatum2(String.format("%d\n", t), -4, t));
+        fp.add(new MmlDatum2("%d\n".formatted(t), -4, t));
 
         t = "COMPOSER_TEXT\t.macro";
-        fp.add(new MmlDatum2(String.format("%d\n", t), -4, t));
-        fp.add(new MmlDatum2(String.format("\tdb\t\"%d\",$00\n", composer), -1, String.format("\"%d\",$00", composer)));
+        fp.add(new MmlDatum2("%d\n".formatted(t), -4, t));
+        fp.add(new MmlDatum2("\tdb\t\"%d\",$00\n".formatted(composer), -1, String.format("\"%d\",$00", composer)));
         t = "\t.endm";
-        fp.add(new MmlDatum2(String.format("%d\n", t), -4, t));
+        fp.add(new MmlDatum2("%d\n".formatted(t), -4, t));
 
         t = "MAKER_TEXT\t.macro";
-        fp.add(new MmlDatum2(String.format("%d\n", t), -4, t));
-        fp.add(new MmlDatum2(String.format("\tdb\t\"%d\",$00\n", maker), -1, String.format("\"%d\",$00", maker)));
+        fp.add(new MmlDatum2("%d\n".formatted(t), -4, t));
+        fp.add(new MmlDatum2("\tdb\t\"%d\",$00\n".formatted(maker), -1, String.format("\"%d\",$00", maker)));
         t = "\t.endm";
-        fp.add(new MmlDatum2(String.format("%d\n", t), -4, t));
+        fp.add(new MmlDatum2("%d\n".formatted(t), -4, t));
 
         if (use_pcm != 0) {
             t = "PCMFILE\t.macro";
-            fp.add(new MmlDatum2(String.format("%d\n", t), -4, t));
-            fp.add(new MmlDatum2(String.format("\tdb\t\"%d\",$00\n", pcm_name), -1, String.format("\"%d\",$00", pcm_name)));
+            fp.add(new MmlDatum2("%d\n".formatted(t), -4, t));
+            fp.add(new MmlDatum2("\tdb\t\"%d\",$00\n".formatted(pcm_name), -1, String.format("\"%d\",$00", pcm_name)));
             t = "\t.endm";
-            fp.add(new MmlDatum2(String.format("%d\n", t), -4, t));
+            fp.add(new MmlDatum2("%d\n".formatted(t), -4, t));
         }
     }
 
@@ -4404,7 +4329,8 @@ on_error:
      * none
      */
     private int setCommandBuf(int n, CMD[] cmd, int cmdPtr, int com_no, String buf, int ptr, int line, int enable) {
-        int cnt = 0, i;
+        int[] cnt = new int[] {0};
+        int i;
         int[] param = new int[PARAM_MAX];
 
         for (i = 0; i < PARAM_MAX; i++) {
@@ -4413,12 +4339,12 @@ on_error:
 
         if (n != 0) {
             for (i = 0; i < n; i++) {
-                cnt = 0;
-                param[i] = str.Asc2Int(buf, ptr, /* ref */ cnt);
-                if (cnt == 0) { // If there is no parameter, replace it with a number that will cause an error.
+                cnt[0] = 0;
+                param[i] = str.asc2Int(buf, ptr, /* ref */ cnt);
+                if (cnt[0] == 0) { // If there is no parameter, replace it with a number that will cause an error.
                     param[i] = (int) PARAM_OMITTED;
                 }
-                ptr += cnt;
+                ptr += cnt[0];
 
                 if (i < n - 1) { // If n is 2 or more, "," is inserted.
                     ptr = str.skipSpace(buf, ptr);
@@ -4455,47 +4381,47 @@ on_error:
      * Output:
      * none
      */
-    private int getLengthSub(String buf, int ptr, /* ref */ double len, double def) {
-        int cnt = 0;
+    private int getLengthSub(String buf, int ptr, /* ref */ double[] len, double def) {
+        int[] cnt = new int[] {0};
         double temp;
 
         // Frame specification
         if (buf.charAt(ptr) == '#') {
             ptr++;
-            len = str.Asc2Int(buf, ptr, /* ref */ cnt);
-            if (cnt != 0) {
-                ptr += cnt;
-                len = len / tbase;
+            len[0] = str.asc2Int(buf, ptr, /* ref */ cnt);
+            if (cnt[0] != 0) {
+                ptr += cnt[0];
+                len[0] = len[0] / tbase;
             } else {
-                len = -1;
+                len[0] = -1;
             }
             // Count specification
         } else if (buf.charAt(ptr) == '%') {
             ptr++;
-            len = str.Asc2Int(buf, ptr, /* ref */ cnt);
-            if (cnt != 0) {
-                ptr += cnt;
+            len[0] = str.asc2Int(buf, ptr, /* ref */ cnt);
+            if (cnt[0] != 0) {
+                ptr += cnt[0];
             } else {
-                len = -1;
+                len[0] = -1;
             }
             // Musical note length designation
         } else {
-            len = str.Asc2Int(buf, ptr, /* ref */ cnt);
-            if (cnt != 0) {
-                ptr += cnt;
-                if (len > 0)
-                    len = _BASE / (len);
+            len[0] = str.asc2Int(buf, ptr, /* ref */ cnt);
+            if (cnt[0] != 0) {
+                ptr += cnt[0];
+                if (len[0] > 0)
+                    len[0] = _BASE / (len[0]);
             } else {
                 // If there is no parameter, replace it with a number that will cause an error.
-                len = def;
+                len[0] = def;
             }
             // Do not process on error /l command
-            if (len != -1) {
+            if (len[0] != -1) {
                 // Processing of dots (multiple possible)
-                temp = len;
+                temp = len[0];
                 while (buf.charAt(ptr) == '.') {
                     temp /= 2;
-                    len += temp;
+                    len[0] += temp;
                     ptr++;
                 }
             }
@@ -4505,21 +4431,20 @@ on_error:
 
     /**
      * Get note length
-     * Output:
-     * len:
+     * @param len out
      */
-    private int getLength(String buf, int ptr, /* ref */ double len, double def) {
+    private int getLength(String buf, int ptr, /* ref */ double[] len, double def) {
         ptr = getLengthSub(buf, ptr, /* ref */ len, def);
         // Note length subtraction (only possible once)
         if (buf.charAt(ptr) == '-' || buf.charAt(ptr) == '~') {
-            double len_adjust = 0;
+            double[] len_adjust = new double[] {0};
             ptr++;
             ptr = getLengthSub(buf, ptr, /* ref */ len_adjust, def);
-            if (len - len_adjust > 0) {
-                len = len - len_adjust;
+            if (len[0] - len_adjust[0] > 0) {
+                len[0] = len[0] - len_adjust[0];
             } else {
                 //dispError(); // Catching errors at the caller
-                len = len - len_adjust;
+                len[0] = len[0] - len_adjust[0];
             }
         }
         return ptr;
@@ -4527,17 +4452,15 @@ on_error:
 
     /**
      * Processing commands with one parameter (note length)
-     * Input:
-     * <p>
-     * Output:
-     * none
      */
     private int setCommandBufL(CMD[] cmd, int cmdPtr, int com_no, String buf, int ptr, int line, int enable) {
         cmd[cmdPtr].cnt = 0;
         cmd[cmdPtr].line = line;
         cmd[cmdPtr].cmd = com_no;
 
-        ptr = getLength(buf, ptr, /* ref */ cmd[cmdPtr].len, -1);
+        double[] tmp = new double[1];
+        ptr = getLength(buf, ptr, /* ref */ tmp, -1);
+        cmd[cmdPtr].len = tmp[0];
         if (cmd[cmdPtr].len > 0) {
             if (enable != 0) {
                 length = cmd[cmdPtr].len;
@@ -4551,14 +4474,10 @@ on_error:
 
     /**
      * Processing commands with one parameter (scale/length)
-     * Input:
-     * <p>
-     * Output:
-     * none
      */
     private int setCommandBufN(CMD[] cmd, int cmdPtr, int com_no, String buf, int ptr, int line, int enable) {
         int oct_ofs, note;
-        double len = 0;
+        double[] len = new double[] {0};
 
         com_no += transpose;
 
@@ -4607,15 +4526,15 @@ on_error:
         }
 
         ptr = getLength(buf, ptr, /* ref */ len, length);
-        if (len <= 0) {
+        if (len[0] <= 0) {
             dispError(enmErrNum.ABNORMAL_NOTE_LENGTH_VALUE.ordinal(), cmd[cmdPtr].filename, line);
-            len = 0.0;
+            len[0] = 0.0;
         }
         if (enable != 0) {
             cmd[cmdPtr].cnt = 0;
             cmd[cmdPtr].line = line;
             cmd[cmdPtr].cmd = note;
-            cmd[cmdPtr].len = len;
+            cmd[cmdPtr].len = len[0];
         }
 
         return ptr;
@@ -4623,7 +4542,7 @@ on_error:
 
     // Processing Drum Flag Commands
     private int setCommandBufD(CMD[] cmd, int cmdPtr, int com_no, String buf, int ptr, int line, int enable) {
-        double len = 0;
+        double[] len = new double[] {0};
         int bit = 0x00;
 
         int loop_end = 0;
@@ -4655,16 +4574,16 @@ on_error:
 
         // The default duration is 0
         ptr = getLength(buf, ptr, /* ref */ len, 0);
-        if (len < 0) {
+        if (len[0] < 0) {
             dispError(enmErrNum.ABNORMAL_NOTE_LENGTH_VALUE.ordinal(), cmd[cmdPtr].filename, line);
-            len = 0.0;
+            len[0] = 0.0;
         }
 
         if (enable != 0) {
             cmd[cmdPtr].cnt = 0;
             cmd[cmdPtr].line = line;
             cmd[cmdPtr].cmd = com_no;
-            cmd[cmdPtr].len = len;
+            cmd[cmdPtr].len = len[0];
             cmd[cmdPtr].param[0] = bit;
         }
 
@@ -4673,22 +4592,19 @@ on_error:
 
     /**
      * Processing commands with one parameter (scale (direct specification)/note length)
-     * Input:
-     * <p>
-     * Output:
-     * none
      */
     private int setCommandBufN0(CMD[] cmd, int cmdPtr, String buf, int ptr, int line, int enable) {
-        int cnt, note;
-        double len = 0;
+        int[] cnt = new int[1];
+        int note;
+        double[] len = new double[] {0};
 
-        cnt = 0;
-        note = str.Asc2Int(buf, ptr, /* ref */ cnt);
-        if (cnt == 0) {
+        cnt[0] = 0;
+        note = str.asc2Int(buf, ptr, /* ref */ cnt);
+        if (cnt[0] == 0) {
             dispError(enmErrNum.ABNORMAL_PITCH_VALUE.ordinal(), cmd[cmdPtr].filename, line);
             return ptr + 1;
         }
-        ptr += cnt;
+        ptr += cnt[0];
 
         // Scale range check
         if (note < 0) {
@@ -4704,20 +4620,20 @@ on_error:
             ptr = str.skipSpace(buf, ptr); // Skip extra spaces
 
             ptr = getLength(buf, ptr, /* ref */ len, length);
-            if (len <= 0) {
+            if (len[0] <= 0) {
                 dispError(enmErrNum.ABNORMAL_NOTE_LENGTH_VALUE.ordinal(), cmd[cmdPtr].filename, line);
-                len = 0.0;
+                len[0] = 0.0;
             }
             // Use default duration when "," is not present
         } else {
-            len = length;
+            len[0] = length;
         }
 
         if (enable != 0) {
             cmd[cmdPtr].cnt = 0;
             cmd[cmdPtr].line = line;
             cmd[cmdPtr].cmd = note;
-            cmd[cmdPtr].len = len;
+            cmd[cmdPtr].len = len[0];
         }
 
         return ptr;
@@ -4725,23 +4641,20 @@ on_error:
 
     /**
      * Processing commands with one parameter (frequency (direct specification)/tone length)
-     * Input:
-     * <p>
-     * Output:
-     * none
      */
     private int setCommandBufN1(CMD[] cmd, int cmdPtr, int com_no, String buf, int ptr, int line, int enable) {
-        int cnt, freq;
-        double len = 0;
+        int[] cnt = new int[1];
+        int freq;
+        double[] len = new double[] {0};
 
-        cnt = 0;
-        freq = str.Asc2Int(buf, ptr, /* ref */ cnt);
+        cnt[0] = 0;
+        freq = str.asc2Int(buf, ptr, /* ref */ cnt);
         // Character count check
-        if (cnt == 0) {
+        if (cnt[0] == 0) {
             dispError(enmErrNum.ABNORMAL_PITCH_VALUE.ordinal(), cmd[cmdPtr].filename, line);
             return ptr + 1;
         }
-        ptr += cnt;
+        ptr += cnt[0];
         // Parameter Range Checking
         if (0x0008 <= freq || freq >= 0x07f2) {
             dispError(enmErrNum.ABNORMAL_PITCH_VALUE.ordinal(), cmd[cmdPtr].filename, line);
@@ -4753,20 +4666,20 @@ on_error:
             ptr++;
             ptr = str.skipSpace(buf, ptr);
             ptr = getLength(buf, ptr, /* ref */ len, length);
-            if (len <= 0) {
+            if (len[0] <= 0) {
                 dispError(enmErrNum.ABNORMAL_NOTE_LENGTH_VALUE.ordinal(), cmd[cmdPtr].filename, line);
-                len = 0.0;
+                len[0] = 0.0;
             }
             // If there is no ",", it will default to the default length.
         } else {
-            len = length;
+            len[0] = length;
         }
 
         if (enable != 0) {
             cmd[cmdPtr].cnt = 0;
             cmd[cmdPtr].line = line;
             cmd[cmdPtr].cmd = com_no;
-            cmd[cmdPtr].len = len;
+            cmd[cmdPtr].len = len[0];
             cmd[cmdPtr].param[0] = freq;
         }
 
@@ -4781,19 +4694,19 @@ on_error:
      * none
      */
     private int setCommandBufR(CMD[] cmd, int cmdPtr, int com_no, String buf, int ptr, int line, int enable) {
-        double len = 0;
+        double[] len = new double[] {0};
 
         ptr = getLength(buf, ptr, /* ref */ len, length);
-        if (len <= 0) {
+        if (len[0] <= 0) {
             dispError(enmErrNum.ABNORMAL_NOTE_LENGTH_VALUE.ordinal(), cmd[cmdPtr].filename, line);
-            len = 0.0;
+            len[0] = 0.0;
         }
 
         if (enable != 0) {
             cmd[cmdPtr].cnt = 0;
             cmd[cmdPtr].line = line;
             cmd[cmdPtr].cmd = com_no;
-            cmd[cmdPtr].len = len;
+            cmd[cmdPtr].len = len[0];
         }
 
         return ptr;
@@ -4807,19 +4720,19 @@ on_error:
      * none
      */
     private int setCommandBufK(CMD[] cmd, int cmdPtr, int com_no, String buf, int ptr, int line, int enable) {
-        double len = 0;
+        double[] len = new double[] {0};
 
         ptr = getLength(buf, ptr, /* ref */ len, length);
-        if (len < 0) { // With sound length 0
+        if (len[0] < 0) { // With sound length 0
             dispError(enmErrNum.ABNORMAL_NOTE_LENGTH_VALUE.ordinal(), cmd[cmdPtr].filename, line);
-            len = 0.0;
+            len[0] = 0.0;
         }
 
         if (enable != 0) {
             cmd[cmdPtr].cnt = 0;
             cmd[cmdPtr].line = line;
             cmd[cmdPtr].cmd = com_no;
-            cmd[cmdPtr].len = len;
+            cmd[cmdPtr].len = len[0];
         }
 
         return ptr;
@@ -4832,12 +4745,12 @@ on_error:
      * none
      */
     private CMD[] analyzeData(int trk, CMD[] cmd, /* ref */ int cmdPtr, LINE[] lptr) {
-        int i, line, com, cnt;
+        int i, line, com;
+        int[] cnt = new int[1];
         String buf;
         int ptr;
 
-
-        cnt = 0;
+        cnt[0] = 0;
 
         transpose = 0;
 
@@ -4877,8 +4790,8 @@ on_error:
                             switch (enmMML.values()[mml[i].num]) {
                                 // octave
                                 case _OCTAVE:
-                                    com = str.Asc2Int(buf, ptr, /* ref */ cnt);
-                                    if (cnt != 0) {
+                                    com = str.asc2Int(buf, ptr, /* ref */ cnt);
+                                    if (cnt[0] != 0) {
                                         // When the command is valid, it registers the action.
                                         if ((mml[i].check.apply(trk)) != 0) {
                                             if (trk == BTRACK(0) || trk == BTRACK(1) || trk == BTRACK(2)) {
@@ -4887,7 +4800,7 @@ on_error:
                                                 octave = com;
                                             }
                                         }
-                                        ptr += cnt;
+                                        ptr += cnt[0];
                                     }
                                     break;
                                 // Octave up
@@ -5697,7 +5610,7 @@ on_error:
 //            if (ptr[ptrPtr].cmd == enmMML._SHUFFLE_QUONTIZE.v) {
 //                shuffle.flag = 1;
 //                shuffle._base = _BASE / ptr[ptrPtr].param[0];
-//                logger.log(Level.INFO, String.format("shfl %d\n", shuffle._base));
+//                logger.log(Level.INFO, "shfl %d\n".formatted(shuffle._base));
 //                shuffle.diff = shuffle._base * 2 * ptr[ptrPtr].param[1] / (ptr[ptrPtr].param[2] + ptr[ptrPtr].param[1]) - shuffle._base;
 //                    /*
 //                    For example, if you divide a 16th note into 2:1,
@@ -5971,14 +5884,14 @@ on_error:
             fn = mml_file_name;
             ln = mml_line_pos;
             b = data & 0xff;
-            fp.add(new MmlDatum2(String.format("\tdb\t%02x", b), -1, b));
+            fp.add(new MmlDatum2("\tdb\t%02x".formatted(b), -1, b));
         } else {
             b = data & 0xff;
-            fp.add(new MmlDatum2(String.format(",%02x", b), -1, b));
+            fp.add(new MmlDatum2(",%02x".formatted(b), -1, b));
         }
 
         if (putAsm_pos == 7) {
-            fp.add(new MmlDatum2(String.format("\t;Trk %d; %d: %d", str_track.charAt(mml_trk), fn, ln), 0));
+            fp.add(new MmlDatum2("\t;Trk %d; %d: %d".formatted(str_track.charAt(mml_trk), fn, ln), 0));
             fp.add(new MmlDatum2("\n", 0));
         }
         if (++putAsm_pos > 7) {
@@ -5989,7 +5902,7 @@ on_error:
 
     private void putAsmFlash(List<MmlDatum2> fp) {
         if (putAsm_pos > 0) {
-            fp.add(new MmlDatum2(String.format("\t;Trk %d; %d: %d", str_track.charAt(mml_trk), mml_file_name, mml_line_pos), 0));
+            fp.add(new MmlDatum2("\t;Trk %d; %d: %d".formatted(str_track.charAt(mml_trk), mml_file_name, mml_line_pos), 0));
             fp.add(new MmlDatum2("\n", 0));
             putAsm_pos = 0;
         }
@@ -6026,8 +5939,8 @@ on_error:
                     org = 0xa000;
                     break;
             }
-            String t = String.format(".org\t${0:x04}", org);
-            fp.add(new MmlDatum2(String.format("\t%d\n", t), 4, t));
+            String t = ".org\t${0:x04}".formatted(org);
+            fp.add(new MmlDatum2("\t%d\n".formatted(t), 4, t));
             bank_org_written_flag[bank] = 1;
             if (bank > bank_maximum) {
                 bank_maximum = bank;
@@ -6259,28 +6172,28 @@ on_error:
             return;
         }
         putAsm(fp, enmMCK.MCK_GOTO.v);
-        String t = String.format("bank(%s_%02d_bnk%03d)", songlabel, trk, banktemp);
-        fp.add(new MmlDatum2(String.format("\n\tdb\t%s\n", t), -3, t));
+        String t = "bank(%s_%02d_bnk%03d)".formatted(songlabel, trk, banktemp);
+        fp.add(new MmlDatum2("\n\tdb\t%s\n".formatted(t), -3, t));
         bank_usage[curr_bank]++;
-        t = String.format("%s_%02d_bnk%03d", songlabel, trk, banktemp);
-        fp.add(new MmlDatum2(String.format("\tdw\t%s\n", t), -3, t));
+        t = "%s_%02d_bnk%03d".formatted(songlabel, trk, banktemp);
+        fp.add(new MmlDatum2("\tdw\t%s\n".formatted(t), -3, t));
         bank_usage[curr_bank] += 2;
 
-        t = String.format(".bank\tDATA_BANK+%d", banktemp);
-        fp.add(new MmlDatum2(String.format("\n\t%s\n", t), -4, ".bank", "DATA_BANK", "+", banktemp));
+        t = ".bank\tDATA_BANK+%d".formatted(banktemp);
+        fp.add(new MmlDatum2("\n\t%s\n".formatted(t), -4, ".bank", "DATA_BANK", "+", banktemp));
         if ((banktemp & 1) != 0) {
             t = ".org\t$A000";
-            fp.add(new MmlDatum2(String.format("\n\t%s\n", t), -4, t));
+            fp.add(new MmlDatum2("\n\t%s\n".formatted(t), -4, t));
         } else {
             t = ".org\t$8000";
-            fp.add(new MmlDatum2(String.format("\n\t%s\n", t), -4, t));
+            fp.add(new MmlDatum2("\n\t%s\n".formatted(t), -4, t));
         }
 
         //	flogger.log(Level.TRACE, fp,"\n\t.bank\t%d\n",banktemp);
         curr_bank = banktemp;
         //	putBankOrigin(fp, curr_bank);
-        t = String.format("%s_%02d_bnk%03d:", songlabel, trk, curr_bank);
-        fp.add(new MmlDatum2(String.format("%s\n", t), -2, t));
+        t = "%s_%02d_bnk%03d:".formatted(songlabel, trk, curr_bank);
+        fp.add(new MmlDatum2("%s\n".formatted(t), -2, t));
         putAsm_pos = 0; // Clear output position
         return;
     }
@@ -6565,11 +6478,11 @@ on_error:
             putAsm_pos = 0;
             loop_flag = 0;
 
-            loop_point_label = String.format("%d_%02d_lp", songlabel, trk);
+            loop_point_label = "%d_%02d_lp".formatted(songlabel, trk);
 
             mml_trk = trk;
-            String t = String.format("%d_%02d:", songlabel, trk);
-            fp.add(new MmlDatum2(String.format("\n%d\t;Trk %d\n", t, str_track.charAt(trk)), -2, t));
+            String t = "%d_%02d:".formatted(songlabel, trk);
+            fp.add(new MmlDatum2("\n%d\t;Trk %d\n".formatted(t, str_track.charAt(trk)), -2, t));
 
             mml_file_name = cmd[cmdPtr].filename;
             mml_line_pos = cmd[cmdPtr].line;
@@ -6680,8 +6593,8 @@ on_error:
                     case _SONG_LOOP:
                         //loop_count.cnt = cmd.cnt; // LEN
                         //loop_count.frm = cmd.frm;
-                        t = String.format("%s:", loop_point_label);
-                        fp.add(new MmlDatum2(String.format("\n%s\n", t), -2, t));
+                        t = "%s:".formatted(loop_point_label);
+                        fp.add(new MmlDatum2("\n%s\n".formatted(t), -2, t));
                         loop_flag = 1;
                         putAsm_pos = 0;
                         cmdPtr++;
@@ -6753,7 +6666,7 @@ on_error:
                         putLengthAndWait(fp, enmMCK.MCK_WAIT.v, delta_time, /* ref */ cmd[cmdtempPtr]);
                     }
                     break;
-                    case _KEY_OFF:  { // Key off with length
+                    case _KEY_OFF: { // Key off with length
                         int delta_time = 0;
                         cmdPtr = getDeltaTime(cmd, cmdPtr, /* ref */ delta_time, 0);
                         if (delta_time == 0) {
@@ -7009,8 +6922,8 @@ on_error:
                         cmdPtr++;
                         break;
                     case _REPEAT_ST2:
-                        t = String.format("%s_%02d_lp_%04d:", songlabel, trk, repeat_index);
-                        fp.add(new MmlDatum2(String.format("\n%s\n", t), -2, t));
+                        t = "%s_%02d_lp_%04d:".formatted(songlabel, trk, repeat_index);
+                        fp.add(new MmlDatum2("\n%s\n".formatted(t), -2, t));
                         repeat_depth++;
                         putAsm_pos = 0;
                         cmdPtr++;
@@ -7026,15 +6939,15 @@ on_error:
                                 putAsm(fp, enmMCK.MCK_REPEAT_END.v);
                                 putAsm(fp, cmd[cmdPtr].param[0] & 0x7f);
                             }
-                            t = String.format("bank(%s_%02d_lp_%04d)", songlabel, trk, repeat_index);
-                            fp.add(new MmlDatum2(String.format("\n\tdb\t%s\n", t), -3, t));
+                            t = "bank(%s_%02d_lp_%04d)".formatted(songlabel, trk, repeat_index);
+                            fp.add(new MmlDatum2("\n\tdb\t%s\n".formatted(t), -3, t));
                             bank_usage[curr_bank]++;
-                            t = String.format("%s_%02d_lp_%04d", songlabel, trk, repeat_index);
-                            fp.add(new MmlDatum2(String.format("\tdw\t%s\n", t), -3, t));
+                            t = "%s_%02d_lp_%04d".formatted(songlabel, trk, repeat_index);
+                            fp.add(new MmlDatum2("\tdw\t%s\n".formatted(t), -3, t));
                             bank_usage[curr_bank] += 2;
 
-                            t = String.format("%s_%02d_lp_exit_%04d:", songlabel, trk, repeat_index);
-                            fp.add(new MmlDatum2(String.format("%s\n", t), -2, t));
+                            t = "%s_%02d_lp_exit_%04d:".formatted(songlabel, trk, repeat_index);
+                            fp.add(new MmlDatum2("%s\n".formatted(t), -2, t));
                             repeat_index++;
                             putAsm_pos = 0;
 //                            // 2004.09.02 stop after all
@@ -7057,11 +6970,11 @@ on_error:
                         } else {
                             putAsm(fp, enmMCK.MCK_REPEAT_ESC.v);
                             putAsm(fp, cmd[cmdPtr].param[0] & 0x7f);
-                            t = String.format("bank(%s_%02d_lp_exit_%04d)", songlabel, trk, repeat_index);
-                            fp.add(new MmlDatum2(String.format("\n\tdb\t%s\n", t), -3, t));
+                            t = "bank(%s_%02d_lp_exit_%04d)".formatted(songlabel, trk, repeat_index);
+                            fp.add(new MmlDatum2("\n\tdb\t%s\n".formatted(t), -3, t));
                             bank_usage[curr_bank]++;
-                            t = String.format("%s_%02d_lp_exit_%04d", songlabel, trk, repeat_index);
-                            fp.add(new MmlDatum2(String.format("\tdw\t%s\n", t), -3, t));
+                            t = "%s_%02d_lp_exit_%04d".formatted(songlabel, trk, repeat_index);
+                            fp.add(new MmlDatum2("\tdw\t%s\n".formatted(t), -3, t));
                             bank_usage[curr_bank] += 2;
                             putAsm_pos = 0;
                             repeat_esc_flag = 1;
@@ -7214,8 +7127,8 @@ on_error:
                 track_count[mml_idx][trk][1].cnt = 0;
                 track_count[mml_idx][trk][1].frm = 0;
 
-                t = String.format("%s:", loop_point_label);
-                fp.add(new MmlDatum2(String.format("\n%s\n", t), -2, t));
+                t = "%s:".formatted(loop_point_label);
+                fp.add(new MmlDatum2("\n%s\n".formatted(t), -2, t));
                 putAsm_pos = 0;
                 putAsm(fp, enmMCK.MCK_REST.v);
                 putAsm(fp, 0xff);
@@ -7226,17 +7139,17 @@ on_error:
 
             // putAsm( fp, MCK_DATA_END );
             putAsm(fp, enmMCK.MCK_GOTO.v);
-            fp.add(new MmlDatum2(String.format("\n\tdb\tbank(%s)\n", loop_point_label), -3, String.format("bank(%d)", loop_point_label)));
+            fp.add(new MmlDatum2("\n\tdb\tbank(%s)\n".formatted(loop_point_label), -3, String.format("bank(%d)", loop_point_label)));
             bank_usage[curr_bank]++;
-            fp.add(new MmlDatum2(String.format("\tdw\t%s\n", loop_point_label), -3, loop_point_label));
+            fp.add(new MmlDatum2("\tdw\t%s\n".formatted(loop_point_label), -3, loop_point_label));
             bank_usage[curr_bank] += 2;
             fp.add(new MmlDatum2("\n", 0));
         }
     }
 
-    /** */
+    /**  */
     private void setSongLabel() {
-        songlabel = String.format("song_%03d", mml_idx);
+        songlabel = "song_%03d".formatted(mml_idx);
     }
 
     /**
@@ -7246,14 +7159,14 @@ on_error:
      */
     private void display_counts_sub(int i, char trk) {
         String msg = "";
-        msg = String.format("   %s   |", trk);
+        msg = "   %s   |".formatted(trk);
         if (track_count[mml_idx][i][0].cnt != 0) {
-            msg += String.format(" %6d   %5d|", double2int(track_count[mml_idx][i][0].cnt), track_count[mml_idx][i][0].frm);
+            msg += " %6d   %5d|".formatted(double2int(track_count[mml_idx][i][0].cnt), track_count[mml_idx][i][0].frm);
         } else {
             msg += "               |";
         }
         if (track_count[mml_idx][i][1].cnt != 0) {
-            msg += String.format(" %6d   %5d|", double2int(track_count[mml_idx][i][1].cnt), track_count[mml_idx][i][1].frm);
+            msg += " %6d   %5d|".formatted(double2int(track_count[mml_idx][i][1].cnt), track_count[mml_idx][i][1].frm);
         } else {
             msg += "               |";
         }
@@ -7304,7 +7217,7 @@ on_error:
             getLineStatus(line_ptr[mml_idx], 0);
 
             //for (i = 1; i < line_ptr[mml_idx].length; i++) {
-            //    logger.log(Level.TRACE, String.format("%4d : {1:X04}", i, line_ptr[mml_idx][i].status));
+            //    logger.log(Level.TRACE, "%4d : {1:X04}".formatted(i, line_ptr[mml_idx][i].status));
             //}
 
             getTone(line_ptr[mml_idx]);
@@ -7424,7 +7337,7 @@ on_error:
 
             // Write MML file
             if (wk.include_flag != 0) {
-                t = String.format("\t.include\t\"%s\"", wk.out_name);
+                t = "\t.include\t\"%s\"".formatted(wk.out_name);
                 efFp.add(new MmlDatum2(t, -4, t));
             }
         }
@@ -7434,7 +7347,7 @@ on_error:
         // Write title/composer/editor information as comments to output files
         writeSongInfo(oufp);
 
-        logger.log(Level.DEBUG, String.format(" test info:vrc7:%d vrc6:%d n106:%d", vrc7_track_num, vrc6_track_num, n106_track_num));
+        logger.log(Level.DEBUG, " test info:vrc7:%d vrc6:%d n106:%d".formatted(vrc7_track_num, vrc6_track_num, n106_track_num));
 
         track_ptr = 0;
 
@@ -7459,16 +7372,16 @@ on_error:
         oufp.add(new MmlDatum2("song_addr_table:\n", -2, "song_addr_table:"));
         for (mml_idx = 0; mml_idx < wk.mml_num; mml_idx++) {
             setSongLabel();
-            t = String.format("%s_track_table", songlabel);
-            oufp.add(new MmlDatum2(String.format("\tdw\t%s\n", t), -3, t));
+            t = "%s_track_table".formatted(songlabel);
+            oufp.add(new MmlDatum2("\tdw\t%s\n".formatted(t), -3, t));
         }
 
         oufp.add(new MmlDatum2("\t.if (ALLOW_BANK_SWITCH)\n", -4, ".if (ALLOW_BANK_SWITCH)"));
         oufp.add(new MmlDatum2("song_bank_table:\n", -2, "song_bank_table:"));
         for (mml_idx = 0; mml_idx < wk.mml_num; mml_idx++) {
             setSongLabel();
-            t = String.format("%s_bank_table", songlabel);
-            oufp.add(new MmlDatum2(String.format("\tdw\t%s\n", t), -3, t));
+            t = "%s_bank_table".formatted(songlabel);
+            oufp.add(new MmlDatum2("\tdw\t%s\n".formatted(t), -3, t));
         }
         oufp.add(new MmlDatum2("\t.endif ; ALLOW_BANK_SWITCH\n", -4, ".endif"));
         oufp.add(new MmlDatum2("\t.endif ; TOTAL_SONGS > 1\n", -4, ".endif"));
@@ -7479,28 +7392,28 @@ on_error:
 
 
             for (i = 0; i < _TRACK_MAX; i++) {
-                t = String.format("%s_%02d", songlabel, i);
-                if (trk_flag[i] != 0) oufp.add(new MmlDatum2(String.format("\tdw\t%s\n", t), -3, t));
+                t = "%s_%02d".formatted(songlabel, i);
+                if (trk_flag[i] != 0) oufp.add(new MmlDatum2("\tdw\t%s\n".formatted(t), -3, t));
             }
 
             oufp.add(new MmlDatum2("\t.if (ALLOW_BANK_SWITCH)\n", -4, ".if (ALLOW_BANK_SWITCH)"));
             oufp.add(new MmlDatum2("sound_data_bank:\n", -2, "sound_data_bank:"));
-            //fp.add(String.format("{0}_bank_table:\n", songlabel));
+            //fp.add("{0}_bank_table:\n".formatted(songlabel));
             for (i = 0; i < _TRACK_MAX; i++) {
-                t = String.format("bank(%s_%02d)", songlabel, i);
-                if (trk_flag[i] != 0) oufp.add(new MmlDatum2(String.format("\tdb\t%s\n", t), -3, t));
+                t = "bank(%s_%02d)".formatted(songlabel, i);
+                if (trk_flag[i] != 0) oufp.add(new MmlDatum2("\tdb\t%s\n".formatted(t), -3, t));
             }
 
             oufp.add(new MmlDatum2("loop_point_table:\n", -2, "loop_point_table:"));
             for (i = 0; i < _TRACK_MAX; i++) {
-                t = String.format("%s_%02d_lp", songlabel, i);
-                if (trk_flag[i] != 0) oufp.add(new MmlDatum2(String.format("\tdw\t%s\n", t), -3, t));
+                t = "%s_%02d_lp".formatted(songlabel, i);
+                if (trk_flag[i] != 0) oufp.add(new MmlDatum2("\tdw\t%s\n".formatted(t), -3, t));
             }
 
             oufp.add(new MmlDatum2("loop_point_bank:\n", -2, "loop_point_bank:"));
             for (i = 0; i < _TRACK_MAX; i++) {
-                t = String.format("bank(%s_%02d_lp)", songlabel, i);
-                if (trk_flag[i] != 0) oufp.add(new MmlDatum2(String.format("\tdb\t%s\n", t), -3, t));
+                t = "bank(%s_%02d_lp)".formatted(songlabel, i);
+                if (trk_flag[i] != 0) oufp.add(new MmlDatum2("\tdb\t%s\n".formatted(t), -3, t));
             }
 
             oufp.add(new MmlDatum2("\n", 0));
@@ -7522,8 +7435,8 @@ on_error:
                     } else {
                         curr_bank = bank_sel[i];
                         oufp.add(new MmlDatum2("\n\n", 0));
-                        t = String.format(".bank\t%d", bank_sel[i]);
-                        oufp.add(new MmlDatum2(String.format("\t%d\n", t), -4, t));
+                        t = ".bank\t%d".formatted(bank_sel[i]);
+                        oufp.add(new MmlDatum2("\t%d\n".formatted(t), -4, t));
                         putBankOrigin(oufp, bank_sel[i]);
                     }
                 }
@@ -7537,39 +7450,39 @@ on_error:
         }
 
         {
-            t = String.format("TOTAL_SONGS\tequ\t$%02x", wk.mml_num);
-            infp.add(new MmlDatum2(String.format("%s\n", t), -5, t));
-            t = String.format("SOUND_GENERATOR\tequ\t$%02x", sndgen_flag);
-            infp.add(new MmlDatum2(String.format("%s\n", t), -5, t));
-            t = String.format("SOUND_USERPCM\tequ\t$%02x", use_pcm);
-            infp.add(new MmlDatum2(String.format("%s\n", t), -5, t));
+            t = "TOTAL_SONGS\tequ\t$%02x".formatted(wk.mml_num);
+            infp.add(new MmlDatum2("%s\n".formatted(t), -5, t));
+            t = "SOUND_GENERATOR\tequ\t$%02x".formatted(sndgen_flag);
+            infp.add(new MmlDatum2("%s\n".formatted(t), -5, t));
+            t = "SOUND_USERPCM\tequ\t$%02x".formatted(use_pcm);
+            infp.add(new MmlDatum2("%s\n".formatted(t), -5, t));
 
-            t = String.format("USE_OPL3_TRACK\t\tequ\t%2d", opl3_track_num);
-            infp.add(new MmlDatum2(String.format("%s\n", t), -5, t));
-            t = String.format("OPL3_BASETRACK\t\tequ\t%2d", BOPL3TRACK());
-            infp.add(new MmlDatum2(String.format("%s\n", t), -5, t));
+            t = "USE_OPL3_TRACK\t\tequ\t%2d".formatted(opl3_track_num);
+            infp.add(new MmlDatum2("%s\n".formatted(t), -5, t));
+            t = "OPL3_BASETRACK\t\tequ\t%2d".formatted(BOPL3TRACK());
+            infp.add(new MmlDatum2("%s\n".formatted(t), -5, t));
 
             //flogger.log(Level.TRACE, fp, "INITIAL_WAIT_FRM\t\tequ\t%2d\n", 0x26);
-            t = String.format("PITCH_CORRECTION\t\tequ\t%d", pitch_correction);
-            infp.add(new MmlDatum2(String.format("%s\n", t), -5, t));
-            t = String.format("DPCM_RESTSTOP\t\tequ\t%d", dpcm_reststop);
-            infp.add(new MmlDatum2(String.format("%s\n", t), -5, t));
-            t = String.format("DPCM_BANKSWITCH\t\tequ\t%d", dpcm_bankswitch);
-            infp.add(new MmlDatum2(String.format("%s\n", t), -5, t));
-            t = String.format("DPCM_EXTRA_BANK_START\t\tequ\t%d", bank_maximum + 1);
-            infp.add(new MmlDatum2(String.format("%s\n", t), -5, t));
-            t = String.format("BANK_MAX_IN_4KB\t\tequ\t(%d + %d)*2+1", bank_maximum, dpcm_extra_bank_num);
-            infp.add(new MmlDatum2(String.format("%s\n", t), -5, t));
+            t = "PITCH_CORRECTION\t\tequ\t%d".formatted(pitch_correction);
+            infp.add(new MmlDatum2("%s\n".formatted(t), -5, t));
+            t = "DPCM_RESTSTOP\t\tequ\t%d".formatted(dpcm_reststop);
+            infp.add(new MmlDatum2("%s\n".formatted(t), -5, t));
+            t = "DPCM_BANKSWITCH\t\tequ\t%d".formatted(dpcm_bankswitch);
+            infp.add(new MmlDatum2("%s\n".formatted(t), -5, t));
+            t = "DPCM_EXTRA_BANK_START\t\tequ\t%d".formatted(bank_maximum + 1);
+            infp.add(new MmlDatum2("%s\n".formatted(t), -5, t));
+            t = "BANK_MAX_IN_4KB\t\tequ\t(%d + %d)*2+1".formatted(bank_maximum, dpcm_extra_bank_num);
+            infp.add(new MmlDatum2("%s\n".formatted(t), -5, t));
 
             // (!dpcm_bankswitch && (bank_maximum + dpcm_extra_bank_num <= 3))
             if (allow_bankswitching == 0) {
                 t = "ALLOW_BANK_SWITCH\t\tequ\t0";
-                infp.add(new MmlDatum2(String.format("%s\n", t), -5, t));
+                infp.add(new MmlDatum2("%s\n".formatted(t), -5, t));
             } else {
                 t = "ALLOW_BANK_SWITCH\t\tequ\t1";
-                infp.add(new MmlDatum2(String.format("%s\n", t), -5, t));
+                infp.add(new MmlDatum2("%s\n".formatted(t), -5, t));
                 t = "BANKSWITCH_INIT_MACRO\t.macro";
-                infp.add(new MmlDatum2(String.format("%s\n", t), -4, t));
+                infp.add(new MmlDatum2("%s\n".formatted(t), -4, t));
                 switch (bank_maximum) {
                     case 0:
                         infp.add(new MmlDatum2("\tdb\t0,1,0,0,0,0,0,0\n", -1, 0, -1, 1, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0));
@@ -7586,7 +7499,7 @@ on_error:
                         break;
                 }
                 t = "\t.endm";
-                infp.add(new MmlDatum2(String.format("%s\n", t), -4, t));
+                infp.add(new MmlDatum2("%s\n".formatted(t), -4, t));
             }
 
             // Write title/composer/editor information to output file as macro
@@ -7672,7 +7585,7 @@ on_error:
         for (mml_idx = 0; mml_idx < wk.mml_num; mml_idx++) {
             logger.log(Level.INFO, "");
             if (wk.mml_num > 1) {
-                logger.log(Level.INFO, String.format("Song %d: %s", mml_idx + 1, wk.mml_names[mml_idx]));
+                logger.log(Level.INFO, "Song %d: %s".formatted(mml_idx + 1, wk.mml_names[mml_idx]));
             }
             logger.log(Level.INFO, "-------+---------------+---------------+");
             logger.log(Level.INFO, "Track  |    Total      |    Loop       |");

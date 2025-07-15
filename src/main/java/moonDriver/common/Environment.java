@@ -8,7 +8,7 @@ import java.util.List;
 
 import dotnet4j.util.compat.StringUtilities;
 
-
+// properties?
 public class Environment {
 
     private List<String> envs = null;
@@ -20,7 +20,7 @@ public class Environment {
     public void AddEnv(String envname) {
         var env = System.getenv(envname);
         if (!StringUtilities.isNullOrEmpty(env)) {
-            envs.add(String.format("%s=%s", envname, env));
+            envs.add("%s=%s".formatted(envname, env));
         }
     }
 

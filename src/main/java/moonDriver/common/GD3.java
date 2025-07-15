@@ -6,6 +6,7 @@ import java.util.StringJoiner;
 import dotnet4j.util.compat.Tuple3;
 
 
+// TODO deprecate
 public class GD3 {
 
     public String TrackName = "";

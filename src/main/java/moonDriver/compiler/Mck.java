@@ -143,7 +143,7 @@ public class Mck {
         return null;
     }
 
-    public CompilerInfo GetCompilerInfo() {
+    public CompilerInfo getCompilerInfo() {
         if (datamake == null) return null;
         CompilerInfo ci = datamake.GetCompilerInfo();
         return ci;
