@@ -254,6 +254,8 @@ public class Program {
 
             switch (device) {
                 case 0:
+                    trdMain = new Thread(Program::AudioLoop);
+                    trdMain.start();
                     audioOutput.start();
                     break;
                 case 1:
@@ -533,6 +535,34 @@ public class Program {
 //            }
 //            trdStopped = true;
 //        }
+
+    private static void AudioLoop() {
+        byte[] b = new byte[frames.length * 2];
+        trdStopped = false;
+        try {
+            while (!trdClosed) {
+                if (audioOutput.available() < frames.length * 2) {
+                    try {
+                        Thread.sleep(1);
+                    } catch (InterruptedException e) {
+                        break;
+                    }
+                    continue;
+                }
+                int count = frames.length;
+                int ret = emuCallback(frames, 0, count);
+                for (int i = 0; i < ret; i++) {
+                    short s = frames[i];
+                    b[i * 2] = (byte) (s & 0xff);
+                    b[i * 2 + 1] = (byte) ((s >> 8) & 0xff);
+                }
+                audioOutput.write(b, 0, ret * 2);
+            }
+        } catch (Exception e) {
+            logger.log(Level.ERROR, e.getMessage(), e);
+        }
+        trdStopped = true;
+    }
 
     private static void OneFrame() {
         drv.render();
