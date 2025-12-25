@@ -112,17 +112,14 @@ class Program {
                 // The default is the source file name with the extension changed to .MDR.
                 String destFileName = "";
                 if (!StringUtilities.isNullOrEmpty(srcFile)) {
-                    destFileName = Path.combine(Path.getDirectoryName(Path.getFullPath(srcFile))
-                            , String.format("%s%s"
-                                    , Path.getFileNameWithoutExtension(srcFile)
-                                    , Common.objExtension)
+                    destFileName = Path.combine(Path.getDirectoryName(Path.getFullPath(srcFile)),
+                            String.format("%s%s", Path.getFileNameWithoutExtension(srcFile), Common.objExtension)
                     );
                 }
 
                 compiler.work.in_name = srcFile;
-                compiler.work.out_name = Path.combine(Path.getDirectoryName(Path.getFullPath(srcFile)), String.format("%s%s"
-                        , Path.getFileNameWithoutExtension(srcFile)
-                        , ".h"));
+                compiler.work.out_name = Path.combine(Path.getDirectoryName(Path.getFullPath(srcFile)),
+                        "%s%s".formatted(Path.getFileNameWithoutExtension(srcFile), ".h"));
                 compiler.work.ef_name = Path.combine(Path.getDirectoryName(Path.getFullPath(srcFile)), compiler.work.ef_name);
                 compiler.work.inc_name = Path.combine(Path.getDirectoryName(Path.getFullPath(srcFile)), compiler.work.inc_name);
 
@@ -139,7 +136,7 @@ class Program {
                 if (tags != null && tags.length > 0) {
                     for (Tuple<String, String> tag : tags) {
 //#if DEBUG
-                        logger.log(Level.TRACE, String.format("%s\t: %s", tag.getItem1(), tag.getItem2()));
+                        logger.log(Level.TRACE, "%s\t: %s".formatted(tag.getItem1(), tag.getItem2()));
 //#endif
                         // Get the output file name
                         //if (tag.getItem1().toUpperCase().indexOf("#FI") != 0) continue; // Because mc is judged up to three characters
@@ -151,16 +148,12 @@ class Program {
                 if (!StringUtilities.isNullOrEmpty(outFileName)) {
                     if (outFileName.charAt(0) != '.') {
                         // When specifying a file name
-                        destFileName = Path.combine(
-                                Path.getDirectoryName(Path.getFullPath(srcFile))
-                                , outFileName);
+                        destFileName = Path.combine(Path.getDirectoryName(Path.getFullPath(srcFile)), outFileName);
                     } else {
                         // When specifying the extension only
                         destFileName = Path.combine(
-                                Path.getDirectoryName(Path.getFullPath(srcFile))
-                                , String.format("%s%s"
-                                        , Path.getFileNameWithoutExtension(srcFile)
-                                        , outFileName));
+                                Path.getDirectoryName(Path.getFullPath(srcFile)),
+                                "%s%s".formatted(Path.getFileNameWithoutExtension(srcFile), outFileName));
                     }
                 }
 
@@ -189,7 +182,8 @@ class Program {
                     }
                 }
             } else {
-                String destFileName = Path.combine(Path.getDirectoryName(Path.getFullPath(srcFile)), String.format("%d.xml", Path.getFileNameWithoutExtension(srcFile)));
+                String destFileName = Path.combine(Path.getDirectoryName(Path.getFullPath(srcFile)),
+                        "%s.xml".formatted(Path.getFileNameWithoutExtension(srcFile)));
                 if (desFile != null) {
                     destFileName = desFile;
                 }

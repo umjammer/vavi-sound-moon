@@ -2,7 +2,6 @@ package moonDriver.compiler;
 
 import java.lang.System.Logger;
 import java.lang.System.Logger.Level;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -18,6 +17,7 @@ import static moonDriver.common.Common.charset;
 public class Assemble {
 
     private static final Logger logger = getLogger(Assemble.class.getName());
+
     private List<MmlDatum2> asFp;
     private List<MmlDatum2> efFp;
     private List<MmlDatum2> ouFp;
@@ -26,49 +26,49 @@ public class Assemble {
     private List<MmlDatum2> asm;
     private Map<String, List<MmlDatum2>> dicMacroBlock;
     private Map<String, MmlDatum2> dicDefine;
-    private Map<String, List<Tuple3<Integer, Integer, Object>>> dicRefLabel = new HashMap<>();
+    private final Map<String, List<Tuple3<Integer, Integer, Object>>> dicRefLabel = new HashMap<>();
     private Map<String, MmlDatum2> dicLabel;
 
-    private List<List<MmlDatum2>> dest = new ArrayList<>();
+    private final List<List<MmlDatum2>> dest = new ArrayList<>();
     private int currentBank = 0;
     private int currentAddress = 0;
-    private Stack<Boolean> assembleBlockStack = new Stack<>();
+    private final Stack<Boolean> assembleBlockStack = new Stack<>();
     private boolean assembleBlockLatest = false;
 
     public List<List<MmlDatum2>> build(Work wk, List<MmlDatum2> efFp, List<MmlDatum2> ouFp, List<MmlDatum2> inFp) {
         // I'll put it aside for now
         assembleBlockStack.push(false);
-        UpdateAssembleBlockLatest();
+        updateAssembleBlockLatest();
 
         //
-        GetAsmList();
+        getAsmList();
         this.efFp = efFp;
         this.ouFp = ouFp;
         this.inFp = inFp;
 
         // Referencing includes and combining each list into one
-        Step1_Append();
+        append();
         // Collecting blocks of macros
-        Step2_GetMacro();
+        getMacro();
         // Replace a block of macros
-        Step3_ReplaceMacro();
+        replaceMacro();
         // Collect constants
-        Step4_GetDefine();
+        getDefinition();
         // Collect labels
-        Step5_GetLabel();
+        getLabel();
         // Assemble
         assemble();
         // Label reference expansion
-        SetLabel();
+        setLabel();
 
         return dest;
     }
 
-    private void UpdateAssembleBlockLatest() {
+    private void updateAssembleBlockLatest() {
         assembleBlockLatest = assembleBlockStack.contains(true);
     }
 
-    private void GetAsmList() {
+    private void getAsmList() {
         String t;
 
         asFp = new ArrayList<>();
@@ -86,15 +86,15 @@ public class Assemble {
         t = ".code";
         asFp.add(new MmlDatum2(t, -4, t));
 
-        asFp.add(new MmlDatum2("ds $80"
-                , -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0
-                , -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0
-                , -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0
-                , -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0
-                , -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0
-                , -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0
-                , -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0
-                , -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0
+        asFp.add(new MmlDatum2("ds $80",
+                -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0,
+                -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0,
+                -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0,
+                -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0,
+                -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0,
+                -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0,
+                -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0,
+                -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0, -1, 0
         ));
 
         t = ".org  $8000";
@@ -237,7 +237,8 @@ public class Assemble {
         asFp.add(new MmlDatum2(t, -4, t));
     }
 
-    private void Step1_Append() {
+    // Step1
+    private void append() {
         asm = new ArrayList<>();
         Step1_start(asFp);
     }
@@ -272,7 +273,8 @@ public class Assemble {
         }
     }
 
-    private void Step2_GetMacro() {
+    // Step2
+    private void getMacro() {
         dicMacroBlock = new HashMap<>();
 
         for (int i = 0; i < asm.size(); i++) {
@@ -325,8 +327,8 @@ public class Assemble {
         }
     }
 
-
-    private void Step3_ReplaceMacro() {
+    // Step3
+    private void replaceMacro() {
         boolean f;
 
         do {
@@ -354,10 +356,10 @@ public class Assemble {
                 }
             }
         } while (f);
-
     }
 
-    private void Step4_GetDefine() {
+    // Step4
+    private void getDefinition() {
         dicDefine = new HashMap<>();
 
         for (int i = 0; i < asm.size(); i++) {
@@ -379,11 +381,11 @@ public class Assemble {
             String defineLabel = wd[0];
             md = new MmlDatum2(wd[2], -5, "");
             dicDefine.put(defineLabel, md);
-
         }
     }
 
-    private void Step5_GetLabel() {
+    // Step5
+    private void getLabel() {
         dicLabel = new HashMap<>();
 
         for (int i = 0; i < asm.size(); i++) {
@@ -399,7 +401,6 @@ public class Assemble {
 
             md.dat = i; // Try adding the number of lines
             dicLabel.put((String) md.args.get(1), md);
-
         }
     }
 
@@ -442,7 +443,7 @@ public class Assemble {
                         asmDbRefDefine(asm.get(i), /* ref */ ptr);
                         break;
                     default:
-                        logger.log(Level.ERROR, String.format("Unknown type[%d] error. ", tp));
+                        logger.log(Level.ERROR, "Unknown type[%d] error. ".formatted(tp));
                         ptr[0]++;
                         break;
                 }
@@ -609,14 +610,14 @@ public class Assemble {
         }
 
         dest.get(bank).set(adr, new MmlDatum2());
-        dest.get(bank).get(adr).dat = dat;
+        dest.get(bank).get(adr).dat = dat & 0xff;
         dest.get(bank).get(adr).args = null;
         dest.get(bank).get(adr).code = "";
         dest.get(bank).get(adr).linePos = src.linePos;
         dest.get(bank).get(adr).type = src.type;
         if (adr > 0x9b84) {
         }
-        logger.log(Level.TRACE, String.format("%02x:%04d:%02x", bank, adr, dat));
+        logger.log(Level.TRACE, "%02x:%04d:%02x".formatted(bank, adr, dat));
     }
 
     private void asmMacro(MmlDatum2 asm,/* ref */ int[] ptr) {
@@ -641,16 +642,16 @@ public class Assemble {
                 break;
             case ".if":
                 assembleBlockStack.push(!anaCondition(macros)); // This is a flag to determine whether to block, so the inverse of the result is set.
-                UpdateAssembleBlockLatest();
+                updateAssembleBlockLatest();
                 break;
             case ".else":
                 boolean flg = assembleBlockStack.pop();
                 assembleBlockStack.push(!flg);
-                UpdateAssembleBlockLatest();
+                updateAssembleBlockLatest();
                 break;
             case ".endif":
                 assembleBlockStack.pop();
-                UpdateAssembleBlockLatest();
+                updateAssembleBlockLatest();
                 break;
             default:
                 logger.log(Level.ERROR, "macro error.");
@@ -755,7 +756,7 @@ public class Assemble {
         }
     }
 
-    private void SetLabel() {
+    private void setLabel() {
         for (String refkey : dicRefLabel.keySet()) {
             String key = refkey + ":";
             if (!dicLabel.containsKey(key)) continue;
@@ -772,16 +773,16 @@ public class Assemble {
                 MmlDatum2 m;
                 if (trgByteFlg instanceof Boolean) {
                     m = new MmlDatum2();
-                    m.dat = (byte) adr;
+                    m.dat = adr & 0xff;
                     dest.get(trgBank).set(trgAdr, m);
                     if (!(boolean) trgByteFlg) {
                         m = new MmlDatum2();
-                        m.dat = (byte) (adr >> 8);
+                        m.dat = (adr >> 8) & 0xff;
                         dest.get(trgBank).set(trgAdr + 1, m);
                     }
                 } else {
                     m = new MmlDatum2();
-                    m.dat = bank;
+                    m.dat = bank & 0xff;
                     dest.get(trgBank).set(trgAdr, m);
                 }
             }

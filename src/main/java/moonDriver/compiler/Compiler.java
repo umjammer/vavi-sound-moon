@@ -5,7 +5,6 @@ package moonDriver.compiler;
 
 import java.awt.Point;
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
@@ -16,7 +15,6 @@ import dotnet4j.io.SeekOrigin;
 import dotnet4j.io.Stream;
 import dotnet4j.io.StreamReader;
 import dotnet4j.util.compat.Tuple;
-import moonDriver.common.Common;
 import musicDriverInterface.CompilerInfo;
 import musicDriverInterface.GD3Tag;
 import musicDriverInterface.ICompiler;
@@ -114,7 +112,7 @@ public class Compiler implements ICompiler {
 
     public CompilerInfo getCompilerInfo() {
         if (mck == null) return null;
-        return mck.GetCompilerInfo();
+        return mck.getCompilerInfo();
     }
 
     public GD3Tag getGD3TagInfo(byte[] srcBuf) {

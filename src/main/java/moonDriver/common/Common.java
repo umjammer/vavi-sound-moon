@@ -75,4 +75,23 @@ public class Common {
         }
         return "";
     }
+
+    public static String getNRDString(byte[] buf, /* ref */ int[] index) {
+        if (buf == null || buf.length < 1 || index[0] < 0 || index[0] >= buf.length) return "";
+
+        try {
+            List<Byte> lst = new ArrayList<>();
+            for (; buf[index[0]] != 0; index[0]++) {
+                lst.add((byte) buf[index[0]]);
+            }
+
+            String n = new String(ByteUtil.toByteArray(lst), charset);
+            index[0]++;
+
+            return n;
+        } catch (Exception e) {
+            logger.log(Level.ERROR, e.getMessage(), e);
+        }
+        return "";
+    }
 }

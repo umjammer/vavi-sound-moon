@@ -1,13 +1,13 @@
 [![Release](https://jitpack.io/v/umjammer/vavi-sound-moon.svg)](https://jitpack.io/#umjammer/vavi-sound-moon)
 [![Java CI](https://github.com/umjammer/vavi-sound-moon/actions/workflows/maven.yml/badge.svg)](https://github.com/umjammer/vavi-sound-moon/actions/workflows/maven.yml)
 [![CodeQL](https://github.com/umjammer/vavi-sound-moon/actions/workflows/codeql.yml/badge.svg)](https://github.com/umjammer/vavi-sound-moon/actions/workflows/codeql.yml)
-![Java](https://img.shields.io/badge/Java-17-b07219)
+![Java](https://img.shields.io/badge/Java-21-b07219)
 
 # vavi-sound-moon
 
 <img alt="duke sings moondriver" src="https://github.com/user-attachments/assets/31aa504c-931a-4d1a-855f-5cbe7bc1ddc6" width="100" />
 
-Java version of MoonDriver.
+🎻 Java version of MoonDriver.
 
 this is a fork of [MoonDriverDotNET](https://github.com/kuma4649/MoonDriverDotNET)
 
@@ -17,12 +17,19 @@ this is a fork of [MoonDriverDotNET](https://github.com/kuma4649/MoonDriverDotNE
 
 ## Usage
 
+currently this project has no good player, use [vavi-sound-mdplayer](https://github.com/umjammer/vavi-sound-mdplayer) instead
+
 ## References
 
  * https://github.com/BouKiCHi/moondrv
 
 ## TODO
 
+ * ~~status~~
+   * ~~loop ok~~
+   * ~~sound starting only, silence continues~~ ... test.mdr is actually one note audio file...
+ * compiler
+ * pcm
 
 ---
 

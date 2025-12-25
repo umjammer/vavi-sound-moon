@@ -36,22 +36,19 @@ public class MmlDatum2 extends MmlDatum implements Serializable {
         this.code = code;
     }
 
-    /// <summary>
-    ///
-    /// </summary>
-    /// <param name="code"></param>
-    /// <param name="args">
-    ///  0:none
-    /// -1:data
-    /// -2:label
-    /// -3:/* ref */ label
-    /// -4:macro
-    /// -5:define
-    /// -6:db /* ref */ define
-    /// -7:/* ref */ macro
-    /// </param>
+    /**
+     * @param code
+     * @param args 0:none <br/>
+     *             -1:data <br/>
+     *             -2:label <br/>
+     *             -3: [ref] label <br/>
+     *             -4:macro <br/>
+     *             -5:define <br/>
+     *             -6:db [ref] define <br/>
+     *             -7: [ref] macro <br/>
+     */
     public MmlDatum2(String code, Object... args) {
-        super(-1, MMLType.unknown, null, args);
+        super(-1, MMLType.Unknown, null, args);
         this.code = code;
     }
 
@@ -63,7 +60,7 @@ public class MmlDatum2 extends MmlDatum implements Serializable {
             c = c.substring(0, c.length() - 1);
             d += "\n";
         }
-        return String.format("%d : %d%d", c, super.toString(), d);
+        return "%d : %d%d".formatted(c, super.toString(), d);
     }
 
     public musicDriverInterface.MmlDatum ToMmlDatumn() {

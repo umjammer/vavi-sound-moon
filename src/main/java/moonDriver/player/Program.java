@@ -112,7 +112,7 @@ public class Program {
     private static String[] envMoonDriverOpt = null;
     private static String srcFile = null;
 
-    static int Main(String[] args) {
+    public static void main(String[] args) {
         int fnIndex = analyzeOption(args);
         int mIndex = -1;
 
@@ -127,15 +127,15 @@ public class Program {
         }
 
         if (mIndex < 0) {
-            logger.log(Level.INFO, String.format("at least one argument is needed (%d file)...", Common.objExtension));
-            return -1;
+            System.err.printf("at least one argument is needed (%s file)...".formatted(Common.objExtension));
+            System.exit(-1);
         }
 
         srcFile = args[mIndex];
 
         if (!File.exists(args[mIndex])) {
-            logger.log(Level.ERROR, String.format("File [%d] not found", args[mIndex]));
-            return -1;
+            System.err.printf("File [%s] not found".formatted(args[mIndex]));
+            System.exit(-1);
         }
 
 //        rsc = CheckDevice();
@@ -218,12 +218,12 @@ public class Program {
             logger.log(Level.INFO, "");
 
             ((Driver) drv).init(
-                    srcFile
-                    , Program::OPL4Write
-                    , SamplingRate
-                    , dop
-                    , pop.toArray(String[]::new)
-                    , Program::appendFileReaderCallback
+                    srcFile,
+                    Program::OPL4Write,
+                    SamplingRate,
+                    dop,
+                    pop.toArray(String[]::new),
+                    Program::appendFileReaderCallback
             );
 
 //            // When AUTO is specified, the configuration will change, so the volume will be set after receiving the configuration information.
@@ -242,18 +242,20 @@ public class Program {
             if (tags != null) {
                 for (Tuple<String, String> tag : tags) {
                     if (Objects.equals(tag.getItem1(), "")) continue;
-                    logger.log(Level.INFO, String.format("{0,-16} : %d", tag.getItem1(), tag.getItem2()), 16 + 3);
+                    logger.log(Level.INFO, "%-16s : %s".formatted(tag.getItem1(), tag.getItem2()), 16 + 3);
                 }
             }
 
             logger.log(Level.INFO, "");
 
-            drv.startRendering((int) SamplingRate, new Tuple[] {new Tuple<>("YMF278B", opl4MasterClock)});
+            drv.startRendering(SamplingRate, new Tuple<>("YMF278B", opl4MasterClock));
 
             drv.startMusic(0);
 
             switch (device) {
                 case 0:
+                    trdMain = new Thread(Program::AudioLoop);
+                    trdMain.start();
                     audioOutput.start();
                     break;
                 case 1:
@@ -320,7 +322,7 @@ public class Program {
 //            }
         }
 
-        return 0;
+        System.exit(0);
     }
 
     public static String getApplicationFolder() {
@@ -332,19 +334,12 @@ public class Program {
     }
 
     private static Stream appendFileReaderCallback(String arg) {
-        String fn;
-        fn = Path.combine(
-                Path.getDirectoryName(srcFile)
-                , arg
-        );
+        String fn = Path.combine(Path.getDirectoryName(srcFile), arg);
 
         if (envMoonDriver != null) {
             int i = 0;
             while (!File.exists(fn) && i < envMoonDriver.length) {
-                fn = Path.combine(
-                        envMoonDriver[i++]
-                        , arg
-                );
+                fn = Path.combine(envMoonDriver[i++], arg);
             }
         }
 
@@ -505,7 +500,7 @@ public class Program {
 
             }
         } catch (Exception ex) {
-            logger.log(Level.ERROR, String.format("%d %d", ex.getMessage(), ex.getStackTrace()));
+            logger.log(Level.ERROR, "%d %d".formatted(ex.getMessage(), ex.getStackTrace()));
         }
 
         return count;
@@ -541,6 +536,34 @@ public class Program {
 //            trdStopped = true;
 //        }
 
+    private static void AudioLoop() {
+        byte[] b = new byte[frames.length * 2];
+        trdStopped = false;
+        try {
+            while (!trdClosed) {
+                if (audioOutput.available() < frames.length * 2) {
+                    try {
+                        Thread.sleep(1);
+                    } catch (InterruptedException e) {
+                        break;
+                    }
+                    continue;
+                }
+                int count = frames.length;
+                int ret = emuCallback(frames, 0, count);
+                for (int i = 0; i < ret; i++) {
+                    short s = frames[i];
+                    b[i * 2] = (byte) (s & 0xff);
+                    b[i * 2 + 1] = (byte) ((s >> 8) & 0xff);
+                }
+                audioOutput.write(b, 0, ret * 2);
+            }
+        } catch (Exception e) {
+            logger.log(Level.ERROR, e.getMessage(), e);
+        }
+        trdStopped = true;
+    }
+
     private static void OneFrame() {
         drv.render();
     }
@@ -549,16 +572,13 @@ public class Program {
         if (dat != null && dat.additionalData != null) {
             MmlDatum md = (MmlDatum) dat.additionalData;
             if (md.linePos != null) {
-                logger.log(Level.TRACE, String.format("! r%d c%d"
-                        , md.linePos.row
-                        , md.linePos.col
-                ));
+                logger.log(Level.TRACE, "! r%d c%d".formatted(md.linePos.row, md.linePos.col));
             }
         }
 
 //#if DEBUG
         //if (dat.address == 0x29)
-        logger.log(Level.INFO, String.format("FM P%d Out:Adr[{0:x02}] val[{1:x02}]", (int) dat.address, (int) dat.data, dat.port));
+        logger.log(Level.INFO, "FM P%d Out:Adr[{0:x02}] val[{1:x02}]".formatted((int) dat.address, (int) dat.data, dat.port));
 //#endif
 
         switch (device) {

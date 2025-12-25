@@ -2,7 +2,6 @@ package moonDriver.compiler;
 
 import java.lang.System.Logger;
 import java.lang.System.Logger.Level;
-import java.nio.charset.Charset;
 import java.util.List;
 
 import dotnet4j.io.File;
@@ -13,34 +12,40 @@ import static java.lang.System.getLogger;
 import static moonDriver.common.Common.charset;
 
 
+//
+// pcmpack.c
+//
 public class PcmPack {
 
     private static final Logger logger = getLogger(PcmPack.class.getName());
-    //
-    // pcmpack.c
-    //
 
     private static final String PRG_NAME = "PCMPACK";
     private static final String PRG_VER = "Ver 0.1";
     private static final String PRG_AUTHOR = "BouKiCHi";
 
-    // MDR File Definition
+    /** MDR File Definition */
     private static class _mdr {
 
         public int fp;
         public int size;
         public int header = 0;
-        public String pcmname; // [PATH_MAX]; // pos:0x40 pcmname
-        public int pcm_packed; // pos: 0x2a 1:pcm is packed
-        public int pcm_startadrs; // pos:0x30 start address of PCM RAM(* 0x10000)
-        public int pcm_startbank; // pos:0x31 start bank (* 8192)
-        public int pcm_banks; // pos:0x32 number of PCM banks (* 8192)
-        public int pcm_lastsize; // pos:0x32 size of last bank (* 0x100)
+        /** pos:0x40 pcmname */
+        public String pcmname;
+        /** pos: 0x2a 1:pcm is packed */
+        public int pcm_packed;
+        /** pos:0x30 start address of PCM RAM(* 0x10000) */
+        public int pcm_startadrs;
+        /** pos:0x31 start bank (* 8192) */
+        public int pcm_startbank;
+        /** pos:0x32 number of PCM banks (* 8192) */
+        public int pcm_banks;
+        /** pos:0x32 size of last bank (* 0x100) */
+        public int pcm_lastsize;
 
         // actual size = (pcm_banks * 0x2000) + (pcm_lastsize * 0x100)
     }
 
-    // MDR file reading
+    /** MDR file reading */
     private int readMDRHeader(List<MmlDatum2> destBuf, String file, /* ref */ _mdr m) {
         try {
             m.size = destBuf.size();
@@ -71,7 +76,7 @@ public class PcmPack {
         }
     }
 
-    // MDR Header Reconstruction
+    /** MDR Header Reconstruction */
     private void writeMDRHeader(List<MmlDatum2> destBuf, _mdr m) {
         // PCM setting value
         destBuf.get(m.header + 0x2a).dat = m.pcm_packed;
@@ -83,7 +88,7 @@ public class PcmPack {
 
     private static final int BANK_SIZE = 0x2000;
 
-    // MDR file reading
+    /** MDR file reading */
     private List<MmlDatum2> packPCMintoMDR(List<MmlDatum2> destBuf, String file, String pcm, /* ref */ _mdr m) {
         if (StringUtilities.isNullOrEmpty(file)) return destBuf;
         if (StringUtilities.isNullOrEmpty(pcm)) return destBuf;
@@ -107,12 +112,12 @@ public class PcmPack {
                 pcmBuf = File.readAllBytes(pcm);
             }
         } catch (Exception e) {
-            logger.log(Level.ERROR, String.format("File open error!:%s", pcm));
+            logger.log(Level.ERROR, "File open error!:%s".formatted(pcm));
             return null;
         }
 
         // PCM data output position
-        logger.log(Level.INFO, String.format("PCM Start:%08xh", start_pos));
+        logger.log(Level.INFO, "PCM Start:%08xh".formatted(start_pos));
         m.fp = start_pos;
 
         int block_len = 0;
@@ -137,10 +142,10 @@ public class PcmPack {
         m.pcm_banks = pcm_blocks - 1; // Number of blocks
         m.pcm_lastsize = (block_len + 0xff) / 0x100; // Last block size
 
-        logger.log(Level.INFO, String.format("PCM StartAdrs:%02xh", m.pcm_startadrs));
-        logger.log(Level.INFO, String.format("PCM StartBank:%02xh", m.pcm_startbank));
-        logger.log(Level.INFO, String.format("PCM Banks:%02xh", m.pcm_banks));
-        logger.log(Level.INFO, String.format("PCM LastSize:%02xh", m.pcm_lastsize));
+        logger.log(Level.INFO, "PCM StartAdrs:%02xh".formatted(m.pcm_startadrs));
+        logger.log(Level.INFO, "PCM StartBank:%02xh".formatted(m.pcm_startbank));
+        logger.log(Level.INFO, "PCM Banks:%02xh".formatted(m.pcm_banks));
+        logger.log(Level.INFO, "PCM LastSize:%02xh".formatted(m.pcm_lastsize));
 
         writeMDRHeader(destBuf, m);
 
@@ -153,16 +158,16 @@ public class PcmPack {
         String mdrfile;
 
         // title
-        logger.log(Level.INFO, String.format("%s %s by %s", PRG_NAME, PRG_VER, PRG_AUTHOR));
+        logger.log(Level.INFO, "%s %s by %s".formatted(PRG_NAME, PRG_VER, PRG_AUTHOR));
 
         mdrfile = mdrFn;
-        logger.log(Level.INFO, String.format("File:%s", mdrfile));
+        logger.log(Level.INFO, "File:%s".formatted(mdrfile));
         if (!StringUtilities.isNullOrEmpty(pcmFn)) pcmfile = pcmFn;
 
         _mdr m = new _mdr();
         readMDRHeader(destBuf, mdrfile, /* ref */ m);
 
-        logger.log(Level.INFO, String.format("Size:%d", m.size));
+        logger.log(Level.INFO, "Size:%d".formatted(m.size));
 
         if (StringUtilities.isNullOrEmpty(pcmfile)) {
             if (!StringUtilities.isNullOrEmpty(m.pcmname)) {
@@ -176,7 +181,7 @@ public class PcmPack {
             return destBuf;
         }
 
-        logger.log(Level.INFO, String.format("PCM File:%s", pcmfile));
+        logger.log(Level.INFO, "PCM File:%s".formatted(pcmfile));
 
         // Stuffing the PCM
         return packPCMintoMDR(destBuf, mdrfile, pcmfile, /* ref */ m);
