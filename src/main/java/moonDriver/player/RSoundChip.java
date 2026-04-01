@@ -2,9 +2,9 @@ package moonDriver.player;
 
 public class RSoundChip {
 
-    protected int SoundLocation;
-    protected int BusID;
-    protected int SoundChip;
+    protected final int SoundLocation;
+    protected final int BusID;
+    protected final int SoundChip;
 
     public int dClock = 3579545;
 

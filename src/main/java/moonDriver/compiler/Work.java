@@ -9,8 +9,8 @@ public class Work {
     public static final int MML_MAX = 128;
     public static final int MML_MAX_NAME = 512;
 
-    public String[] mml_names = new String[MML_MAX];
-    public String[] mml_short_names = new String[MML_MAX];
+    public final String[] mml_names = new String[MML_MAX];
+    public final String[] mml_short_names = new String[MML_MAX];
     public int debug_flag = 0;
 
     public String ef_name = "effect.h";

@@ -37,7 +37,7 @@ public class Driver implements IDriver {
 
     private static final Logger logger = getLogger(Driver.class.getName());
 
-    public Exception renderingException = null;
+    public final Exception renderingException = null;
     private MoonDriver md = null;
     static MmlDatum[] srcBuf = null;
     private Consumer<ChipDatum> writeOPL4;
@@ -132,7 +132,7 @@ public class Driver implements IDriver {
     public void init(List<ChipAction> list, MmlDatum[] mmlData, Function<String, Stream> function, Object... objects) {
         if (mmlData != null && mmlData.length >= 1) {
             Driver.srcBuf = mmlData;
-            writeOPL4 = list.get(0)::writeRegister;
+            writeOPL4 = list.getFirst()::writeRegister;
             String path = (String) objects[0];
             double sampleRate = (double) objects[1];
             int dummy = (int) objects[2];

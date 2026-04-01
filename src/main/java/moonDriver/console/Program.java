@@ -3,7 +3,6 @@ package moonDriver.console;
 import java.io.OutputStream;
 import java.lang.System.Logger;
 import java.lang.System.Logger.Level;
-import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
@@ -47,7 +46,7 @@ class Program {
 
     private static Environment env = null;
 
-    public static void main(String[] args) {
+    static void main(String[] args) {
         int fnIndex = analyzeOption(args);
 
         if (args == null || args.length - fnIndex < 1) {

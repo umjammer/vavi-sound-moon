@@ -346,7 +346,7 @@ public class Assemble {
 
                 String wd = ((String) md.args.get(1)).trim().toLowerCase();
                 for (String key : dicMacroBlock.keySet()) {
-                    if (wd != key) continue;
+                    if (!wd.equals(key)) continue;
 
                     f = true;
                     asm.remove(i);
@@ -362,9 +362,7 @@ public class Assemble {
     private void getDefinition() {
         dicDefine = new HashMap<>();
 
-        for (int i = 0; i < asm.size(); i++) {
-            MmlDatum2 md = asm.get(i);
-
+        for (MmlDatum2 md : asm) {
             if (md == null || md.args == null || md.args.size() < 2 || !(md.args.get(0) instanceof Integer) || (int) md.args.get(0) != -5) {
                 continue;
             }
@@ -458,62 +456,67 @@ public class Assemble {
         }
 
         List<Object> args = asm.args;
-        if (args.get(ptr[0] + 1) instanceof Byte) {
-            byte n = (byte) args.get(ptr[0] + 1);
-            ptr[0] += 2;
-            Poke(currentBank, currentAddress++, n, asm);
-        } else if (args.get(ptr[0] + 1) instanceof Integer) {
-            byte n = (byte) (int) args.get(ptr[0] + 1);
-            ptr[0] += 2;
-            Poke(currentBank, currentAddress++, n, asm); // Even if it is an int, it is treated as a byte.
-        } else if (args.get(ptr[0] + 1) instanceof Character) {
-            byte n = (byte) (char) args.get(ptr[0] + 1);
-            ptr[0] += 2;
-            Poke(currentBank, currentAddress++, n, asm);
-        } else if (args.get(ptr[0] + 1) instanceof String) {
-            // Composite type
-            String sen = (String) args.get(ptr[0] + 1);
-            List<Byte> wd = new ArrayList<>();
-            for (int i = 0; i < sen.length(); i++) {
-                if (sen.charAt(i) == ' ' || sen.charAt(i) == '\t') continue;
-                if (sen.charAt(i) == ',') {
-                    continue;
-                }
+        switch (args.get(ptr[0] + 1)) {
+            case Byte aByte -> {
+                byte n = (byte) args.get(ptr[0] + 1);
+                ptr[0] += 2;
+                Poke(currentBank, currentAddress++, n, asm);
+            }
+            case Integer integer -> {
+                byte n = (byte) (int) args.get(ptr[0] + 1);
+                ptr[0] += 2;
+                Poke(currentBank, currentAddress++, n, asm); // Even if it is an int, it is treated as a byte.
 
-                int j;
-                String x = "";
+            }
+            case Character c -> {
+                byte n = (byte) (char) args.get(ptr[0] + 1);
+                ptr[0] += 2;
+                Poke(currentBank, currentAddress++, n, asm);
+            }
+            case String sen -> {
+                // Composite type
+                List<Byte> wd = new ArrayList<>();
+                for (int i = 0; i < sen.length(); i++) {
+                    if (sen.charAt(i) == ' ' || sen.charAt(i) == '\t') continue;
+                    if (sen.charAt(i) == ',') {
+                        continue;
+                    }
 
-                if (sen.charAt(i) == '"') {
+                    int j;
+                    String x = "";
+
+                    if (sen.charAt(i) == '"') {
+                        x = "";
+                        j = i + 1;
+                        for (; j < sen.length(); j++) {
+                            if (sen.charAt(j) == '"') break;
+                            x += sen.charAt(j);
+                        }
+                        i = j;
+
+                        byte[] ary = x.getBytes(charset);
+                        for (byte b : ary) wd.add(b);
+                        continue;
+                    }
+
                     x = "";
-                    j = i + 1;
+                    j = i;
                     for (; j < sen.length(); j++) {
-                        if (sen.charAt(j) == '"') break;
+                        if (sen.charAt(i) == ' ' || sen.charAt(i) == '\t' || sen.charAt(i) == ',') break;
                         x += sen.charAt(j);
                     }
                     i = j;
-
-                    byte[] ary = x.getBytes(charset);
-                    for (byte b : ary) wd.add(b);
-                    continue;
+                    int n = getInt(x);
+                    wd.add((byte) n);
                 }
 
-                x = "";
-                j = i;
-                for (; j < sen.length(); j++) {
-                    if (sen.charAt(i) == ' ' || sen.charAt(i) == '\t' || sen.charAt(i) == ',') break;
-                    x += sen.charAt(j);
-                }
-                i = j;
-                int n = GetInt(x);
-                wd.add((byte) n);
+                ptr[0] += 2;
+                for (byte b : wd) Poke(currentBank, currentAddress++, b, asm);
             }
-
-            ptr[0] += 2;
-            for (byte b : wd) Poke(currentBank, currentAddress++, b, asm);
-
-        } else {
-            logger.log(Level.ERROR, "Db error.");
-            ptr[0]++;
+            case null, default -> {
+                logger.log(Level.ERROR, "Db error.");
+                ptr[0]++;
+            }
         }
     }
 
@@ -551,12 +554,12 @@ public class Assemble {
         if (args.get(ptr[0] + 1) instanceof String) {
             String label = ((String) args.get(ptr[0] + 1)).toLowerCase();
             Object byteFlg = false;
-            if (label.indexOf("b:") >= 0) {
+            if (label.contains("b:")) {
                 byteFlg = true;
                 label = label.substring(2);
             }
 
-            if (label.indexOf("bank(") >= 0) {
+            if (label.contains("bank(")) {
                 byteFlg = -1;
                 label = label.substring(label.indexOf("bank(") + 5, label.lastIndexOf(")") - label.indexOf("bank(") - 5);
             }
@@ -565,7 +568,7 @@ public class Assemble {
                 dicRefLabel.put(label, new ArrayList<>()); // currentBank, currentAddress, byteFlg
             }
 
-            dicRefLabel.get(label).add(new Tuple3<Integer, Integer, Object>(currentBank, currentAddress, byteFlg));
+            dicRefLabel.get(label).add(new Tuple3<>(currentBank, currentAddress, byteFlg));
             Poke(currentBank, currentAddress++, (byte) 0, asm);
             if (byteFlg instanceof Boolean && !(boolean) byteFlg) Poke(currentBank, currentAddress++, (byte) 0, asm);
 
@@ -586,11 +589,11 @@ public class Assemble {
         if (args.get(ptr[0] + 1) instanceof String) {
             String define = ((String) args.get(ptr[0] + 1)).toLowerCase();
             boolean byteFlg = false;
-            if (define.indexOf("b:") >= 0) {
+            if (define.contains("b:")) {
                 byteFlg = true;
                 define = define.substring(2);
             }
-            int n = GetInt(dicDefine.get(define).code);
+            int n = getInt(dicDefine.get(define).code);
 
             ptr[0] += 2;
             Poke(currentBank, currentAddress++, (byte) n, asm);
@@ -634,7 +637,7 @@ public class Assemble {
                 return;
             case ".org":
                 if (assembleBlockLatest) break;
-                n = GetInt(macros[ptr[0] + 1]);
+                n = getInt(macros[ptr[0] + 1]);
                 currentAddress = n;
                 break;
             case ".code":
@@ -673,7 +676,7 @@ public class Assemble {
 
             // Is it a constant?
             if (dicDefine.containsKey(macros[i].toLowerCase())) {
-                op.add(GetInt(dicDefine.get(macros[i].toLowerCase()).code));
+                op.add(getInt(dicDefine.get(macros[i].toLowerCase()).code));
             } else if (macros[i].equals("=")) {
                 con = 0;
             } else if (macros[i].equals("<")) {
@@ -684,7 +687,7 @@ public class Assemble {
                 con = 2;
             } else {
                 try {
-                    op.add(GetInt(macros[i]));
+                    op.add(getInt(macros[i]));
                 } catch (Exception e) {
                 }
             }
@@ -695,11 +698,11 @@ public class Assemble {
         }
 
         if (op.size() == 1) {
-            return op.get(0) != 0;
+            return op.getFirst() != 0;
         }
 
         if (con == 0) {
-            return op.get(0) == op.get(1);
+            return op.get(0).equals(op.get(1));
         }
         if (con == -1) {
             return op.get(0) < op.get(1);
@@ -708,7 +711,7 @@ public class Assemble {
             return op.get(0) > op.get(1);
         }
         if (con == 2) {
-            return op.get(0) != op.get(1);
+            return !op.get(0).equals(op.get(1));
         }
 
         return false;
@@ -725,7 +728,7 @@ public class Assemble {
 
                 // Is it a constant?
                 if (dicDefine.containsKey(s)) {
-                    n = GetInt(dicDefine.get(s).code);
+                    n = getInt(dicDefine.get(s).code);
                     flg = true;
                 } else if (s.equals("+")) {
                     ope = 0;
@@ -744,7 +747,7 @@ public class Assemble {
         return ans;
     }
 
-    private int GetInt(String v) {
+    private static int getInt(String v) {
         if (v == null || v.isEmpty()) {
             throw new IllegalArgumentException("integer parse error");
         }

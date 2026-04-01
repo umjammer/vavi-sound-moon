@@ -39,7 +39,7 @@ public class Compiler implements ICompiler {
     private boolean isIDE = false;
     private Point skipPoint = new Point(0, 0);
     private Function<String, Stream> appendFileReaderCallback;
-    public Work work = new Work();
+    public final Work work = new Work();
     public Mck mck = null;
 
     public Compiler() {
@@ -191,7 +191,7 @@ public class Compiler implements ICompiler {
         return null;
     }
 
-    private MemoryStream readAllBytesToMemoryStream(Stream stream) {
+    private static MemoryStream readAllBytesToMemoryStream(Stream stream) {
         if (stream == null) return null;
 
         var buf = new byte[8192];

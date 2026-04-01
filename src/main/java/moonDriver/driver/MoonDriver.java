@@ -57,7 +57,7 @@ public class MoonDriver {
 
     public boolean init(MmlDatum[] vgmBuf, Consumer<ChipDatum> WriteOPL4Register, double SampleRate) {
         logger.log(Level.INFO, "MoonDriver  Orig. %s Programed by BouKiCHi".formatted(version));
-        logger.log(Level.INFO, "MoonDriverDotNET  VER yymmdd Programed by Kuma");
+        logger.log(Level.INFO, "MoonDriverDotNET  VER 20201226 Programed by Kuma");
 
         this.vgmBuf = vgmBuf;
         this.WriteOPL4Register = WriteOPL4Register;
@@ -185,13 +185,13 @@ public class MoonDriver {
     private double ntscCounter = 0.0;
     private boolean nextFlg = false;
     public Tuple<String, byte[]> ExtendFile = null;
-    private int[] pcmKeyon = {
+    private final int[] pcmKeyon = {
             -1, -1, -1, -1, -1, -1,
             -1, -1, -1, -1, -1, -1,
             -1, -1, -1, -1, -1, -1,
             -1, -1, -1, -1, -1, -1
     };
-    private int[] pcmKeyonB = new int[24];
+    private final int[] pcmKeyonB = new int[24];
 
     public int[] getPCMKeyOn() {
         for (int i = 0; i < pcmKeyonB.length; i++) {
@@ -215,15 +215,15 @@ public class MoonDriver {
     private static final short MOON_VERNUM = 0x0002;
 
     private static final short MOON_BASE = 0x00C4;
-    private final short MOON_REG1 = MOON_BASE;
-    private final short MOON_DAT1 = MOON_BASE + 1;
-    private final short MOON_REG2 = MOON_BASE + 2;
-    private final short MOON_DAT2 = MOON_BASE + 3;
-    private final short MOON_STAT = MOON_BASE;
+    private static final short MOON_REG1 = MOON_BASE;
+    private static final short MOON_DAT1 = MOON_BASE + 1;
+    private static final short MOON_REG2 = MOON_BASE + 2;
+    private static final short MOON_DAT2 = MOON_BASE + 3;
+    private static final short MOON_STAT = MOON_BASE;
 
     // I/O
     private static final short MOON_WREG = 0x7E;
-    private final short MOON_WDAT = MOON_WREG + 1;
+    private static final short MOON_WDAT = MOON_WREG + 1;
 
     private static final byte RAM_PAGE3 = (byte) 0xFE;
 
@@ -245,18 +245,18 @@ public class MoonDriver {
     private static final short S_DEVICE_FLAGS = (short) 0x8007;
 
     private static final short S_TRACK_TABLE = (short) 0x8010;
-    private final short S_TRACK_BANK = S_TRACK_TABLE + 2;
-    private final short S_LOOP_TABLE = S_TRACK_TABLE + 4;
-    private final short S_LOOP_BANK = S_TRACK_TABLE + 6;
-    private final short S_VENV_TABLE = S_TRACK_TABLE + 8;
-    private final short S_VENV_LOOP = S_TRACK_TABLE + 10;
-    private final short S_PENV_TABLE = S_TRACK_TABLE + 12;
-    private final short S_PENV_LOOP = S_TRACK_TABLE + 14;
-    private final short S_NENV_TABLE = S_TRACK_TABLE + 16;
-    private final short S_NENV_LOOP = S_TRACK_TABLE + 18;
-    private final short S_LFO_TABLE = S_TRACK_TABLE + 20;
-    private final short S_INST_TABLE = S_TRACK_TABLE + 22;
-    private final short S_OPL3_TABLE = S_TRACK_TABLE + 24;
+    private static final short S_TRACK_BANK = S_TRACK_TABLE + 2;
+    private static final short S_LOOP_TABLE = S_TRACK_TABLE + 4;
+    private static final short S_LOOP_BANK = S_TRACK_TABLE + 6;
+    private static final short S_VENV_TABLE = S_TRACK_TABLE + 8;
+    private static final short S_VENV_LOOP = S_TRACK_TABLE + 10;
+    private static final short S_PENV_TABLE = S_TRACK_TABLE + 12;
+    private static final short S_PENV_LOOP = S_TRACK_TABLE + 14;
+    private static final short S_NENV_TABLE = S_TRACK_TABLE + 16;
+    private static final short S_NENV_LOOP = S_TRACK_TABLE + 18;
+    private static final short S_LFO_TABLE = S_TRACK_TABLE + 20;
+    private static final short S_INST_TABLE = S_TRACK_TABLE + 22;
+    private static final short S_OPL3_TABLE = S_TRACK_TABLE + 24;
 
     public static class Work {
 
@@ -297,7 +297,7 @@ public class MoonDriver {
             public byte damp = 0x00;
             public byte lfo = 0x00;
             public byte lfo_vib = 0x00;
-            public byte[] ol = new byte[4];
+            public final byte[] ol = new byte[4];
             //public byte ar_d1r = 0x00;
             //public byte dl_d2r = 0x00;
             //public byte rc_rr = 0x00;
@@ -738,7 +738,7 @@ public class MoonDriver {
 
     //str_moondrv:
     //private String  str_moondrv = "MOONDRIVER "
-    private String version = "VER 160305";
+    private static final String version = "VER 160305";
     //+ "\0d\0a$";
 
     /** work for debug */
@@ -3549,7 +3549,7 @@ public class MoonDriver {
     }
 
     /** Checks SRAM. */
-    private boolean moon_check_sram() {
+    private static boolean moon_check_sram() {
         // skip
         return false;
 //        // $77-> ($200000)
@@ -3780,7 +3780,7 @@ public class MoonDriver {
         moon_wave_out();
     }
 
-    private byte inport(short adr) {
+    private static byte inport(short adr) {
         return 0;
     }
 
@@ -3792,10 +3792,10 @@ public class MoonDriver {
 
     private final MmlDatum[] mem = new MmlDatum[1024 * 64];
     private final MmlDatum[][] extMem = new MmlDatum[256][];
-    private Byte seg0x0000 = null;
-    private Byte seg0x4000 = null;
+    private final Byte seg0x0000 = null;
+    private final Byte seg0x4000 = null;
     private Byte seg0x8000 = null;
-    private Byte seg0xc000 = null;
+    private final Byte seg0xc000 = null;
     private byte a = 0;
     private byte b = 0;
     private byte c = 0;
@@ -3809,7 +3809,7 @@ public class MoonDriver {
 
     }
 
-    private dlgSeqFunc[] seq_jmptable;
+    private final dlgSeqFunc[] seq_jmptable;
 
     private MmlDatum readMemory(short adr) {
         switch ((adr & 0xffff) >>> 14) {

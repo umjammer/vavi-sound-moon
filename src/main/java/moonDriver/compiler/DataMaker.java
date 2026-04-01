@@ -21,7 +21,7 @@ public class DataMaker {
 
     private static final Logger logger = getLogger(DataMaker.class.getName());
 
-    ResourceBundle rb = ResourceBundle.getBundle("lang/message");
+    final ResourceBundle rb = ResourceBundle.getBundle("lang/message");
 
     private final Compiler compiler;
     private final Work wk;
@@ -90,7 +90,7 @@ public class DataMaker {
     private int mml_trk;                    //
 
     private int nest;                       // Repeat nesting level
-    private LEN[][][] track_count; // [MML_MAX][_TRACK_MAX] [2];			// Total note length storage location (note length/frame/loop note length/loop frame)
+    private final LEN[][][] track_count; // [MML_MAX][_TRACK_MAX] [2];			// Total note length storage location (note length/frame/loop note length/loop frame)
     private int volume_flag;                // Volume Status
     private double tbase = 0.625;               // [frame/count] rate during conversion
 
@@ -105,7 +105,7 @@ public class DataMaker {
     private static final int OPL4_MAX = 24;
     private static final int OPL3_MAX = 18;
 
-    private int BOPL3TRACK() {
+    private static int BOPL3TRACK() {
         return BTRACK(24);
     }
 
@@ -334,8 +334,8 @@ public class DataMaker {
 
     public static class HEAD {
 
-        public String str;
-        public int status;
+        public final String str;
+        public final int status;
 
         public HEAD(String str, int status) {
             this.str = str;
@@ -394,7 +394,7 @@ public class DataMaker {
     //                                        012345678901234567890123012345678901234567
     private static final String _TRACK_STR = "ABCDEFGHIJKLMNOPQRSTUVWXabcdefghijklmnopqr";
 
-    private int BTRACK(int a) {
+    private static int BTRACK(int a) {
         return a;
     }
 
@@ -465,7 +465,7 @@ public class DataMaker {
         public int lfrm;   // ↑ in frame units
         public int cmd;
         public double len;    // Unit: count
-        public int[] param = new int[PARAM_MAX];
+        public final int[] param = new int[PARAM_MAX];
     }
 
     private static final long PARAM_OMITTED = 0x8000_0000L;
@@ -480,33 +480,33 @@ public class DataMaker {
     private static final int MIN_NOTE = -3;
     private static final int MAX_NOTE = 0x8f;
 
-    private int[] bank_sel = new int[_TRACK_MAX];   // 0 to 127 = Bank switch, 0xFF = No change
+    private final int[] bank_sel = new int[_TRACK_MAX];   // 0 to 127 = Bank switch, 0xFF = No change
     private int allow_bankswitching = 1;
     private int dpcm_bankswitch = 0;
     private int auto_bankswitch = 0;
     private int curr_bank = 0x00;
-    private int[] bank_usage = new int[128];        // bank_usage[0] is currently meaningless
+    private final int[] bank_usage = new int[128];        // bank_usage[0] is currently meaningless
     private int bank_maximum = 0;       // 8KB
     private int dpcm_extra_bank_num = 0;    // 8KB
 
-    private int[][] tone_tbl = new int[_TONE_MAX][]; // [1024];	// Tone
-    private int[][] envelope_tbl = new int[_ENVELOPE_MAX][]; // [1024];	// Envelope
-    private int[][] pitch_env_tbl = new int[_PITCH_ENV_MAX][]; // [1024];	// Pitch Envelope
-    private int[][] pitch_mod_tbl = new int[_PITCH_MOD_MAX][]; // [   5];	// LFO
-    private int[][] arpeggio_tbl = new int[_ARPEGGIO_MAX][]; // [1024];	// Arpeggio
+    private final int[][] tone_tbl = new int[_TONE_MAX][]; // [1024];	// Tone
+    private final int[][] envelope_tbl = new int[_ENVELOPE_MAX][]; // [1024];	// Envelope
+    private final int[][] pitch_env_tbl = new int[_PITCH_ENV_MAX][]; // [1024];	// Pitch Envelope
+    private final int[][] pitch_mod_tbl = new int[_PITCH_MOD_MAX][]; // [   5];	// LFO
+    private final int[][] arpeggio_tbl = new int[_ARPEGGIO_MAX][]; // [1024];	// Arpeggio
     private int[][] fm_tone_tbl; // [_FM_TONE_MAX][2+64];	// FM Tone
     private int[][] vrc7_tone_tbl; // [_VRC7_TONE_MAX][2+64];	// VRC7 Tone(The number of arrays depends on the function used.)
     private int[][] n106_tone_tbl; // [_N106_TONE_MAX][2+64];	// NAMCO106 Tone
-    private int[][] hard_effect_tbl = new int[_HARD_EFFECT_MAX][]; // [5];	// FDS Hardware Effect
-    private int[][] effect_wave_tbl = new int[_EFFECT_WAVE_MAX][]; // [33];	// Effect Wave (4088) Data
+    private final int[][] hard_effect_tbl = new int[_HARD_EFFECT_MAX][]; // [5];	// FDS Hardware Effect
+    private final int[][] effect_wave_tbl = new int[_EFFECT_WAVE_MAX][]; // [33];	// Effect Wave (4088) Data
 
     private int[][] wtb_tone_tbl; // [_WTB_TONE_MAX][2+64];		// HuSIC WaveTable Tone
 
-    private int[][] tonetbl_tbl = new int[_TONETBL_MAX][]; // [1024+2];
-    private int[][] opl3op_tbl = new int[_OPL3TBL_MAX][]; // [1024+2];
-    private int[] opl3op_flag = new int[_OPL3TBL_MAX]; // operator flag
+    private final int[][] tonetbl_tbl = new int[_TONETBL_MAX][]; // [1024+2];
+    private final int[][] opl3op_tbl = new int[_OPL3TBL_MAX][]; // [1024+2];
+    private final int[] opl3op_flag = new int[_OPL3TBL_MAX]; // operator flag
 
-    private DPCMTBL[] dpcm_tbl = new DPCMTBL[64]; // [_DPCM_MAX];                // DPCM
+    private final DPCMTBL[] dpcm_tbl = new DPCMTBL[64]; // [_DPCM_MAX];                // DPCM
     private DPCMTBL[] xpcm_tbl = new DPCMTBL[64]; // [_DPCM_MAX];                // XPCM(for HuSIC)
 
     private enum enmMML {
@@ -621,7 +621,7 @@ public class DataMaker {
     private static final int SELF_DELAY_MAX = 8;
 
     /** header */
-    private HEAD[] head = {
+    private final HEAD[] head = {
             new HEAD("#TITLE", _TITLE),
             new HEAD("#COMPOSER", _COMPOSER),
             new HEAD("#MAKER", _MAKER),
@@ -669,9 +669,9 @@ public class DataMaker {
 
     public static class MML {
 
-        public String cmd;
-        public int num;
-        public Function<Integer, Integer> check; // (int trk);
+        public final String cmd;
+        public final int num;
+        public final Function<Integer, Integer> check; // (int trk);
 
         //		unsigned long		enable;
         public MML(String cmd, int num, Function<Integer, Integer> check) {
@@ -682,7 +682,7 @@ public class DataMaker {
     }
 
     // MML Commands
-    private MML[] mml = {
+    private final MML[] mml = {
             new MML("`", enmMML._DRUM_BIT.ordinal(), DataMaker::isAllTrack),
             new MML("c", _NOTE_C, DataMaker::isAllTrack),
             new MML("d", _NOTE_D, DataMaker::isAllTrack),
@@ -820,7 +820,7 @@ public class DataMaker {
      *
      * @param buf Data Storage Pointer
      */
-    private void deleteCRemark(/* ref */ String buf) {
+    private static void deleteCRemark(/* ref */ String buf) {
         StringBuilder sb = new StringBuilder(buf);
         int ptr = 0;
 
@@ -861,7 +861,7 @@ public class DataMaker {
      *
      * @param buf Data Storage Pointer
      */
-    private int getLineCount(/* ref */ int ptr, String buf) {
+    private static int getLineCount(/* ref */ int ptr, String buf) {
         int line;
 
         line = 0;
@@ -949,7 +949,7 @@ public class DataMaker {
      *
      * @param buf Data Storage Pointer
      */
-    private int changeNULL(int ptr, /* ref */ String buf) {
+    private static int changeNULL(int ptr, /* ref */ String buf) {
         StringBuilder sb = new StringBuilder(buf);
 
         while (ptr < sb.length() && sb.charAt(ptr) != '\n') {
@@ -1030,7 +1030,7 @@ on_error:
         return str.skipSpace(st, ptr);
     }
 
-    private int isTrackNum(String str, int ptr, int trk) {
+    private static int isTrackNum(String str, int ptr, int trk) {
         int temp;
         if (str.charAt(ptr) == 0)
             return 0;
@@ -1108,7 +1108,7 @@ on_error:
                     }
                     // Compare the header string to the table string
                     for (i = 0; head[i].status != -1; i++) {
-                        if (sb.substring(ptr).indexOf(head[i].str) >= 0) {
+                        if (sb.substring(ptr).contains(head[i].str)) {
                             break;
                         }
                     }
@@ -3401,7 +3401,7 @@ on_error:
      * Output:
      * int	: The largest tone number
      */
-    private int checkLoop(int[][] ptr, int max) { //[128][1024]
+    private static int checkLoop(int[][] ptr, int max) { //[128][1024]
         int j, lp_flag, ret;
 
         ret = 0;
@@ -3432,7 +3432,7 @@ on_error:
      * Output:
      * int	: The largest tone number
      */
-    private int getMaxTone(int[][] ptr, int max) { // [128][66]
+    private static int getMaxTone(int[][] ptr, int max) { // [128][66]
         int ret;
         ret = 0;
         for (int i = 0; i < max; i++) {
@@ -3450,7 +3450,7 @@ on_error:
      * Output:
      * int	: The largest tone number
      */
-    private int getMaxToneTable(int[][] ptr, int max) { // [_TONETBL_MAX][1024+2]
+    private static int getMaxToneTable(int[][] ptr, int max) { // [_TONETBL_MAX][1024+2]
         int i, ret;
         ret = 0;
         for (i = 0; i < max; i++) {
@@ -3468,7 +3468,7 @@ on_error:
      * Output:
      * int	: The largest tone number
      */
-    private int getMaxOpl3tbl(int[][] ptr, int max) { // [_OPL3TBL_MAX][1024+2]
+    private static int getMaxOpl3tbl(int[][] ptr, int max) { // [_OPL3TBL_MAX][1024+2]
         int ret;
         ret = 0;
         for (int i = 0; i < max; i++) {
@@ -3486,7 +3486,7 @@ on_error:
      * Output:
      * int	: The largest LFO number
      */
-    private int getMaxLFO(int[][] ptr, int max) { // [_PITCH_MOD_MAX][5]
+    private static int getMaxLFO(int[][] ptr, int max) { // [_PITCH_MOD_MAX][5]
         int i, ret;
         ret = 0;
         for (i = 0; i < max; i++) {
@@ -3522,7 +3522,7 @@ on_error:
      * Output:
      * int	: The largest tone number
      */
-    private int getMaxHardEffect(int[][] ptr, int max) { // [_HARD_EFFECT_MAX][5]
+    private static int getMaxHardEffect(int[][] ptr, int max) { // [_HARD_EFFECT_MAX][5]
         int ret;
 
         ret = 0;
@@ -3542,7 +3542,7 @@ on_error:
      * Output:
      * int	: The largest tone number
      */
-    private int getMaxEffectWave(int[][] ptr, int max) { // [_EFFECT_WAVE_MAX][33]
+    private static int getMaxEffectWave(int[][] ptr, int max) { // [_EFFECT_WAVE_MAX][33]
         int i, ret;
 
         ret = 0;
@@ -3562,7 +3562,7 @@ on_error:
      * Output:
      * none
      */
-    private void writeTone(List<MmlDatum2> fp, int[][] tbl, String str, int max) { // [128][1024]
+    private static void writeTone(List<MmlDatum2> fp, int[][] tbl, String str, int max) { // [128][1024]
         int i, j, x;
         String t;
 
@@ -3709,7 +3709,7 @@ on_error:
      * Output:
      * none
      */
-    private void writeToneTable(List<MmlDatum2> fp, int[][] tbl, String str, int max) { // [_TONETBL_MAX][1024+2]
+    private static void writeToneTable(List<MmlDatum2> fp, int[][] tbl, String str, int max) { // [_TONETBL_MAX][1024+2]
         String t = "%d_data_table:".formatted(str);
         fp.add(new MmlDatum2("%d\n".formatted(t), -2, t));
         if (max != 0) {
@@ -3890,7 +3890,7 @@ on_error:
      * Output:
      * none
      */
-    private void writeHardEffect(List<MmlDatum2> fp, int[][] tbl, String str, int max) { // [_HARD_EFFECT_MAX][5]
+    private static void writeHardEffect(List<MmlDatum2> fp, int[][] tbl, String str, int max) { // [_HARD_EFFECT_MAX][5]
         String t = "%d_effect_select:".formatted(str);
         fp.add(new MmlDatum2("%d\n".formatted(t), -2, t));
         for (int i = 0; i < max; i++) {
@@ -3913,7 +3913,7 @@ on_error:
      * Output:
      * none
      */
-    private void writeEffectWave(List<MmlDatum2> fp, int[][] tbl, String str, int max) { // [_EFFECT_WAVE_MAX][33]
+    private static void writeEffectWave(List<MmlDatum2> fp, int[][] tbl, String str, int max) { // [_EFFECT_WAVE_MAX][33]
         String t = "%d_4088_data:".formatted(str);
         fp.add(new MmlDatum2("%d\n".formatted(t), -2, t));
         for (int i = 0; i < max; i++) {
@@ -4231,7 +4231,7 @@ on_error:
      * <p>
      * Output:
      */
-    private void printStrDb(List<MmlDatum2> fp, String str, int max) {
+    private static void printStrDb(List<MmlDatum2> fp, String str, int max) {
         byte[] ary = str.getBytes(charset);
 
         String des = "";
@@ -4265,7 +4265,7 @@ on_error:
 
         for (int i = 0; i < sDes.length; i++) {
 
-            fp.add(new MmlDatum2("\tdb\t%s\n".formatted(sDes[i]), aryInt.get(i)));
+            fp.add(new MmlDatum2("\tdb\t%s\n".formatted(sDes[i]), (Object) aryInt.get(i)));
         }
     }
 
@@ -4507,20 +4507,12 @@ on_error:
         note = ((octave + oct_ofs) << 4) + com_no;
         // Scale range check
         if (note < 0) {
-            switch (note) {
-                case -5:
-                    note = 15;
-                    break;
-                case -6:
-                    note = 14;
-                    break;
-                case -7:
-                    note = 13;
-                    break;
-                default:
-                    note = 0;
-                    break;
-            }
+            note = switch (note) {
+                case -5 -> 15;
+                case -6 -> 14;
+                case -7 -> 13;
+                default -> 0;
+            };
         } else if (note > MAX_NOTE) {
             note = MAX_NOTE;
         }
@@ -5911,7 +5903,7 @@ on_error:
     /**
      *
      */
-    private int[] bank_org_written_flag = new int[128];// = { 1 };
+    private final int[] bank_org_written_flag = new int[128];// = { 1 };
     private CompilerInfo compilerInfo;
 
     private void putBankOrigin(List<MmlDatum2> fp, int bank) {
@@ -5921,24 +5913,14 @@ on_error:
             return;
         }
         if (bank_org_written_flag[bank] == 0) {
-            switch (bank) {
-                case 0:
-                    org = 0x8000;
-                    //assert(0);
-                    break;
-                case 1:
-                    org = 0xa000;
-                    break;
-                case 2:
-                    org = 0xc000;
-                    break;
-                case 3:
-                    org = 0xe000;
-                    break;
-                default:
-                    org = 0xa000;
-                    break;
-            }
+            org = switch (bank) {
+                case 0 -> 0x8000;
+                //assert(0);
+                case 1 -> 0xa000;
+                case 2 -> 0xc000;
+                case 3 -> 0xe000;
+                default -> 0xa000;
+            };
             String t = ".org\t${0:x04}".formatted(org);
             fp.add(new MmlDatum2("\t%d\n".formatted(t), 4, t));
             bank_org_written_flag[bank] = 1;
@@ -5970,7 +5952,7 @@ on_error:
      * Output:
      * none
      */
-    private int double2int(double d) {
+    private static int double2int(double d) {
         return (int) Math.round(d); // (d + 0.5);
     }
 
@@ -6091,8 +6073,8 @@ on_error:
         public int rel_tone;       //
         public int last_written_tone;  //
         public int key_pressed;        // Key on/off status
-        public int[] last_note = new int[SELF_DELAY_MAX + 1];      // Last note I wrote (ignore @n)
-        public int[] last_note_keep = new int[SELF_DELAY_MAX + 1]; // last_note state when using '¥' command
+        public final int[] last_note = new int[SELF_DELAY_MAX + 1];      // Last note I wrote (ignore @n)
+        public final int[] last_note_keep = new int[SELF_DELAY_MAX + 1]; // last_note state when using '¥' command
         public int self_delay;     // How many previous notes to use? (no self-delay if negative)
     }
 
@@ -6198,22 +6180,14 @@ on_error:
         return;
     }
 
-    private int isCmdNotOutput(CMD[] cmd, int cmdPtr) {
-        switch (enmMML.values()[cmd[cmdPtr].cmd]) {
-            case _NOP:
-            case _TEMPO:
-            case _TEMPO2:
-            case _OCTAVE:
-            case _OCT_UP:
-            case _OCT_DW:
-            case _LENGTH:
-            case _TRANSPOSE:
-                return 1;
-        }
-        return 0;
+    private static int isCmdNotOutput(CMD[] cmd, int cmdPtr) {
+        return switch (enmMML.values()[cmd[cmdPtr].cmd]) {
+            case _NOP, _TEMPO, _TEMPO2, _OCTAVE, _OCT_UP, _OCT_DW, _LENGTH, _TRANSPOSE -> 1;
+            default -> 0;
+        };
     }
 
-    private int isNextSlar(CMD[] cmd, int cmdPtr) {
+    private static int isNextSlar(CMD[] cmd, int cmdPtr) {
         while (cmd[cmdPtr].cmd != enmMML._TRACK_END.v
                 && isCmdNotOutput(cmd, cmdPtr) != 0) cmdPtr++;
 
