@@ -7547,13 +7547,6 @@ on_error:
         }
 
         compilerInfo = new CompilerInfo();
-        compilerInfo.partName = new ArrayList<>();
-        compilerInfo.partNumber = new ArrayList<>();
-        compilerInfo.partType = new ArrayList<>();
-        compilerInfo.totalCount = new ArrayList<>();
-        compilerInfo.loopCount = new ArrayList<>();
-        compilerInfo.errorList = new ArrayList<>();
-        compilerInfo.warningList = new ArrayList<>();
 
         // All about MML
         for (mml_idx = 0; mml_idx < wk.mml_num; mml_idx++) {

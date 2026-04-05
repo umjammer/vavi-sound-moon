@@ -16,7 +16,7 @@ import dotnet4j.io.Stream;
 import dotnet4j.io.StreamReader;
 import dotnet4j.util.compat.Tuple;
 import musicDriverInterface.CompilerInfo;
-import musicDriverInterface.GD3Tag;
+import musicDriverInterface.MetaData;
 import musicDriverInterface.ICompiler;
 import musicDriverInterface.MmlDatum;
 
@@ -115,7 +115,7 @@ public class Compiler implements ICompiler {
         return mck.getCompilerInfo();
     }
 
-    public GD3Tag getGD3TagInfo(byte[] srcBuf) {
+    public MetaData getGD3TagInfo(byte[] srcBuf) {
         return null;
     }
 

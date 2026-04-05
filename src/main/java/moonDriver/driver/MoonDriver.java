@@ -6,9 +6,10 @@ import java.util.function.Consumer;
 
 import dotnet4j.util.compat.Tuple;
 import moonDriver.common.Common;
-import moonDriver.common.GD3;
 import moonDriver.driver.MoonDriver.Work.Ch;
 import musicDriverInterface.ChipDatum;
+import musicDriverInterface.MetaData;
+import musicDriverInterface.MetaData.Tag;
 import musicDriverInterface.MmlDatum;
 
 import static java.lang.System.getLogger;
@@ -18,8 +19,8 @@ public class MoonDriver {
 
     private static final Logger logger = getLogger(MoonDriver.class.getName());
 
-    public Consumer<ChipDatum> WriteOPL4Register = null;
-    public GD3 gd3 = null;
+    public Consumer<ChipDatum> writeOpl4 = null;
+    public MetaData gd3 = null;
     private double sampleRate;
     private boolean stopped;
     private int vgmCurLoop;
@@ -31,28 +32,28 @@ public class MoonDriver {
     private double vgmSpeedCounter;
     private MmlDatum[] vgmBuf;
 
-    public GD3 getGD3Info(MmlDatum[] buf, int vgmGd3) {
+    public MetaData getGD3Info(MmlDatum[] buf, int vgmGd3) {
 
-        GD3 gd3 = new GD3();
+        MetaData metaData = new MetaData();
 
         int[] adrTag = new int[1];
         adrTag[0] = (buf[0x2e].dat + buf[0x2f].dat * 0x100) & 0xffff;
         if (adrTag[0] != 0) {
             adrTag[0] -= 0x8000;
-            gd3.TrackName = Common.getNRDString(buf, /* ref */ adrTag);
-            gd3.TrackNameJ = Common.getNRDString(buf, /* ref */ adrTag);
-            gd3.GameName = Common.getNRDString(buf, /* ref */ adrTag);
-            gd3.GameNameJ = Common.getNRDString(buf, /* ref */ adrTag);
-            gd3.SystemName = Common.getNRDString(buf, /* ref */ adrTag);
-            gd3.SystemNameJ = Common.getNRDString(buf, /* ref */ adrTag);
-            gd3.Composer = Common.getNRDString(buf, /* ref */ adrTag); // Track author
-            gd3.ComposerJ = Common.getNRDString(buf, /* ref */ adrTag); // Track author(jp)
-            gd3.Version = Common.getNRDString(buf, /* ref */ adrTag); // Release date
-            gd3.Converted = Common.getNRDString(buf, /* ref */ adrTag); // Programmer
-            gd3.Notes = Common.getNRDString(buf, /* ref */ adrTag); // Notes
+            metaData.add(Tag.Title, Common.getNRDString(buf, /* ref */ adrTag));
+            metaData.add(Tag.TitleJ, Common.getNRDString(buf, /* ref */ adrTag));
+            metaData.add(Tag.GameTitle, Common.getNRDString(buf, /* ref */ adrTag));
+            metaData.add(Tag.GameTitleJ, Common.getNRDString(buf, /* ref */ adrTag));
+            metaData.add(Tag.GameSystem, Common.getNRDString(buf, /* ref */ adrTag));
+            metaData.add(Tag.GameSystemJ, Common.getNRDString(buf, /* ref */ adrTag));
+            metaData.add(Tag.Composer, Common.getNRDString(buf, /* ref */ adrTag)); // Track author
+            metaData.add(Tag.ComposerJ, Common.getNRDString(buf, /* ref */ adrTag)); // Track author(jp)
+            metaData.add(Tag.SongObjVersion, Common.getNRDString(buf, /* ref */ adrTag)); // Release date
+            metaData.add(Tag.Maker, Common.getNRDString(buf, /* ref */ adrTag)); // Programmer
+            metaData.add(Tag.Note, Common.getNRDString(buf, /* ref */ adrTag)); // Notes
         }
 
-        return gd3;
+        return metaData;
     }
 
     public boolean init(MmlDatum[] vgmBuf, Consumer<ChipDatum> WriteOPL4Register, double SampleRate) {
@@ -60,7 +61,7 @@ public class MoonDriver {
         logger.log(Level.INFO, "MoonDriverDotNET  VER 20201226 Programed by Kuma");
 
         this.vgmBuf = vgmBuf;
-        this.WriteOPL4Register = WriteOPL4Register;
+        this.writeOpl4 = WriteOPL4Register;
         this.sampleRate = SampleRate;
 
         gd3 = getGD3Info(vgmBuf, 0);
@@ -2962,17 +2963,17 @@ public class MoonDriver {
 
     private void moon_fm1_out() {
         ChipDatum cd = new ChipDatum(0 * 0x100 + 0, d & 0xff, e & 0xff);
-        WriteOPL4Register.accept(cd);
+        writeOpl4.accept(cd);
     }
 
     private void moon_fm2_out() {
         ChipDatum cd = new ChipDatum(0 * 0x100 + 1, d & 0xff, e & 0xff);
-        WriteOPL4Register.accept(cd);
+        writeOpl4.accept(cd);
     }
 
     private void moon_wave_out() {
         ChipDatum cd = new ChipDatum(0 * 0x100 + 2, d & 0xff, e & 0xff);
-        WriteOPL4Register.accept(cd);
+        writeOpl4.accept(cd);
         backDat = e;
     }
 

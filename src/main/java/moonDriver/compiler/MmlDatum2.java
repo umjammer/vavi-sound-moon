@@ -9,7 +9,6 @@ import java.util.List;
 
 import dotnet4j.util.compat.StringUtilities;
 import musicDriverInterface.LinePos;
-import musicDriverInterface.MMLType;
 import musicDriverInterface.MmlDatum;
 
 
