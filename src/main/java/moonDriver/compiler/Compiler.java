@@ -115,7 +115,7 @@ public class Compiler implements ICompiler {
         return mck.getCompilerInfo();
     }
 
-    public MetaData getGD3TagInfo(byte[] srcBuf) {
+    public MetaData getMetaData(byte[] srcBuf) {
         return null;
     }
 

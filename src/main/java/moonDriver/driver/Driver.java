@@ -53,7 +53,7 @@ public class Driver implements IDriver {
         throw new UnsupportedOperationException();
     }
 
-    public MetaData getGD3TagInfo(byte[] srcBuf) {
+    public MetaData getMetaData(byte[] srcBuf) {
         MetaData metaData = new MetaData();
 
         int[] adrTag = new int[1];
