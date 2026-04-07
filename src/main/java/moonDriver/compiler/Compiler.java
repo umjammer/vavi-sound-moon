@@ -16,7 +16,7 @@ import dotnet4j.io.Stream;
 import dotnet4j.io.StreamReader;
 import dotnet4j.util.compat.Tuple;
 import musicDriverInterface.CompilerInfo;
-import musicDriverInterface.GD3Tag;
+import musicDriverInterface.MetaData;
 import musicDriverInterface.ICompiler;
 import musicDriverInterface.MmlDatum;
 
@@ -39,7 +39,7 @@ public class Compiler implements ICompiler {
     private boolean isIDE = false;
     private Point skipPoint = new Point(0, 0);
     private Function<String, Stream> appendFileReaderCallback;
-    public Work work = new Work();
+    public final Work work = new Work();
     public Mck mck = null;
 
     public Compiler() {
@@ -115,7 +115,7 @@ public class Compiler implements ICompiler {
         return mck.getCompilerInfo();
     }
 
-    public GD3Tag getGD3TagInfo(byte[] srcBuf) {
+    public MetaData getMetaData(byte[] srcBuf) {
         return null;
     }
 
@@ -191,7 +191,7 @@ public class Compiler implements ICompiler {
         return null;
     }
 
-    private MemoryStream readAllBytesToMemoryStream(Stream stream) {
+    private static MemoryStream readAllBytesToMemoryStream(Stream stream) {
         if (stream == null) return null;
 
         var buf = new byte[8192];

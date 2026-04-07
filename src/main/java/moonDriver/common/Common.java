@@ -19,7 +19,7 @@ public class Common {
 
     private static final Logger logger = getLogger(Common.class.getName());
 
-    public static Charset charset = Charset.forName("ms932");
+    public static final Charset charset = Charset.forName("ms932");
 
     public static final String mmlExtension = ".mdm";
     public static final String objExtension = ".mdr";
@@ -82,7 +82,7 @@ public class Common {
         try {
             List<Byte> lst = new ArrayList<>();
             for (; buf[index[0]] != 0; index[0]++) {
-                lst.add((byte) buf[index[0]]);
+                lst.add(buf[index[0]]);
             }
 
             String n = new String(ByteUtil.toByteArray(lst), charset);

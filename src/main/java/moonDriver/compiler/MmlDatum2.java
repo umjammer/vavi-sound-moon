@@ -9,7 +9,6 @@ import java.util.List;
 
 import dotnet4j.util.compat.StringUtilities;
 import musicDriverInterface.LinePos;
-import musicDriverInterface.MMLType;
 import musicDriverInterface.MmlDatum;
 
 
@@ -48,7 +47,7 @@ public class MmlDatum2 extends MmlDatum implements Serializable {
      *             -7: [ref] macro <br/>
      */
     public MmlDatum2(String code, Object... args) {
-        super(-1, MMLType.Unknown, null, args);
+        super(0xff, MMLType.Unknown, null, args);
         this.code = code;
     }
 

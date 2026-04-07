@@ -1,7 +1,7 @@
 [![Release](https://jitpack.io/v/umjammer/vavi-sound-moon.svg)](https://jitpack.io/#umjammer/vavi-sound-moon)
 [![Java CI](https://github.com/umjammer/vavi-sound-moon/actions/workflows/maven.yml/badge.svg)](https://github.com/umjammer/vavi-sound-moon/actions/workflows/maven.yml)
 [![CodeQL](https://github.com/umjammer/vavi-sound-moon/actions/workflows/codeql.yml/badge.svg)](https://github.com/umjammer/vavi-sound-moon/actions/workflows/codeql.yml)
-![Java](https://img.shields.io/badge/Java-21-b07219)
+![Java](https://img.shields.io/badge/Java-25-b07219)
 
 # vavi-sound-moon
 
@@ -22,6 +22,13 @@ currently this project has no good player, use [vavi-sound-mdplayer](https://git
 ## References
 
  * https://github.com/BouKiCHi/moondrv
+
+### File Types
+
+| name | type | status | desxription |
+|------|------|:------:|-------------|
+|      | MML  |   ️?   |             |
+| MND  | SEQ  |   ✅️   |             |
 
 ## TODO
 

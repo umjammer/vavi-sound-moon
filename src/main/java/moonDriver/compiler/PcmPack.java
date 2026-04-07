@@ -46,7 +46,7 @@ public class PcmPack {
     }
 
     /** MDR file reading */
-    private int readMDRHeader(List<MmlDatum2> destBuf, String file, /* ref */ _mdr m) {
+    private static int readMDRHeader(List<MmlDatum2> destBuf, String file, /* ref */ _mdr m) {
         try {
             m.size = destBuf.size();
 
@@ -77,7 +77,7 @@ public class PcmPack {
     }
 
     /** MDR Header Reconstruction */
-    private void writeMDRHeader(List<MmlDatum2> destBuf, _mdr m) {
+    private static void writeMDRHeader(List<MmlDatum2> destBuf, _mdr m) {
         // PCM setting value
         destBuf.get(m.header + 0x2a).dat = m.pcm_packed;
         destBuf.get(m.header + 0x30).dat = m.pcm_startadrs;
@@ -89,7 +89,7 @@ public class PcmPack {
     private static final int BANK_SIZE = 0x2000;
 
     /** MDR file reading */
-    private List<MmlDatum2> packPCMintoMDR(List<MmlDatum2> destBuf, String file, String pcm, /* ref */ _mdr m) {
+    private static List<MmlDatum2> packPCMintoMDR(List<MmlDatum2> destBuf, String file, String pcm, /* ref */ _mdr m) {
         if (StringUtilities.isNullOrEmpty(file)) return destBuf;
         if (StringUtilities.isNullOrEmpty(pcm)) return destBuf;
 

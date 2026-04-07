@@ -46,7 +46,7 @@ public class Program {
 
     static class KeyboardHook {
 
-        static AtomicBoolean typed = new AtomicBoolean();
+        static final AtomicBoolean typed = new AtomicBoolean();
 
         static {
             try {
@@ -96,9 +96,9 @@ public class Program {
 
     private static final int SamplingRate = 55467; // 44100;
     private static final int samplingBuffer = 1024;
-    private static short[] frames = new short[samplingBuffer * 4];
+    private static final short[] frames = new short[samplingBuffer * 4];
     private static mdsound.MDSound mds = null;
-    private static short[] emuRenderBuf = new short[2];
+    private static final short[] emuRenderBuf = new short[2];
     private static musicDriverInterface.IDriver drv = null;
     private static final int opl4MasterClock = 33868800;
     private static int device = 0;

@@ -17,7 +17,7 @@ public class Mck {
     /**
      * Help display
      */
-    private void dispHelpMessage() {
+    private static void dispHelpMessage() {
         System.err.println(rb.getString("usage"));
         //exit(1);
     }

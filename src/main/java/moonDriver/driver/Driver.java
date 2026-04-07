@@ -24,10 +24,10 @@ import dotnet4j.util.compat.Tuple;
 import moonDriver.common.Common;
 import musicDriverInterface.ChipAction;
 import musicDriverInterface.ChipDatum;
-import musicDriverInterface.GD3Tag;
+import musicDriverInterface.MetaData;
 import musicDriverInterface.IDriver;
+import musicDriverInterface.MetaData.Tag;
 import musicDriverInterface.MmlDatum;
-import musicDriverInterface.Tag;
 import vavi.util.serdes.Serdes;
 
 import static java.lang.System.getLogger;
@@ -37,7 +37,7 @@ public class Driver implements IDriver {
 
     private static final Logger logger = getLogger(Driver.class.getName());
 
-    public Exception renderingException = null;
+    public final Exception renderingException = null;
     private MoonDriver md = null;
     static MmlDatum[] srcBuf = null;
     private Consumer<ChipDatum> writeOPL4;
@@ -53,27 +53,27 @@ public class Driver implements IDriver {
         throw new UnsupportedOperationException();
     }
 
-    public GD3Tag getGD3TagInfo(byte[] srcBuf) {
-        GD3Tag gd3 = new GD3Tag();
+    public MetaData getMetaData(byte[] srcBuf) {
+        MetaData metaData = new MetaData();
 
         int[] adrTag = new int[1];
         adrTag[0] = (srcBuf[0x2e] & 0xff) + (srcBuf[0x2f] & 0xff) * 0x100;
         if (adrTag[0] != 0) {
             adrTag[0] -= 0x8000;
-            gd3.items.put(Tag.Title, new String[] {Common.getNRDString(srcBuf, /* ref */ adrTag)});
-            gd3.items.put(Tag.TitleJ, new String[] {Common.getNRDString(srcBuf, /* ref */ adrTag)});
-            gd3.items.put(Tag.GameTitle, new String[] {Common.getNRDString(srcBuf, /* ref */ adrTag)});
-            gd3.items.put(Tag.GameTitleJ, new String[] {Common.getNRDString(srcBuf, /* ref */ adrTag)});
-            gd3.items.put(Tag.GameSystem, new String[] {Common.getNRDString(srcBuf, /* ref */ adrTag)});
-            gd3.items.put(Tag.GameSystemJ, new String[] {Common.getNRDString(srcBuf, /* ref */ adrTag)});
-            gd3.items.put(Tag.Composer, new String[] {Common.getNRDString(srcBuf, /* ref */ adrTag)}); // Track author
-            gd3.items.put(Tag.ComposerJ, new String[] {Common.getNRDString(srcBuf, /* ref */ adrTag)}); // Track author(jp)
-            gd3.items.put(Tag.BuildCompilerVersion, new String[] {Common.getNRDString(srcBuf, /* ref */ adrTag)}); // Release date
-            gd3.items.put(Tag.Converter, new String[] {Common.getNRDString(srcBuf, /* ref */ adrTag)}); // Programmer
-            gd3.items.put(Tag.Note, new String[] {Common.getNRDString(srcBuf, /* ref */ adrTag)}); // Notes
+            metaData.add(Tag.Title, Common.getNRDString(srcBuf, /* ref */ adrTag));
+            metaData.add(Tag.TitleJ, Common.getNRDString(srcBuf, /* ref */ adrTag));
+            metaData.add(Tag.GameTitle, Common.getNRDString(srcBuf, /* ref */ adrTag));
+            metaData.add(Tag.GameTitleJ, Common.getNRDString(srcBuf, /* ref */ adrTag));
+            metaData.add(Tag.GameSystem, Common.getNRDString(srcBuf, /* ref */ adrTag));
+            metaData.add(Tag.GameSystemJ, Common.getNRDString(srcBuf, /* ref */ adrTag));
+            metaData.add(Tag.Composer, Common.getNRDString(srcBuf, /* ref */ adrTag)); // Track author
+            metaData.add(Tag.ComposerJ, Common.getNRDString(srcBuf, /* ref */ adrTag)); // Track author(jp)
+            metaData.add(Tag.BuildCompilerVersion, Common.getNRDString(srcBuf, /* ref */ adrTag)); // Release date
+            metaData.add(Tag.Converter, Common.getNRDString(srcBuf, /* ref */ adrTag)); // Programmer
+            metaData.add(Tag.Note, Common.getNRDString(srcBuf, /* ref */ adrTag)); // Notes
         }
 
-        return gd3;
+        return metaData;
     }
 
     public int getNowLoopCounter() {
@@ -132,7 +132,7 @@ public class Driver implements IDriver {
     public void init(List<ChipAction> list, MmlDatum[] mmlData, Function<String, Stream> function, Object... objects) {
         if (mmlData != null && mmlData.length >= 1) {
             Driver.srcBuf = mmlData;
-            writeOPL4 = list.get(0)::writeRegister;
+            writeOPL4 = list.getFirst()::writeRegister;
             String path = (String) objects[0];
             double sampleRate = (double) objects[1];
             int dummy = (int) objects[2];
