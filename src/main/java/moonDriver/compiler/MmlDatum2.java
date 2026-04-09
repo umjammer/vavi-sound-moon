@@ -54,12 +54,12 @@ public class MmlDatum2 extends MmlDatum implements Serializable {
     @Override
     public String toString() {
         String c = StringUtilities.isNullOrEmpty(code) ? "" : code;
-        String d = "";
+        StringBuilder d = new StringBuilder();
         while (!c.isEmpty() && c.charAt(c.length() - 1) == '\n') {
             c = c.substring(0, c.length() - 1);
-            d += "\n";
+            d.append("\n");
         }
-        return "%d : %d%d".formatted(c, super.toString(), d);
+        return "%d : %s%s".formatted(c, super.toString(), d.toString());
     }
 
     public musicDriverInterface.MmlDatum ToMmlDatumn() {

@@ -35,7 +35,7 @@ public class Environment {
             String[] kv = item.split("=");
             if (kv == null) continue;
             if (kv.length != 2) continue;
-            if (!kv[0].toUpperCase().equals(envname.toUpperCase())) continue;
+            if (!kv[0].equalsIgnoreCase(envname)) continue;
 
             String[] vals = kv[1].split(";");
             return vals;
