@@ -3566,28 +3566,28 @@ on_error:
         int i, j, x;
         String t;
 
-        t = "%d_table:".formatted(str);
+        t = "%s_table:".formatted(str);
         fp.add(new MmlDatum2(t + "\n", -2, t));
 
         if (max != 0) {
             for (i = 0; i < max; i++) {
                 if (tbl[i][0] != 0) {
-                    t = "%d_%03d".formatted(str, i);
-                    fp.add(new MmlDatum2("\tdw\t%d\n".formatted(t), -3, t));
+                    t = "%s_%03d".formatted(str, i);
+                    fp.add(new MmlDatum2("\tdw\t%s\n".formatted(t), -3, t));
                 } else {
                     fp.add(new MmlDatum2("\tdw\t0\n", -1, 0, -1, 0));
                 }
             }
         }
 
-        t = "%d_lp_table:".formatted(str);
+        t = "%s_lp_table:".formatted(str);
         fp.add(new MmlDatum2(t + "\n", -2, t));
 
         if (max != 0) {
             for (i = 0; i < max; i++) {
                 if (tbl[i][0] != 0) {
-                    t = "%d_lp_%03d".formatted(str, i);
-                    fp.add(new MmlDatum2("\tdw\t%d\n".formatted(t), -3, t));
+                    t = "%s_lp_%03d".formatted(str, i);
+                    fp.add(new MmlDatum2("\tdw\t%s\n".formatted(t), -3, t));
                 } else {
                     fp.add(new MmlDatum2("\tdw\t0\n", -1, 0, -1, 0));
                 }
@@ -3595,14 +3595,14 @@ on_error:
 
             for (i = 0; i < max; i++) {
                 if (tbl[i][0] != 0) {
-                    t = "%d_%03d:".formatted(str, i);
-                    fp.add(new MmlDatum2("\n%d\n".formatted(t), -2, t));
+                    t = "%s_%03d:".formatted(str, i);
+                    fp.add(new MmlDatum2("\n%s\n".formatted(t), -2, t));
                     x = 0;
                     for (j = 1; j <= tbl[i][0]; j++) {
                         if (tbl[i][j] == enmEFTBL.LOOP.v) {
                             if (x != 0) fp.add(new MmlDatum2("\n", 0));
-                            t = "%d_lp_%03d:".formatted(str, i);
-                            fp.add(new MmlDatum2("%d\n".formatted(t), -2, t));
+                            t = "%s_lp_%03d:".formatted(str, i);
+                            fp.add(new MmlDatum2("%s\n".formatted(t), -2, t));
                             x = 0;
                         } else if (x == 0) {
                             fp.add(new MmlDatum2("\tdb\t%02x".formatted(tbl[i][j] & 0xff), -1, tbl[i][j] & 0xff));
@@ -3710,13 +3710,13 @@ on_error:
      * none
      */
     private static void writeToneTable(List<MmlDatum2> fp, int[][] tbl, String str, int max) { // [_TONETBL_MAX][1024+2]
-        String t = "%d_data_table:".formatted(str);
-        fp.add(new MmlDatum2("%d\n".formatted(t), -2, t));
+        String t = "%s_data_table:".formatted(str);
+        fp.add(new MmlDatum2("%s\n".formatted(t), -2, t));
         if (max != 0) {
             for (int i = 0; i < max; i++) {
                 if (tbl[i][0] != 0) {
-                    t = "%d_%03d".formatted(str, i);
-                    fp.add(new MmlDatum2("\tdw\t%d\n".formatted(t), -3, t));
+                    t = "%s_%03d".formatted(str, i);
+                    fp.add(new MmlDatum2("\tdw\t%s\n".formatted(t), -3, t));
                 } else {
                     fp.add(new MmlDatum2("\tdw\t0\n", -1, 0, -1, 0));
                 }
@@ -3724,15 +3724,15 @@ on_error:
 
             for (int i = 0; i < max; i++) {
                 if (tbl[i][0] != 0) {
-                    t = "%d_%03d:".formatted(str, i);
-                    fp.add(new MmlDatum2("\n%d\n".formatted(t), -2, t));
+                    t = "%s_%03d:".formatted(str, i);
+                    fp.add(new MmlDatum2("\n%s\n".formatted(t), -2, t));
                     int x = 0;
                     for (int j = 0, k = 1; j < tbl[i][0] / 9; k += 9, j++) {
                         byte b = (byte) (tbl[i][k] & 0xff);
                         byte b2 = (byte) (tbl[i][k + 1] & 0xff);
                         fp.add(new MmlDatum2("\tdb\t%02x,%02x\n".formatted(b, b2), -1, b, -1, b2));
                         short s = (short) (tbl[i][k + 2] & 0xffff);
-                        fp.add(new MmlDatum2("\tdw\t${0:x04}\n".formatted(s), -1, (byte) s, -1, (byte) (s >> 8)));
+                        fp.add(new MmlDatum2("\tdw\t$%04x\n".formatted(s), -1, (byte) s, -1, (byte) (s >> 8)));
                         s = (short) (tbl[i][k + 3] & 0xffff);
                         fp.add(new MmlDatum2("\tdw\t%d\n".formatted(s), -1, (byte) s, -1, (byte) (s >> 8)));
                         fp.add(new MmlDatum2(String.format("\tdb\t%02x,%02x,%02x,%02x,%02x\n",
@@ -3769,13 +3769,13 @@ on_error:
      * none
      */
     private void writeOPL3tbl(List<MmlDatum2> fp, String str, int max) {
-        String t = "%d_data_table:".formatted(str);
-        fp.add(new MmlDatum2("%d\n".formatted(t), -2, t));
+        String t = "%s_data_table:".formatted(str);
+        fp.add(new MmlDatum2("%s\n".formatted(t), -2, t));
         if (max != 0) {
             for (int i = 0; i < max; i++) {
                 if (opl3op_tbl[i][0] != 0) {
-                    t = "%d_%03d".formatted(str, i);
-                    fp.add(new MmlDatum2("\tdw\t%d\n".formatted(t), -3, t));
+                    t = "%s_%03d".formatted(str, i);
+                    fp.add(new MmlDatum2("\tdw\t%s\n".formatted(t), -3, t));
                 } else {
                     fp.add(new MmlDatum2("\tdw\t0\n", -1, 0, -1, 0));
                 }
@@ -3783,8 +3783,8 @@ on_error:
 
             for (int i = 0; i < max; i++) {
                 if (opl3op_tbl[i][0] != 0) {
-                    t = "%d_%03d:".formatted(str, i);
-                    fp.add(new MmlDatum2("\n%d\n".formatted(t), -2, t));
+                    t = "%s_%03d:".formatted(str, i);
+                    fp.add(new MmlDatum2("\n%s\n".formatted(t), -2, t));
                     int x = 0;
 
                     int cnt_val = opl3op_tbl[i][2] & 0x03;
@@ -3891,8 +3891,8 @@ on_error:
      * none
      */
     private static void writeHardEffect(List<MmlDatum2> fp, int[][] tbl, String str, int max) { // [_HARD_EFFECT_MAX][5]
-        String t = "%d_effect_select:".formatted(str);
-        fp.add(new MmlDatum2("%d\n".formatted(t), -2, t));
+        String t = "%s_effect_select:".formatted(str);
+        fp.add(new MmlDatum2("%s\n".formatted(t), -2, t));
         for (int i = 0; i < max; i++) {
             byte b1 = (byte) tbl[i][1];
             byte b2 = (byte) (tbl[i][3] | 0x80);
@@ -3914,8 +3914,8 @@ on_error:
      * none
      */
     private static void writeEffectWave(List<MmlDatum2> fp, int[][] tbl, String str, int max) { // [_EFFECT_WAVE_MAX][33]
-        String t = "%d_4088_data:".formatted(str);
-        fp.add(new MmlDatum2("%d\n".formatted(t), -2, t));
+        String t = "%s_4088_data:".formatted(str);
+        fp.add(new MmlDatum2("%s\n".formatted(t), -2, t));
         for (int i = 0; i < max; i++) {
             if (tbl[i][0] != 0) {
                 int x = 0;
@@ -4216,12 +4216,12 @@ on_error:
      * none
      */
     private void writeSongInfo(List<MmlDatum2> fp) {
-        fp.add(new MmlDatum2("; Title: %d\n".formatted(song_name), -1));
-        fp.add(new MmlDatum2("; Composer: %d\n".formatted(composer), -1));
-        fp.add(new MmlDatum2("; Maker: %d\n".formatted(maker), -1));
+        fp.add(new MmlDatum2("; Title: %s\n".formatted(song_name), -1));
+        fp.add(new MmlDatum2("; Composer: %s\n".formatted(composer), -1));
+        fp.add(new MmlDatum2("; Maker: %s\n".formatted(maker), -1));
 
         if (programer != null) {
-            fp.add(new MmlDatum2("; Programer: %d\n".formatted(programer), -1));
+            fp.add(new MmlDatum2("; Programer: %s\n".formatted(programer), -1));
         }
         fp.add(new MmlDatum2("\n", -1));
     }
@@ -4234,26 +4234,26 @@ on_error:
     private static void printStrDb(List<MmlDatum2> fp, String str, int max) {
         byte[] ary = str.getBytes(charset);
 
-        String des = "";
+        StringBuilder des = new StringBuilder();
         List<Integer> lstInt = new ArrayList<>();
         List<int[]> aryInt = new ArrayList<>();
 
         for (int i = 0; i < max; i++) {
             if (i < ary.length) {
-                des += "%02x".formatted(ary[i]);
+                des.append("%02x".formatted(ary[i]));
                 lstInt.add(-1);
                 lstInt.add(ary[i] & 0xff);
             } else {
-                des += "$00";
+                des.append("$00");
                 lstInt.add(-1);
                 lstInt.add(0);
             }
 
             if ((i + 1) % 8 == 0) {
-                des += "@@";
+                des.append("@@");
                 aryInt.add(lstInt.stream().mapToInt(x -> x).toArray());
                 lstInt.clear();
-            } else des += ", ";
+            } else des.append(", ");
         }
 
         //des += "$00";
@@ -4261,11 +4261,11 @@ on_error:
         lstInt.add(0);
         aryInt.add(lstInt.stream().mapToInt(x -> x).toArray());
 
-        String[] sDes = des.split("@@");
+        String[] sDes = des.toString().split("@@");
 
         for (int i = 0; i < sDes.length; i++) {
 
-            fp.add(new MmlDatum2("\tdb\t%s\n".formatted(sDes[i]), (Object) aryInt.get(i)));
+            fp.add(new MmlDatum2("\tdb\t%s\n".formatted(sDes[i]), aryInt.get(i)));
         }
     }
 
@@ -4278,46 +4278,46 @@ on_error:
      */
     private void writeSongInfoMacro(List<MmlDatum2> fp) {
         String t = "TITLE\t.macro";
-        fp.add(new MmlDatum2("%d\n".formatted(t), -4, t));
+        fp.add(new MmlDatum2("%s\n".formatted(t), -4, t));
         printStrDb(fp, song_name, 32);
         t = "\t.endm";
-        fp.add(new MmlDatum2("%d\n".formatted(t), -4, t));
+        fp.add(new MmlDatum2("%s\n".formatted(t), -4, t));
         t = "COMPOSER\t.macro";
-        fp.add(new MmlDatum2("%d\n".formatted(t), -4, t));
+        fp.add(new MmlDatum2("%s\n".formatted(t), -4, t));
         printStrDb(fp, composer, 32);
         t = "\t.endm";
-        fp.add(new MmlDatum2("%d\n".formatted(t), -4, t));
+        fp.add(new MmlDatum2("%s\n".formatted(t), -4, t));
         t = "MAKER\t.macro";
-        fp.add(new MmlDatum2("%d\n".formatted(t), -4, t));
+        fp.add(new MmlDatum2("%s\n".formatted(t), -4, t));
         printStrDb(fp, maker, 32);
         t = "\t.endm";
-        fp.add(new MmlDatum2("%d\n".formatted(t), -4, t));
+        fp.add(new MmlDatum2("%s\n".formatted(t), -4, t));
 
         // text
         t = "TITLE_TEXT\t.macro";
-        fp.add(new MmlDatum2("%d\n".formatted(t), -4, t));
-        fp.add(new MmlDatum2("\tdb\t\"%d\",$00\n".formatted(song_name), -1, String.format("\"%d\",$00", song_name)));
+        fp.add(new MmlDatum2("%s\n".formatted(t), -4, t));
+        fp.add(new MmlDatum2("\tdb\t\"%s\",$00\n".formatted(song_name), -1, String.format("\"%s\",$00", song_name)));
         t = "\t.endm";
-        fp.add(new MmlDatum2("%d\n".formatted(t), -4, t));
+        fp.add(new MmlDatum2("%s\n".formatted(t), -4, t));
 
         t = "COMPOSER_TEXT\t.macro";
-        fp.add(new MmlDatum2("%d\n".formatted(t), -4, t));
-        fp.add(new MmlDatum2("\tdb\t\"%d\",$00\n".formatted(composer), -1, String.format("\"%d\",$00", composer)));
+        fp.add(new MmlDatum2("%s\n".formatted(t), -4, t));
+        fp.add(new MmlDatum2("\tdb\t\"%s\",$00\n".formatted(composer), -1, String.format("\"%s\",$00", composer)));
         t = "\t.endm";
-        fp.add(new MmlDatum2("%d\n".formatted(t), -4, t));
+        fp.add(new MmlDatum2("%s\n".formatted(t), -4, t));
 
         t = "MAKER_TEXT\t.macro";
-        fp.add(new MmlDatum2("%d\n".formatted(t), -4, t));
-        fp.add(new MmlDatum2("\tdb\t\"%d\",$00\n".formatted(maker), -1, String.format("\"%d\",$00", maker)));
+        fp.add(new MmlDatum2("%s\n".formatted(t), -4, t));
+        fp.add(new MmlDatum2("\tdb\t\"%s\",$00\n".formatted(maker), -1, String.format("\"%s\",$00", maker)));
         t = "\t.endm";
-        fp.add(new MmlDatum2("%d\n".formatted(t), -4, t));
+        fp.add(new MmlDatum2("%s\n".formatted(t), -4, t));
 
         if (use_pcm != 0) {
             t = "PCMFILE\t.macro";
-            fp.add(new MmlDatum2("%d\n".formatted(t), -4, t));
-            fp.add(new MmlDatum2("\tdb\t\"%d\",$00\n".formatted(pcm_name), -1, String.format("\"%d\",$00", pcm_name)));
+            fp.add(new MmlDatum2("%s\n".formatted(t), -4, t));
+            fp.add(new MmlDatum2("\tdb\t\"%s\",$00\n".formatted(pcm_name), -1, String.format("\"%s\",$00", pcm_name)));
             t = "\t.endm";
-            fp.add(new MmlDatum2("%d\n".formatted(t), -4, t));
+            fp.add(new MmlDatum2("%s\n".formatted(t), -4, t));
         }
     }
 
@@ -5883,7 +5883,7 @@ on_error:
         }
 
         if (putAsm_pos == 7) {
-            fp.add(new MmlDatum2("\t;Trk %d; %d: %d".formatted(str_track.charAt(mml_trk), fn, ln), 0));
+            fp.add(new MmlDatum2("\t;Trk %d; %s: %d".formatted(str_track.charAt(mml_trk), fn, ln), 0));
             fp.add(new MmlDatum2("\n", 0));
         }
         if (++putAsm_pos > 7) {
@@ -5894,7 +5894,7 @@ on_error:
 
     private void putAsmFlash(List<MmlDatum2> fp) {
         if (putAsm_pos > 0) {
-            fp.add(new MmlDatum2("\t;Trk %d; %d: %d".formatted(str_track.charAt(mml_trk), mml_file_name, mml_line_pos), 0));
+            fp.add(new MmlDatum2("\t;Trk %s; %s: %d".formatted(str_track.charAt(mml_trk), mml_file_name, mml_line_pos), 0));
             fp.add(new MmlDatum2("\n", 0));
             putAsm_pos = 0;
         }
@@ -5921,8 +5921,8 @@ on_error:
                 case 3 -> 0xe000;
                 default -> 0xa000;
             };
-            String t = ".org\t${0:x04}".formatted(org);
-            fp.add(new MmlDatum2("\t%d\n".formatted(t), 4, t));
+            String t = ".org\t$%04x".formatted(org);
+            fp.add(new MmlDatum2("\t%s\n".formatted(t), 4, t));
             bank_org_written_flag[bank] = 1;
             if (bank > bank_maximum) {
                 bank_maximum = bank;
@@ -6452,11 +6452,11 @@ on_error:
             putAsm_pos = 0;
             loop_flag = 0;
 
-            loop_point_label = "%d_%02d_lp".formatted(songlabel, trk);
+            loop_point_label = "%s_%02d_lp".formatted(songlabel, trk);
 
             mml_trk = trk;
-            String t = "%d_%02d:".formatted(songlabel, trk);
-            fp.add(new MmlDatum2("\n%d\t;Trk %d\n".formatted(t, str_track.charAt(trk)), -2, t));
+            String t = "%s_%02d:".formatted(songlabel, trk);
+            fp.add(new MmlDatum2("\n%s\t;Trk %s\n".formatted(t, str_track.charAt(trk)), -2, t));
 
             mml_file_name = cmd[cmdPtr].filename;
             mml_line_pos = cmd[cmdPtr].line;
@@ -7113,7 +7113,7 @@ on_error:
 
             // putAsm( fp, MCK_DATA_END );
             putAsm(fp, enmMCK.MCK_GOTO.v);
-            fp.add(new MmlDatum2("\n\tdb\tbank(%s)\n".formatted(loop_point_label), -3, String.format("bank(%d)", loop_point_label)));
+            fp.add(new MmlDatum2("\n\tdb\tbank(%s)\n".formatted(loop_point_label), -3, String.format("bank(%s)", loop_point_label)));
             bank_usage[curr_bank]++;
             fp.add(new MmlDatum2("\tdw\t%s\n".formatted(loop_point_label), -3, loop_point_label));
             bank_usage[curr_bank] += 2;
@@ -7410,7 +7410,7 @@ on_error:
                         curr_bank = bank_sel[i];
                         oufp.add(new MmlDatum2("\n\n", 0));
                         t = ".bank\t%d".formatted(bank_sel[i]);
-                        oufp.add(new MmlDatum2("\t%d\n".formatted(t), -4, t));
+                        oufp.add(new MmlDatum2("\t%s\n".formatted(t), -4, t));
                         putBankOrigin(oufp, bank_sel[i]);
                     }
                 }

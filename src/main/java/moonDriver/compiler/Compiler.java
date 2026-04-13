@@ -123,8 +123,7 @@ public class Compiler implements ICompiler {
         if (param == null) return;
 
         for (Object prm : param) {
-            if (prm instanceof Function) // <String, Stream>
-            {
+            if (prm instanceof Function) { // <String, Stream>
                 appendFileReaderCallback = (Function<String, Stream>) prm;
                 continue;
             }

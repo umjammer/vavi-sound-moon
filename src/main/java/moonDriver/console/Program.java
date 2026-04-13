@@ -5,6 +5,7 @@ import java.lang.System.Logger;
 import java.lang.System.Logger.Level;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -67,9 +68,7 @@ class Program {
     private static void Compile(String[] args, int argIndex) {
         try {
             // Create a list of arguments for mc
-            List<String> lstArg = new ArrayList<>();
-            for (int i = argIndex; i < args.length; i++)
-                lstArg.add(args[i]);
+            List<String> lstArg = new ArrayList<>(Arrays.asList(args).subList(argIndex, args.length));
 
             Compiler compiler = new Compiler();
             compiler.init();
@@ -97,7 +96,6 @@ class Program {
                 logger.log(Level.ERROR, rb.getString("E0601"));
                 return;
             }
-
 
             // Setting DotNET Options
             if (isSrc) compiler.setCompileSwitch("SRC");

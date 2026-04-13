@@ -3,6 +3,7 @@ package moonDriver.player;
 import java.lang.System.Logger;
 import java.lang.System.Logger.Level;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -174,7 +175,7 @@ public class Program {
             chip.volume = 0;
             chip.option = new Object[] {getApplicationFolder()};
 
-            mds = new MDSound(SamplingRate, samplingBuffer, List.of(chip));
+            mds = new MDSound();
             //ppz8em = new PPZ8em(SamplingRate);
             //ppsdrv = new PPSDRV(SamplingRate);
 
@@ -184,10 +185,8 @@ public class Program {
             envMoonDriver = env.GetEnvVal("moondriver");
             envMoonDriverOpt = env.GetEnvVal("moondriveropt");
 
-            List<String> opt = envMoonDriverOpt == null ? new ArrayList<>() : List.of(envMoonDriverOpt);
-            for (int i = fnIndex; i < args.length; i++) {
-                opt.add(args[i]);
-            }
+            List<String> opt = new ArrayList<>(envMoonDriverOpt == null ? new ArrayList<>() : List.of(envMoonDriverOpt));
+            opt.addAll(Arrays.asList(args).subList(fnIndex, args.length));
             mIndex += (envMoonDriverOpt == null ? 0 : envMoonDriverOpt.length) - fnIndex;
 
             drv = new Driver();

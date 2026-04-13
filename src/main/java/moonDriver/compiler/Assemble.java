@@ -483,30 +483,30 @@ public class Assemble {
                     }
 
                     int j;
-                    String x = "";
+                    StringBuilder x = new StringBuilder();
 
                     if (sen.charAt(i) == '"') {
-                        x = "";
+                        x = new StringBuilder();
                         j = i + 1;
                         for (; j < sen.length(); j++) {
                             if (sen.charAt(j) == '"') break;
-                            x += sen.charAt(j);
+                            x.append(sen.charAt(j));
                         }
                         i = j;
 
-                        byte[] ary = x.getBytes(charset);
+                        byte[] ary = x.toString().getBytes(charset);
                         for (byte b : ary) wd.add(b);
                         continue;
                     }
 
-                    x = "";
+                    x = new StringBuilder();
                     j = i;
                     for (; j < sen.length(); j++) {
                         if (sen.charAt(i) == ' ' || sen.charAt(i) == '\t' || sen.charAt(i) == ',') break;
-                        x += sen.charAt(j);
+                        x.append(sen.charAt(j));
                     }
                     i = j;
-                    int n = getInt(x);
+                    int n = getInt(x.toString());
                     wd.add((byte) n);
                 }
 
