@@ -31,7 +31,6 @@ import mdsound.Instrument;
 import mdsound.MDSound;
 import mdsound.instrument.YmF278BInst;
 import moonDriver.common.Common;
-import moonDriver.common.Environment;
 import moonDriver.driver.Driver;
 import moonDriver.driver.MoonDriverJavaOption;
 import musicDriverInterface.ChipDatum;
@@ -41,6 +40,11 @@ import static java.lang.System.getLogger;
 import static vavi.sound.SoundUtil.volume;
 
 
+/**
+ * System properties
+ * <li>{@code moonDriver.opt} ... </li>
+ * <li>{@code moonDriver.moonDriver} ... </li>
+ */
 public class Program {
 
     private static final Logger logger = getLogger(Program.class.getName());
@@ -179,11 +183,8 @@ public class Program {
             //ppz8em = new PPZ8em(SamplingRate);
             //ppsdrv = new PPSDRV(SamplingRate);
 
-            Environment env = new Environment();
-            env.AddEnv("moondriver");
-            env.AddEnv("moondriveropt");
-            envMoonDriver = env.GetEnvVal("moondriver");
-            envMoonDriverOpt = env.GetEnvVal("moondriveropt");
+            envMoonDriver = System.getProperty("moonDriver.moonDriver").split(";");
+            envMoonDriverOpt = System.getProperty("moonDriver.opt").split(";");
 
             List<String> opt = new ArrayList<>(envMoonDriverOpt == null ? new ArrayList<>() : List.of(envMoonDriverOpt));
             opt.addAll(Arrays.asList(args).subList(fnIndex, args.length));

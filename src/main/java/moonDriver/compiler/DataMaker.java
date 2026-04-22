@@ -4,6 +4,7 @@ package moonDriver.compiler;
 import java.lang.System.Logger;
 import java.lang.System.Logger.Level;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.function.Function;
@@ -21,11 +22,10 @@ public class DataMaker {
 
     private static final Logger logger = getLogger(DataMaker.class.getName());
 
-    final ResourceBundle rb = ResourceBundle.getBundle("lang/message");
+    final ResourceBundle rb = ResourceBundle.getBundle("moonDriver/message");
 
     private final Compiler compiler;
     private final Work wk;
-    private final Strings str = new Strings();
 
     public DataMaker(Compiler compiler, Work wk) {
         this.compiler = compiler;
@@ -42,13 +42,13 @@ public class DataMaker {
         for (int i = 0; i < tonetbl_tbl.length; i++) tonetbl_tbl[i] = new int[1024 + 2];
         for (int i = 0; i < opl3op_tbl.length; i++) opl3op_tbl[i] = new int[1024 + 2];
 
-        track_count = new LEN[Work.MML_MAX][][];
+        track_count = new Len[Work.MML_MAX][][];
         for (int i = 0; i < Work.MML_MAX; i++) {
-            track_count[i] = new LEN[_TRACK_MAX][];
+            track_count[i] = new Len[_TRACK_MAX][];
             for (int j = 0; j < _TRACK_MAX; j++) {
-                track_count[i][j] = new LEN[2];
+                track_count[i][j] = new Len[2];
                 for (int k = 0; k < 2; k++) {
-                    track_count[i][j][k] = new LEN();
+                    track_count[i][j][k] = new Len();
                 }
             }
         }
@@ -90,7 +90,7 @@ public class DataMaker {
     private int mml_trk;                    //
 
     private int nest;                       // Repeat nesting level
-    private final LEN[][][] track_count; // [MML_MAX][_TRACK_MAX] [2];			// Total note length storage location (note length/frame/loop note length/loop frame)
+    private final Len[][][] track_count; // [MML_MAX][_TRACK_MAX] [2];			// Total note length storage location (note length/frame/loop note length/loop frame)
     private int volume_flag;                // Volume Status
     private double tbase = 0.625;               // [frame/count] rate during conversion
 
@@ -113,17 +113,17 @@ public class DataMaker {
 
     private static final int HUSIC_EXT = 1;
 
-    public enum enmEFTBL {
+    public enum EFTBL {
         END(0xffff),
         LOOP(0xfffe);
         final int v;
 
-        enmEFTBL(int v) {
+        EFTBL(int v) {
             this.v = v;
         }
     }
 
-    public enum enmMCK {
+    public enum MCK {
         MCK_REPEAT_END(0xa0),
         MCK_REPEAT_ESC(0xa1),
 
@@ -163,7 +163,7 @@ public class DataMaker {
         MCK_DATA_END(0xff);
         final int v;
 
-        enmMCK(int v) {
+        MCK(int v) {
             this.v = v;
         }
     }
@@ -224,7 +224,7 @@ public class DataMaker {
     private static final String str_track = "ABCDEFGHIJKLMNOPQRSTUVWXabcdefghijklmnopqr";// _TRACK_STR;
 
     // Error number
-    private enum enmErrNum {
+    private enum ErrNum {
         COMMAND_NOT_DEFINED,
         DATA_ENDED_BY_LOOP_DEPTH_EXCEPT_0,
         DEFINITION_IS_WRONG,
@@ -277,7 +277,7 @@ public class DataMaker {
         CANT_USE_SHIFT_AMOUNT_WITHOUT_PITCH_CORRECTION,
         UNUSE_COMMAND_IN_THIS_TRACK,
 
-        /* for HuSIC */
+        // for HuSIC
         WTB_TONE_DEFINITION_IS_WRONG,
         ABNORMAL_PARAMETERS_OF_WTB_TONE,
         XPCM_DEFINITION_IS_WRONG,
@@ -292,11 +292,11 @@ public class DataMaker {
 
         ABNORMAL_PARAMETERS,
 
-        /* MoonDriver */
+        // MoonDriver
         COMMAND_REDUNDANT,
     }
 
-    private enum enmSys {
+    private enum Sys {
         TOO_MANY_INCLUDE_FILES,
         FRAME_LENGTH_IS_0,
         REPEAT2_FRAME_ERROR_OVER_3,
@@ -304,9 +304,6 @@ public class DataMaker {
         THIS_NUMBER_IS_ALREADY_USED,
         DPCM_FILE_SIZE_ERROR
     }
-
-    private String[] WarningMessage = new String[] {
-    };
 
     /**
      * Track Mask Functions
@@ -319,25 +316,25 @@ public class DataMaker {
     private static final double _BASE = 192.0;
     private static final int _BASETEMPO = 75;
 
-    public static class LEN {
+    public static class Len {
 
         public double cnt;
         public int frm;
     }
 
-    public static class GATE_Q {
+    public static class GateQ {
 
         public int rate;
         public int adjust;
         // gate length = delta * rate/gate_denom + adjust
     }
 
-    public static class HEAD {
+    public static class Head {
 
         public final String str;
         public final int status;
 
-        public HEAD(String str, int status) {
+        public Head(String str, int status) {
             this.str = str;
             this.status = status;
         }
@@ -509,7 +506,7 @@ public class DataMaker {
     private final DPCMTBL[] dpcm_tbl = new DPCMTBL[64]; // [_DPCM_MAX];                // DPCM
     private DPCMTBL[] xpcm_tbl = new DPCMTBL[64]; // [_DPCM_MAX];                // XPCM(for HuSIC)
 
-    private enum enmMML {
+    private enum Mml {
         _TEMPO(MAX_NOTE + 1),
         _OCTAVE(MAX_NOTE + 2),
         _OCT_UP(MAX_NOTE + 3),
@@ -610,61 +607,67 @@ public class DataMaker {
 
         _REST(0xfc),
         _NOP(0xfe),
-        _TRACK_END(0xff);
+        _TRACK_END(0xff),
+
+        Undefined(-1);
         final int v;
 
-        enmMML(int v) {
+        Mml(int v) {
             this.v = v;
+        }
+
+        public static Mml valueOf(int v) {
+            return Arrays.stream(Mml.values()).filter(e -> e.v == v).findFirst().orElse(Undefined);
         }
     }
 
     private static final int SELF_DELAY_MAX = 8;
 
     /** header */
-    private final HEAD[] head = {
-            new HEAD("#TITLE", _TITLE),
-            new HEAD("#COMPOSER", _COMPOSER),
-            new HEAD("#MAKER", _MAKER),
-            new HEAD("#PROGRAMER", _PROGRAMER),
-            new HEAD("#OCTAVE-REV", _OCTAVE_REV),
-            new HEAD("#GATE-DENOM", _GATE_DENOM),
-            new HEAD("#INCLUDE", _INCLUDE),
+    private final Head[] head = {
+            new Head("#TITLE", _TITLE),
+            new Head("#COMPOSER", _COMPOSER),
+            new Head("#MAKER", _MAKER),
+            new Head("#PROGRAMER", _PROGRAMER),
+            new Head("#OCTAVE-REV", _OCTAVE_REV),
+            new Head("#GATE-DENOM", _GATE_DENOM),
+            new Head("#INCLUDE", _INCLUDE),
             //{"#EX-DISKFM", _EX_DISKFM},
             //{"#EX-NAMCO106", _EX_NAMCO106},
             //{"#EX-VRC7", _EX_VRC7},
             //{"#EX-VRC6", _EX_VRC6},
             //{"#EX-FME7", _EX_FME7},
             //{"#EX-MMC5", _EX_MMC5},
-            new HEAD("#NO-BANKSWITCH", _NO_BANKSWITCH),
-            new HEAD("#AUTO-BANKSWITCH", _AUTO_BANKSWITCH),
-            new HEAD("#PITCH-CORRECTION", _PITCH_CORRECTION),
-            new HEAD("#BANK-CHANGE", _BANK_CHANGE),
-            new HEAD("#SETBANK", _SET_SBANK),
-            new HEAD("#EFFECT-INCLUDE", _EFFECT_INCLUDE),
-            new HEAD("#DPCM-RESTSTOP", _DPCM_RESTSTOP),
+            new Head("#NO-BANKSWITCH", _NO_BANKSWITCH),
+            new Head("#AUTO-BANKSWITCH", _AUTO_BANKSWITCH),
+            new Head("#PITCH-CORRECTION", _PITCH_CORRECTION),
+            new Head("#BANK-CHANGE", _BANK_CHANGE),
+            new Head("#SETBANK", _SET_SBANK),
+            new Head("#EFFECT-INCLUDE", _EFFECT_INCLUDE),
+            new Head("#DPCM-RESTSTOP", _DPCM_RESTSTOP),
             // for HuSIC
             //{"@XPCM", _SET_XPCM_DATA},
             //{"@WT", _SET_WTB_TONE},
             // for MoonDriver
-            new HEAD("@TONE", _SET_TONETBL),
-            new HEAD("@OPF", _SET_FMOP_FOUR),
-            new HEAD("@OPL", _SET_FMOP),
-            new HEAD("#EX-OPL3", _EX_OPL3),
-            new HEAD("#OPL4-NOUSE", _OPL4_NOUSE),
-            new HEAD("#PCMFILE", _PCM_FILE),
-            new HEAD("@DPCM", _SET_DPCM_DATA),
-            new HEAD("@MP", _SET_PITCH_MOD),
-            new HEAD("@EN", _SET_ARPEGGIO),
-            new HEAD("@EP", _SET_PITCH_ENV),
-            new HEAD("@FM", _SET_FM_TONE),
-            new HEAD("@MH", _SET_HARD_EFFECT),
-            new HEAD("@MW", _SET_EFFECT_WAVE),
-            new HEAD("@OP", _SET_VRC7_TONE),
-            new HEAD("@N", _SET_N106_TONE),
-            new HEAD("@V", _SET_ENVELOPE),
-            new HEAD("@", _SET_TONE),
-            new HEAD("#PCMPACK", _PCM_PACK),
-            new HEAD("", -1),
+            new Head("@TONE", _SET_TONETBL),
+            new Head("@OPF", _SET_FMOP_FOUR),
+            new Head("@OPL", _SET_FMOP),
+            new Head("#EX-OPL3", _EX_OPL3),
+            new Head("#OPL4-NOUSE", _OPL4_NOUSE),
+            new Head("#PCMFILE", _PCM_FILE),
+            new Head("@DPCM", _SET_DPCM_DATA),
+            new Head("@MP", _SET_PITCH_MOD),
+            new Head("@EN", _SET_ARPEGGIO),
+            new Head("@EP", _SET_PITCH_ENV),
+            new Head("@FM", _SET_FM_TONE),
+            new Head("@MH", _SET_HARD_EFFECT),
+            new Head("@MW", _SET_EFFECT_WAVE),
+            new Head("@OP", _SET_VRC7_TONE),
+            new Head("@N", _SET_N106_TONE),
+            new Head("@V", _SET_ENVELOPE),
+            new Head("@", _SET_TONE),
+            new Head("#PCMPACK", _PCM_PACK),
+            new Head("", -1),
     };
 
     public static class MML {
@@ -673,7 +676,7 @@ public class DataMaker {
         public final int num;
         public final Function<Integer, Integer> check; // (int trk);
 
-        //		unsigned long		enable;
+        //unsigned long	enable;
         public MML(String cmd, int num, Function<Integer, Integer> check) {
             this.cmd = cmd;
             this.num = num;
@@ -683,7 +686,7 @@ public class DataMaker {
 
     // MML Commands
     private final MML[] mml = {
-            new MML("`", enmMML._DRUM_BIT.ordinal(), DataMaker::isAllTrack),
+            new MML("`", Mml._DRUM_BIT.v, DataMaker::isAllTrack),
             new MML("c", _NOTE_C, DataMaker::isAllTrack),
             new MML("d", _NOTE_D, DataMaker::isAllTrack),
             new MML("e", _NOTE_E, DataMaker::isAllTrack),
@@ -691,25 +694,25 @@ public class DataMaker {
             new MML("g", _NOTE_G, DataMaker::isAllTrack),
             new MML("a", _NOTE_A, DataMaker::isAllTrack),
             new MML("b", _NOTE_B, DataMaker::isAllTrack),
-            new MML("@n", enmMML._KEY.ordinal(), DataMaker::isAllTrack),
-            new MML("n", enmMML._NOTE.ordinal(), DataMaker::isAllTrack),
-            new MML("w", enmMML._WAIT.ordinal(), DataMaker::isAllTrack),
-            new MML("@t", enmMML._TEMPO2.ordinal(), DataMaker::isAllTrack),
-            new MML("t", enmMML._TEMPO.ordinal(), DataMaker::isAllTrack),
-            new MML("o", enmMML._OCTAVE.ordinal(), DataMaker::isAllTrack),
-            new MML(">", enmMML._OCT_UP.ordinal(), DataMaker::isAllTrack),
-            new MML("<", enmMML._OCT_DW.ordinal(), DataMaker::isAllTrack),
-            new MML("l", enmMML._LENGTH.ordinal(), DataMaker::isAllTrack),
-            new MML("v+", enmMML._VOL_PLUS.ordinal(), DataMaker::isAllTrack),
-            new MML("v-", enmMML._VOL_MINUS.ordinal(), DataMaker::isAllTrack),
-            new MML("v", enmMML._VOLUME.ordinal(), DataMaker::isAllTrack),
-            new MML("NB", enmMML._NEW_BANK.ordinal(), DataMaker::isAllTrack),
-            new MML("EPOF", enmMML._EP_OFF.ordinal(), DataMaker::isAllTrack),
-            new MML("EP", enmMML._EP_ON.ordinal(), DataMaker::isAllTrack),
-            new MML("ENOF", enmMML._EN_OFF.ordinal(), DataMaker::isAllTrack),
-            new MML("EN", enmMML._EN_ON.ordinal(), DataMaker::isAllTrack),
-            new MML("MPOF", enmMML._LFO_OFF.ordinal(), DataMaker::isAllTrack),
-            new MML("MP", enmMML._LFO_ON.ordinal(), DataMaker::isAllTrack),
+            new MML("@n", Mml._KEY.v, DataMaker::isAllTrack),
+            new MML("n", Mml._NOTE.v, DataMaker::isAllTrack),
+            new MML("w", Mml._WAIT.v, DataMaker::isAllTrack),
+            new MML("@t", Mml._TEMPO2.v, DataMaker::isAllTrack),
+            new MML("t", Mml._TEMPO.v, DataMaker::isAllTrack),
+            new MML("o", Mml._OCTAVE.v, DataMaker::isAllTrack),
+            new MML(">", Mml._OCT_UP.v, DataMaker::isAllTrack),
+            new MML("<", Mml._OCT_DW.v, DataMaker::isAllTrack),
+            new MML("l", Mml._LENGTH.v, DataMaker::isAllTrack),
+            new MML("v+", Mml._VOL_PLUS.v, DataMaker::isAllTrack),
+            new MML("v-", Mml._VOL_MINUS.v, DataMaker::isAllTrack),
+            new MML("v", Mml._VOLUME.v, DataMaker::isAllTrack),
+            new MML("NB", Mml._NEW_BANK.v, DataMaker::isAllTrack),
+            new MML("EPOF", Mml._EP_OFF.v, DataMaker::isAllTrack),
+            new MML("EP", Mml._EP_ON.v, DataMaker::isAllTrack),
+            new MML("ENOF", Mml._EN_OFF.v, DataMaker::isAllTrack),
+            new MML("EN", Mml._EN_ON.v, DataMaker::isAllTrack),
+            new MML("MPOF", Mml._LFO_OFF.v, DataMaker::isAllTrack),
+            new MML("MP", Mml._LFO_ON.v, DataMaker::isAllTrack),
 
             // for HuSIC
             //{"FSOF", _FMLFO_OFF, HULFO_TRK},
@@ -719,98 +722,96 @@ public class DataMaker {
 
             // for MoonDriver
 
-            new MML("j", enmMML._JUMP_FLAG.ordinal(), DataMaker::isAllTrack),
-            new MML("VOP", enmMML._REVERB_SET.ordinal(), DataMaker::isAllTrack),
-            new MML("RV", enmMML._REVERB_SET.ordinal(), DataMaker::isAllTrack),
-            new MML("DA", enmMML._DAMP_SET.ordinal(), DataMaker::isAllTrack),
+            new MML("j", Mml._JUMP_FLAG.v, DataMaker::isAllTrack),
+            new MML("VOP", Mml._REVERB_SET.v, DataMaker::isAllTrack),
+            new MML("RV", Mml._REVERB_SET.v, DataMaker::isAllTrack),
+            new MML("DA", Mml._DAMP_SET.v, DataMaker::isAllTrack),
 
-            new MML("OPB", enmMML._SET_OPBASE.ordinal(), DataMaker::isAllTrack),
-            new MML("WX", enmMML._LOAD_OP2.ordinal(), DataMaker::isAllTrack),
-            new MML("TVP", enmMML._SET_TVP.ordinal(), DataMaker::isAllTrack),
-            new MML("DR", enmMML._DRUM_SW.ordinal(), DataMaker::isAllTrack),
-            new MML("DN", enmMML._DRUM_NOTE.ordinal(), DataMaker::isAllTrack),
-            new MML("FB", enmMML._SET_FBS.ordinal(), DataMaker::isAllTrack),
-            new MML("OPM", enmMML._SET_OPM.ordinal(), DataMaker::isAllTrack),
+            new MML("OPB", Mml._SET_OPBASE.v, DataMaker::isAllTrack),
+            new MML("WX", Mml._LOAD_OP2.v, DataMaker::isAllTrack),
+            new MML("TVP", Mml._SET_TVP.v, DataMaker::isAllTrack),
+            new MML("DR", Mml._DRUM_SW.v, DataMaker::isAllTrack),
+            new MML("DN", Mml._DRUM_NOTE.v, DataMaker::isAllTrack),
+            new MML("FB", Mml._SET_FBS.v, DataMaker::isAllTrack),
+            new MML("OPM", Mml._SET_OPM.v, DataMaker::isAllTrack),
 
-            new MML("PL", enmMML._L_PAN.ordinal(), DataMaker::isAllTrack),
-            new MML("PR", enmMML._R_PAN.ordinal(), DataMaker::isAllTrack),
-            new MML("PC", enmMML._C_PAN.ordinal(), DataMaker::isAllTrack),
-            new MML("P", enmMML._PAN.ordinal(), DataMaker::isAllTrack),
-            new MML("W", enmMML._WAVE_CHG.ordinal(), DataMaker::isAllTrack),
-            new MML("M", enmMML._MODE_CHG.ordinal(), DataMaker::isAllTrack),
+            new MML("PL", Mml._L_PAN.v, DataMaker::isAllTrack),
+            new MML("PR", Mml._R_PAN.v, DataMaker::isAllTrack),
+            new MML("PC", Mml._C_PAN.v, DataMaker::isAllTrack),
+            new MML("P", Mml._PAN.v, DataMaker::isAllTrack),
+            new MML("W", Mml._WAVE_CHG.v, DataMaker::isAllTrack),
+            new MML("M", Mml._MODE_CHG.v, DataMaker::isAllTrack),
 
-            new MML("SDQR", enmMML._SELF_DELAY_QUEUE_RESET.ordinal(), DataMaker::isAllTrack),
-            new MML("SDOF", enmMML._SELF_DELAY_OFF.ordinal(), DataMaker::isAllTrack),
-            new MML("SD", enmMML._SELF_DELAY_ON.ordinal(), DataMaker::isAllTrack),
+            new MML("SDQR", Mml._SELF_DELAY_QUEUE_RESET.v, DataMaker::isAllTrack),
+            new MML("SDOF", Mml._SELF_DELAY_OFF.v, DataMaker::isAllTrack),
+            new MML("SD", Mml._SELF_DELAY_ON.v, DataMaker::isAllTrack),
 
-            new MML("D", enmMML._DETUNE.ordinal(), DataMaker::isAllTrack),
-            new MML("K", enmMML._TRANSPOSE.ordinal(), DataMaker::isAllTrack),
+            new MML("D", Mml._DETUNE.v, DataMaker::isAllTrack),
+            new MML("K", Mml._TRANSPOSE.v, DataMaker::isAllTrack),
 
-            new MML("@q", enmMML._QUONTIZE2.ordinal(), DataMaker::isAllTrack),
-            new MML("@vr", enmMML._REL_ENV.ordinal(), DataMaker::isAllTrack),
-            new MML("@v", enmMML._ENVELOPE.ordinal(), DataMaker::isAllTrack),
+            new MML("@q", Mml._QUONTIZE2.v, DataMaker::isAllTrack),
+            new MML("@vr", Mml._REL_ENV.v, DataMaker::isAllTrack),
+            new MML("@v", Mml._ENVELOPE.v, DataMaker::isAllTrack),
 
             //{"@@r", _REL_ORG_TONE, (TRACK(0)|TRACK(1)|FMTRACK|VRC7TRACK|VRC6PLSTRACK|N106TRACK|MMC5PLSTRACK)},
             //{"@@", _ORG_TONE, (TRACK(0)|TRACK(1)|FMTRACK|VRC7TRACK|VRC6PLSTRACK|N106TRACK|MMC5PLSTRACK)},
 
-            new MML("@", enmMML._TONE.ordinal(), DataMaker::isAllTrack),
-            new MML("&", enmMML._SLAR.ordinal(), DataMaker::isAllTrack),
+            new MML("@", Mml._TONE.v, DataMaker::isAllTrack),
+            new MML("&", Mml._SLAR.v, DataMaker::isAllTrack),
 
-            new MML("yo", enmMML._DATA_WRITE_OFS.ordinal(), DataMaker::isAllTrack),
+            new MML("yo", Mml._DATA_WRITE_OFS.v, DataMaker::isAllTrack),
 
-            new MML("y", enmMML._DATA_WRITE.ordinal(), DataMaker::isAllTrack),
-            new MML("x", enmMML._DATA_THRUE.ordinal(), DataMaker::isAllTrack),
+            new MML("y", Mml._DATA_WRITE.v, DataMaker::isAllTrack),
+            new MML("x", Mml._DATA_THRUE.v, DataMaker::isAllTrack),
 
-            new MML("|:", enmMML._REPEAT_ST2.ordinal(), DataMaker::isAllTrack),
-            new MML(":|", enmMML._REPEAT_END2.ordinal(), DataMaker::isAllTrack),
-            new MML("\\", enmMML._REPEAT_ESC2.ordinal(), DataMaker::isAllTrack),
+            new MML("|:", Mml._REPEAT_ST2.v, DataMaker::isAllTrack),
+            new MML(":|", Mml._REPEAT_END2.v, DataMaker::isAllTrack),
+            new MML("\\", Mml._REPEAT_ESC2.v, DataMaker::isAllTrack),
 
-            new MML("k", enmMML._KEY_OFF.ordinal(), DataMaker::isAllTrack),
+            new MML("k", Mml._KEY_OFF.v, DataMaker::isAllTrack),
 
-            new MML("L", enmMML._SONG_LOOP.ordinal(), DataMaker::isAllTrack),
-            new MML("[", enmMML._REPEAT_ST.ordinal(), DataMaker::isAllTrack),
-            new MML("]", enmMML._REPEAT_END.ordinal(), DataMaker::isAllTrack),
-            new MML("|", enmMML._REPEAT_ESC.ordinal(), DataMaker::isAllTrack),
-            new MML("{", enmMML._CONT_NOTE.ordinal(), DataMaker::isAllTrack),
-            new MML("}", enmMML._CONT_END.ordinal(), DataMaker::isAllTrack),
-            new MML("q", enmMML._QUONTIZE.ordinal(), DataMaker::isAllTrack),
-            new MML("r", enmMML._REST.ordinal(), DataMaker::isAllTrack),
-            new MML("^", enmMML._TIE.ordinal(), DataMaker::isAllTrack),
-            new MML("!", enmMML._DATA_BREAK.ordinal(), DataMaker::isAllTrack),
-            new MML("", enmMML._TRACK_END.ordinal(), DataMaker::isAllTrack),
+            new MML("L", Mml._SONG_LOOP.v, DataMaker::isAllTrack),
+            new MML("[", Mml._REPEAT_ST.v, DataMaker::isAllTrack),
+            new MML("]", Mml._REPEAT_END.v, DataMaker::isAllTrack),
+            new MML("|", Mml._REPEAT_ESC.v, DataMaker::isAllTrack),
+            new MML("{", Mml._CONT_NOTE.v, DataMaker::isAllTrack),
+            new MML("}", Mml._CONT_END.v, DataMaker::isAllTrack),
+            new MML("q", Mml._QUONTIZE.v, DataMaker::isAllTrack),
+            new MML("r", Mml._REST.v, DataMaker::isAllTrack),
+            new MML("^", Mml._TIE.v, DataMaker::isAllTrack),
+            new MML("!", Mml._DATA_BREAK.v, DataMaker::isAllTrack),
+            new MML("", Mml._TRACK_END.v, DataMaker::isAllTrack),
     };
 
     /**
      * Error display
-     * Input:
-     * <p>
-     * Output:
-     * none
      */
-    private void dispError(int no, String file, int line) {
-        no = no * 2;
+    private void dispError(ErrNum err, String file, int line) {
         if (!StringUtilities.isNullOrEmpty(file)) {
-            logger.log(Level.ERROR, "%s %6d: %s".formatted(file, line, rb.getString("error." + no)));
+            System.err.printf("%s %6d: %s%n".formatted(file, line, rb.getString("error." + err.ordinal())));
         } else {
-            logger.log(Level.ERROR, "%s".formatted(rb.getString("error." + no)));
+            System.err.printf("%s%n".formatted(rb.getString("error." + err.ordinal())));
         }
         error_flag = 1;
     }
 
+    private void dispWarning(ErrNum err, String file, int line) {
+        dispWarning(err.ordinal(), file, line);
+    }
+
+    private void dispWarning(Sys sys, String file, int line) {
+        dispWarning(sys.ordinal(), file, line);
+    }
+
     /**
      * Warning Display
-     * Input:
-     * <p>
-     * Output:
-     * none
      */
     private void dispWarning(int no, String file, int line) {
         if (wk.warning_flag != 0) {
-            no = no * 2;
             if (!StringUtilities.isNullOrEmpty(file)) {
-                logger.log(Level.WARNING, "%s %6d: %s".formatted(file, line, rb.getString("warn." + no)));
+                System.err.printf("%s %6d: %s%n".formatted(file, line, rb.getString("warn." + no)));
             } else {
-                logger.log(Level.WARNING, "%s".formatted(rb.getString("warn." + no)));
+                System.err.printf("%s%n".formatted(rb.getString("warn." + no)));
             }
         }
     }
@@ -820,8 +821,8 @@ public class DataMaker {
      *
      * @param buf Data Storage Pointer
      */
-    private static void deleteCRemark(/* ref */ String buf) {
-        StringBuilder sb = new StringBuilder(buf);
+    private static void deleteCRemark(/* ref */ String[] buf) {
+        StringBuilder sb = new StringBuilder(buf[0]);
         int ptr = 0;
 
         int within_com = 0;
@@ -837,7 +838,7 @@ public class DataMaker {
                         within_com = 0;
                         break;
                     }
-                    if (sb.charAt(ptr) != '\n') {
+                    if (sb.charAt(ptr) != '\n' && sb.charAt(ptr) != '\r') {
                         sb.setCharAt(ptr, ' ');
                     }
                     ptr++;
@@ -852,7 +853,7 @@ public class DataMaker {
             logger.log(Level.WARNING, "Reached EOF in comment");
         }
 
-        buf = sb.toString();
+        buf[0] = sb.toString();
     }
 
 
@@ -861,69 +862,71 @@ public class DataMaker {
      *
      * @param buf Data Storage Pointer
      */
-    private static int getLineCount(/* ref */ int ptr, String buf) {
+    private static int getLineCount(/* ref */ int[] ptr, String buf) {
         int line;
 
         line = 0;
 
-        while (ptr < buf.length()) {
-            if (buf.charAt(ptr) == '\n') {
+        while (ptr[0] < buf.length()) {
+            if (buf.charAt(ptr[0]) == '\n' || buf.charAt(ptr[0]) == '\r') {
                 line++;
             }
-            ptr++;
+            ptr[0]++;
         }
-        if (buf.charAt(ptr - 1) != '\n') {
+        if (buf.charAt(ptr[0] - 1) != '\n' && buf.charAt(ptr[0] - 1) != '\r') {
             line++;
         }
         return line;
     }
 
-    /**  */
-    private LINE[] readMmlFile(String fname, String fname_short) {
-        LINE[] lbuf;
+    /** */
+    private Line[] readMmlFile(String fname, String fname_short) {
+        Line[] lbuf;
         int line_count;
         int i;
-        String filestr;
-        filestr = wk.srcBuf; // Files.readAllText(fname);
+        String[] filestr = new String[1];
+        filestr[0] = wk.srcBuf; // Files.readAllText(fname);
 
-        if (StringUtilities.isNullOrEmpty(filestr)) {
+        if (StringUtilities.isNullOrEmpty(filestr[0])) {
             error_flag = 1;
             return null;
         }
 
-        int filestrPtr = 0;
+        int[] filestrPtr = {0};
         deleteCRemark(/* ref */ filestr);
 
-        line_count = getLineCount(/* ref */ filestrPtr, filestr);
-        lbuf = new LINE[(line_count + 1)]; // Allocate a line buffer
+        line_count = getLineCount(/* ref */ filestrPtr, filestr[0]);
+        lbuf = new Line[(line_count + 1)]; // Allocate a line buffer
 
-        lbuf[0] = new LINE();
+        lbuf[0] = new Line();
         lbuf[0].status = _HEADER; // LINE status[0] was malloc'd
-        lbuf[0].str = filestr; // The pointer and size are stored
-        lbuf[0].ostr = filestr; // The pointer and size are stored
+        lbuf[0].str = filestr[0]; // The pointer and size are stored
+        lbuf[0].ostr = filestr[0]; // The pointer and size are stored
         lbuf[0].line = line_count;
         lbuf[0].filename = fname;
         lbuf[0].shortname = fname_short;
 
-        filestrPtr = 0;
+        filestrPtr[0] = 0;
 
         for (i = 1; i <= line_count; i++) {
-            lbuf[i] = new LINE();
+            lbuf[i] = new Line();
             lbuf[i].filename = fname;
             lbuf[i].shortname = fname_short;
             lbuf[i].line = i;
 
-            int nextPtr = filestr.indexOf("\n", filestrPtr);
-            lbuf[i].str = filestr.substring(filestrPtr, nextPtr - filestrPtr);
+            int nextPtr1 = filestr[0].indexOf("\n", filestrPtr[0]);
+            int nextPtr2 = filestr[0].indexOf("\r", filestrPtr[0]);
+            int nextPtr = Math.max(nextPtr1, nextPtr2);
+            lbuf[i].str = filestr[0].substring(filestrPtr[0], nextPtr >= 0 ? nextPtr : filestr[0].length());
             lbuf[i].ostr = lbuf[i].str;
-            filestrPtr = nextPtr + 1;
+            filestrPtr[0] = nextPtr + 1;
         }
 
         return lbuf;
     }
 
-    // struct st_line
-    public static class LINE {
+    /** struct st_line */
+    public static class Line {
 
         /** File name */
         public String filename;
@@ -938,7 +941,7 @@ public class DataMaker {
         /** Line String */
         public String str;
         /** Include File Data Pointer */
-        public LINE[] inc_ptr;
+        public Line[] inc_ptr;
 
         /** Original line string */
         public String ostr;
@@ -949,10 +952,10 @@ public class DataMaker {
      *
      * @param buf Data Storage Pointer
      */
-    private static int changeNULL(int ptr, /* ref */ String buf) {
-        StringBuilder sb = new StringBuilder(buf);
+    private static int changeNULL(int ptr, /* ref */ String[] buf) {
+        StringBuilder sb = new StringBuilder(buf[0]);
 
-        while (ptr < sb.length() && sb.charAt(ptr) != '\n') {
+        while (ptr < sb.length() && sb.charAt(ptr) != '\n' && sb.charAt(ptr) != '\r') {
             if (sb.charAt(ptr) == '\0') break;
             ptr++;
         }
@@ -962,7 +965,7 @@ public class DataMaker {
             ptr++;
         }
 
-        buf = sb.toString();
+        buf[0] = sb.toString();
         return ptr;
     }
 
@@ -971,14 +974,14 @@ public class DataMaker {
      * @hoge123 = Processing { ag ae aeag g}
      * @HOGE¥s*(¥d+)¥s*(=|)¥s*{.*?(}.*|)$
      */
-    private int setEffectSub(LINE[] lptr, int line, /* ref */ int ptr_status_end_flag, int min, int max, int error_no) {
+    private int setEffectSub(Line[] lptr, int line, /* ref */ boolean[] ptr_status_end_flag, int min, int max, ErrNum error) {
         int param;
         int[] cnt = new int[] {0};
         String temp;
         int tempPtr = 0;
         temp = lptr[line].str;
-        tempPtr = str.skipSpace(lptr[line].str, 0);
-        param = str.asc2Int(temp, tempPtr, /* ref */ cnt);
+        tempPtr = Strings.skipSpace(lptr[line].str, 0);
+        param = Strings.asc2Int(temp, tempPtr, /* ref */ cnt);
 on_error:
         {
             if (cnt[0] == 0)
@@ -987,28 +990,28 @@ on_error:
                 break on_error;
 
             lptr[line].param = param;
-            tempPtr = str.skipSpace(temp, tempPtr + cnt[0]);
+            tempPtr = Strings.skipSpace(temp, tempPtr + cnt[0]);
 
             if (temp.charAt(tempPtr) == '=') {
                 tempPtr++;
-                tempPtr = str.skipSpace(temp, tempPtr);
+                tempPtr = Strings.skipSpace(temp, tempPtr);
             }
 
             if (temp.charAt(tempPtr) != '{')
                 throw new IllegalStateException();
 
             lptr[line].str = temp.substring(tempPtr);
-            ptr_status_end_flag = 1;
+            ptr_status_end_flag[0] = true;
 
 
             while (tempPtr < temp.length() && temp.charAt(tempPtr) != '\0') {
                 if (temp.charAt(tempPtr) == '}') {
-                    ptr_status_end_flag = 0;
+                    ptr_status_end_flag[0] = false;
                 }
                 if (temp.charAt(tempPtr) == '\"') {
-                    tempPtr = str.skipQuote(temp, tempPtr);
-                } else if (str.isComment(temp, tempPtr))
-                    tempPtr = str.skipComment(temp, tempPtr);
+                    tempPtr = Strings.skipQuote(temp, tempPtr);
+                } else if (Strings.isComment(temp, tempPtr))
+                    tempPtr = Strings.skipComment(temp, tempPtr);
                 else
                     tempPtr++;
 
@@ -1017,7 +1020,7 @@ on_error:
             return 1;
         }
         lptr[line].status = 0;
-        dispError(error_no, lptr[line].filename, line);
+        dispError(error, lptr[line].filename, line);
         return 0;
     }
 
@@ -1027,7 +1030,7 @@ on_error:
 
         while (ptr < st.length() && st.charAt(ptr) != 0 && str_track.indexOf(st.charAt(ptr)) >= 0) ptr++;
 
-        return str.skipSpace(st, ptr);
+        return Strings.skipSpace(st, ptr);
     }
 
     private static int isTrackNum(String str, int ptr, int trk) {
@@ -1050,59 +1053,60 @@ on_error:
      *
      * @param lbuf Data Storage Pointer
      */
-    private void getLineStatus(LINE[] lbuf, int inc_nest) {
+    private void getLineStatus(Line[] lbuf, int inc_nest) {
 
-        int line, i, param, track_flag, status_end_flag, bank, bank_ch;
+        int line, i, param, track_flag, bank, bank_ch;
+        boolean[] status_end_flag;
         int[] cnt = new int[] {0};
         String temp, temp2;
         int tempPtr;
         int temp2Ptr;
-        String ln;
+        String[] ln = new String[1];
         int ptr;
 
-
         int lptr = 0;
-        status_end_flag = 0;
+        status_end_flag = new boolean[1];
 
         for (line = 1; line <= lbuf[lptr].line; line++) {
-            ln = lbuf[line].str;
+            ln[0] = lbuf[line].str;
             ptr = 0;
 
-            ptr = str.skipSpace(ln, ptr);
+            ptr = Strings.skipSpace(ln[0], ptr);
             // Was the previous line the effect definition process?
-            if (((lbuf[lptr + line - 1].status & _SET_EFFECT) != 0) && (status_end_flag != 0)) {
+            if (((lbuf[lptr + line - 1].status & _SET_EFFECT) != 0) && (status_end_flag[0])) {
                 lbuf[lptr + line].status = lbuf[lptr + line - 1].status | _SAME_LINE;
                 lbuf[lptr + line].param = lbuf[lptr + line - 1].param;
-                lbuf[lptr + line].str = ln;
-                temp = ln;
+                lbuf[lptr + line].str = ln[0];
+                temp = ln[0];
                 tempPtr = ptr;
                 ptr = changeNULL(ptr, /* ref */ ln);
-                temp = ln;
-                status_end_flag = 1;
+                temp = ln[0];
+                status_end_flag[0] = true;
 
                 while (tempPtr < temp.length() && temp.charAt(tempPtr) != '\0') {
                     if (temp.charAt(tempPtr) == '}') {
-                        status_end_flag = 0;
+                        status_end_flag[0] = false;
                     }
                     if (temp.charAt(tempPtr) == '\"')
-                        tempPtr = str.skipQuote(temp, tempPtr);
-                    else if (str.isComment(temp, tempPtr))
-                        tempPtr = str.skipComment(temp, tempPtr);
+                        tempPtr = Strings.skipQuote(temp, tempPtr);
+                    else if (Strings.isComment(temp, tempPtr))
+                        tempPtr = Strings.skipComment(temp, tempPtr);
                     else
                         tempPtr++;
                 }
 
                 // If there is nothing at the beginning of a line, it is considered an invalid line.
-            } else if (ptr == ln.length() || ln.charAt(ptr) == '\n' || ln.charAt(ptr) == '\0') {
+            } else if (ptr == ln[0].length() || ln[0].charAt(ptr) == '\n' || ln[0].charAt(ptr) == '\r' || ln[0].charAt(ptr) == '\0') {
                 lbuf[lptr + line].status = 0;
-                lbuf[lptr + line].str = ln;
+                lbuf[lptr + line].str = ln[0];
                 ptr = changeNULL(ptr, /* ref */ ln);
             } else {
                 // Make the header string uppercase when using #/@ headers
-                if (ln.charAt(ptr) == '#' || ln.charAt(ptr) == '@') {
-                    StringBuilder sb = new StringBuilder(ln);
+                if (ln[0].charAt(ptr) == '#' || ln[0].charAt(ptr) == '@') {
+                    StringBuilder sb = new StringBuilder(ln[0]);
+//logger.log(Level.INFO, StringUtil.getDump(sb.toString().getBytes()));
                     i = 1;
-                    while ((sb.charAt(ptr + i) != ' ') && (sb.charAt(ptr + i) != '\t') && (sb.charAt(ptr + i) != '\n')) {
+                    while ((sb.charAt(ptr + i) != ' ') && (sb.charAt(ptr + i) != '\t') && (sb.charAt(ptr + i) != '\r' && (sb.charAt(ptr + i) != '\n'))) {
                         sb.setCharAt(ptr + i, String.valueOf(Character.toUpperCase(sb.charAt(ptr + i))).charAt(0));
                         i++;
                     }
@@ -1113,15 +1117,15 @@ on_error:
                         }
                     }
                     lbuf[lptr + line].status = head[i].status;
-                    lbuf[lptr + line].str = lbuf[lptr + line].str.substring(str.skipSpaceOld(ln, ptr + head[i].str.length())); // Header + whitespace to start
-                } else if (str_track.indexOf(ln.charAt(ptr)) >= 0) {
+                    lbuf[lptr + line].str = lbuf[lptr + line].str.substring(Strings.skipSpaceOld(ln[0], ptr + head[i].str.length())); // Header + whitespace to start
+                } else if (str_track.indexOf(ln[0].charAt(ptr)) >= 0) {
                     track_flag = 0;
-                    temp = ln;
+                    temp = ln[0];
                     tempPtr = ptr;
-                    while (tempPtr < ln.length() && temp.charAt(tempPtr) != ' ' && temp.charAt(tempPtr) != '\t') {
+                    while (tempPtr < ln[0].length() && temp.charAt(tempPtr) != ' ' && temp.charAt(tempPtr) != '\t') {
                         temp2Ptr = str_track.indexOf(temp.charAt(tempPtr));
                         if (temp2Ptr < 0) {
-                            dispError(enmErrNum.INVALID_TRACK_HEADER.ordinal(), lbuf[lptr + line].filename, line);
+                            dispError(ErrNum.INVALID_TRACK_HEADER, lbuf[lptr + line].filename, line);
                         } else {
                             track_flag = 1;
                         }
@@ -1131,14 +1135,14 @@ on_error:
                     if (track_flag != 0) {
                         lbuf[lptr + line].status = _TRACK;
                         lbuf[lptr + line].param = track_flag;
-                        lbuf[lptr + line].str = ln.substring(ptr);
+                        lbuf[lptr + line].str = ln[0].substring(ptr);
                     } else {
                         lbuf[lptr + line].status = 0;
                         lbuf[lptr + line].param = 0;
                     }
                 } else {
                     lbuf[lptr + line].status = -1;
-                    lbuf[lptr + line].str = ln.substring(str.skipSpace(ln, ptr));
+                    lbuf[lptr + line].str = ln[0].substring(Strings.skipSpace(ln[0], ptr));
                 }
 
                 ptr = changeNULL(ptr, /* ref */ ln);
@@ -1148,12 +1152,12 @@ on_error:
                     case _INCLUDE:
                         if (inc_nest > 16) {
                             // Nesting is limited to 16 levels (if it is called recursively it will not terminate)
-                            dispWarning(enmSys.TOO_MANY_INCLUDE_FILES.ordinal(), lbuf[lptr + line].filename, line);
+                            dispWarning(Sys.TOO_MANY_INCLUDE_FILES, lbuf[lptr + line].filename, line);
                             lbuf[lptr + line].status = 0;
                         } else {
-                            LINE[] ltemp;
+                            Line[] ltemp;
                             temp = lbuf[lptr + line].str;
-                            tempPtr = str.skipSpaceOld(lbuf[line].str, lptr); // Try not to skip the '/'
+                            tempPtr = Strings.skipSpaceOld(lbuf[line].str, lptr); // Try not to skip the '/'
                             ltemp = readMmlFile(temp, temp);
                             if (ltemp != null) {
                                 lbuf[lptr + line].inc_ptr = ltemp;
@@ -1168,53 +1172,53 @@ on_error:
                         break;
                     // LFO Commands
                     case _SET_PITCH_MOD:
-                        setEffectSub(lbuf, line, /* ref */ status_end_flag, 0, _PITCH_MOD_MAX, enmErrNum.LFO_DEFINITION_IS_WRONG.ordinal());
+                        setEffectSub(lbuf, line, /* ref */ status_end_flag, 0, _PITCH_MOD_MAX, ErrNum.LFO_DEFINITION_IS_WRONG);
                         break;
                     // Pitch Envelope Commands
                     case _SET_PITCH_ENV:
-                        setEffectSub(lbuf, line, /* ref */ status_end_flag, 0, _PITCH_ENV_MAX, enmErrNum.PITCH_ENVELOPE_DEFINITION_IS_WRONG.ordinal());
+                        setEffectSub(lbuf, line, /* ref */ status_end_flag, 0, _PITCH_ENV_MAX, ErrNum.PITCH_ENVELOPE_DEFINITION_IS_WRONG);
                         break;
                     // Volume Envelope Commands
                     case _SET_ENVELOPE:
-                        setEffectSub(lbuf, line, /* ref */ status_end_flag, 0, _ENVELOPE_MAX, enmErrNum.ENVELOPE_DEFINITION_IS_WRONG.ordinal());
+                        setEffectSub(lbuf, line, /* ref */ status_end_flag, 0, _ENVELOPE_MAX, ErrNum.ENVELOPE_DEFINITION_IS_WRONG);
                         break;
                     // Original Sounds
                     case _SET_TONE:
-                        setEffectSub(lbuf, line, /* ref */ status_end_flag, 0, _TONE_MAX, enmErrNum.TONE_DEFINITION_IS_WRONG.ordinal());
+                        setEffectSub(lbuf, line, /* ref */ status_end_flag, 0, _TONE_MAX, ErrNum.TONE_DEFINITION_IS_WRONG);
                         break;
                     // arpeggio
                     case _SET_ARPEGGIO:
-                        setEffectSub(lbuf, line, /* ref */ status_end_flag, 0, _ARPEGGIO_MAX, enmErrNum.NOTE_ENVELOPE_DEFINITION_IS_WRONG.ordinal());
+                        setEffectSub(lbuf, line, /* ref */ status_end_flag, 0, _ARPEGGIO_MAX, ErrNum.NOTE_ENVELOPE_DEFINITION_IS_WRONG);
                         break;
                     // DPCM Registration Command
                     case _SET_DPCM_DATA:
-                        setEffectSub(lbuf, line, /* ref */ status_end_flag, 0, _DPCM_MAX, enmErrNum.DPCM_DEFINITION_IS_WRONG.ordinal());
+                        setEffectSub(lbuf, line, /* ref */ status_end_flag, 0, _DPCM_MAX, ErrNum.DPCM_DEFINITION_IS_WRONG);
                         break;
                     // VRC7 Tone
                     case _SET_VRC7_TONE:
-                        setEffectSub(lbuf, line, /* ref */ status_end_flag, 0, _VRC7_TONE_MAX, enmErrNum.FM_TONE_DEFINITION_IS_WRONG.ordinal());
+                        setEffectSub(lbuf, line, /* ref */ status_end_flag, 0, _VRC7_TONE_MAX, ErrNum.FM_TONE_DEFINITION_IS_WRONG);
                         break;
                     // FM Tones
                     case _SET_FM_TONE:
-                        setEffectSub(lbuf, line, /* ref */ status_end_flag, 0, _DPCM_MAX, enmErrNum.FM_TONE_DEFINITION_IS_WRONG.ordinal());
+                        setEffectSub(lbuf, line, /* ref */ status_end_flag, 0, _DPCM_MAX, ErrNum.FM_TONE_DEFINITION_IS_WRONG);
                         break;
 //                    // HuSIC XPCM
 //                    case _SET_XPCM_DATA:
-//                        setEffectSub(lbuf, line, /* ref */ status_end_flag, 0, _FM_TONE_MAX, enmErrNum.XPCM_DEFINITION_IS_WRONG.ordinal());
+//                        setEffectSub(lbuf, line, /* ref */ status_end_flag, 0, _FM_TONE_MAX, enmErrNum.XPCM_DEFINITION_IS_WRONG);
 //                        break;
 //                    // HuSIC WTB
 //                    case _SET_WTB_TONE:
-//                        setEffectSub(lbuf, line, /* ref */ status_end_flag, 0, _WTB_TONE_MAX, enmErrNum.WTB_TONE_DEFINITION_IS_WRONG.ordinal());
+//                        setEffectSub(lbuf, line, /* ref */ status_end_flag, 0, _WTB_TONE_MAX, enmErrNum.WTB_TONE_DEFINITION_IS_WRONG);
 //                        break;
                     // MoonDriver
                     // Waveform sound source tone
                     case _SET_TONETBL:
-                        setEffectSub(lbuf, line, /* ref */ status_end_flag, 0, _TONETBL_MAX, enmErrNum.TONETBL_DEFINITION_IS_WRONG.ordinal());
+                        setEffectSub(lbuf, line, /* ref */ status_end_flag, 0, _TONETBL_MAX, ErrNum.TONETBL_DEFINITION_IS_WRONG);
                         break;
                     // FM sound source
                     case _SET_FMOP:
                     case _SET_FMOP_FOUR:
-                        setEffectSub(lbuf, line, /* ref */ status_end_flag, 0, _OPL3TBL_MAX, enmErrNum.FM_TONE_DEFINITION_IS_WRONG.ordinal());
+                        setEffectSub(lbuf, line, /* ref */ status_end_flag, 0, _OPL3TBL_MAX, ErrNum.FM_TONE_DEFINITION_IS_WRONG);
                         break;
                     // MoonDriver OPL3 FM
                     case _EX_OPL3:
@@ -1229,15 +1233,15 @@ on_error:
 
 //                    // Namco106 sound source
 //                    case _SET_N106_TONE:
-//                        setEffectSub(lptr, line, & status_end_flag, 0, _N106_TONE_MAX, N106_TONE_DEFINITION_IS_WRONG.ordinal());
+//                        setEffectSub(lptr, line, & status_end_flag, 0, _N106_TONE_MAX, N106_TONE_DEFINITION_IS_WRONG);
 //                        break;
                     // Hardware Effects
                     case _SET_HARD_EFFECT:
-                        setEffectSub(lbuf, line, /* ref */ status_end_flag, 0, _HARD_EFFECT_MAX, enmErrNum.HARD_EFFECT_DEFINITION_IS_WRONG.ordinal());
+                        setEffectSub(lbuf, line, /* ref */ status_end_flag, 0, _HARD_EFFECT_MAX, ErrNum.HARD_EFFECT_DEFINITION_IS_WRONG);
                         break;
                     // Effect Waveform
                     case _SET_EFFECT_WAVE:
-                        setEffectSub(lbuf, line, /* ref */ status_end_flag, 0, _EFFECT_WAVE_MAX, enmErrNum.EFFECT_WAVE_DEFINITION_IS_WRONG.ordinal());
+                        setEffectSub(lbuf, line, /* ref */ status_end_flag, 0, _EFFECT_WAVE_MAX, ErrNum.EFFECT_WAVE_DEFINITION_IS_WRONG);
                         break;
 //                    // DISKSYSTEM FM sound source use flag
 //                    case _EX_DISKFM:
@@ -1284,7 +1288,7 @@ on_error:
 //                                track_allow_flag |= TRACK(BN106TRACK + i);
 //                            }
 //                        } else {
-//                            dispError(DEFINITION_IS_WRONG.ordinal(), lptr[line].filename, line);
+//                            dispError(DEFINITION_IS_WRONG, lptr[line].filename, line);
 //                            lptr[line].status = 0;
 //                        }
 //                        break;
@@ -1299,9 +1303,9 @@ on_error:
                     // Automatic Bank Switching
                     case _AUTO_BANKSWITCH:
                         temp = lbuf[lptr + line].str;
-                        tempPtr = str.skipSpaceOld(lbuf[line].str, lptr); // Try not to skip the '/'
+                        tempPtr = Strings.skipSpaceOld(lbuf[line].str, lptr); // Try not to skip the '/'
                         cnt[0] = 0;
-                        param = str.asc2Int(temp, tempPtr, /* ref */ cnt);
+                        param = Strings.asc2Int(temp, tempPtr, /* ref */ cnt);
                         if (cnt[0] != 0 && (0 <= param && param <= 8192)) {
                             // Only activate the first time
                             if (auto_bankswitch == 0) {
@@ -1309,7 +1313,7 @@ on_error:
                             }
                             auto_bankswitch = 1;
                         } else {
-                            dispError(enmErrNum.DEFINITION_IS_WRONG.ordinal(), lbuf[lptr + line].filename, line);
+                            dispError(ErrNum.DEFINITION_IS_WRONG, lbuf[lptr + line].filename, line);
                         }
                         break;
 //                    // Bank switching embedding (provisional compatibility measure)
@@ -1366,12 +1370,12 @@ on_error:
 //                                        //bank_change[bank] = param-1;
 //                                        bank_sel[param - 1] = bank + 1;
 //                                    } else {
-//                                        dispError(DEFINITION_IS_WRONG.ordinal(), lptr[line].filename, line);
+//                                        dispError(DEFINITION_IS_WRONG, lptr[line].filename, line);
 //                                        lptr[line].status = 0;
 //                                        //bank_change[bank] = 0xff;
 //                                    }
 //                                } else {
-//                                    dispError(DEFINITION_IS_WRONG.ordinal(), lptr[line].filename, line);
+//                                    dispError(DEFINITION_IS_WRONG, lptr[line].filename, line);
 //                                    lptr[line].status = 0;
 //                                }
 //                            } else {
@@ -1380,13 +1384,13 @@ on_error:
 //                                    //bank_change[0] = param-1;
 //                                    bank_sel[param - 1] = 1;
 //                                } else {
-//                                    dispError(DEFINITION_IS_WRONG.ordinal(), lptr[line].filename, line);
+//                                    dispError(DEFINITION_IS_WRONG, lptr[line].filename, line);
 //                                    lptr[line].status = 0;
 //                                    //bank_change[0] = 0xff;
 //                                }
 //                            }
 //                        } else {
-//                            dispError(DEFINITION_IS_WRONG.ordinal(), lptr[line].filename, line);
+//                            dispError(DEFINITION_IS_WRONG, lptr[line].filename, line);
 //                            lptr[line].status = 0;
 //                        }
 //                        break;
@@ -1402,7 +1406,7 @@ on_error:
 //                            // Numeric track designation
 //                            param = Asc2Int(temp, & cnt);
 //                            if (cnt == 0) {
-//                                dispError(DEFINITION_IS_WRONG.ordinal(), lptr[line].filename, line);
+//                                dispError(DEFINITION_IS_WRONG, lptr[line].filename, line);
 //                                lptr[line].status = 0;
 //                                break;
 //                            } else {
@@ -1425,15 +1429,15 @@ on_error:
 //                                    }
 //                                    bank_sel[bank_ch - 1] = param;
 //                                } else {
-//                                    dispError(DEFINITION_IS_WRONG.ordinal(), lptr[line].filename, line);
+//                                    dispError(DEFINITION_IS_WRONG, lptr[line].filename, line);
 //                                    lptr[line].status = 0;
 //                                }
 //                            } else {
-//                                dispError(DEFINITION_IS_WRONG.ordinal(), lptr[line].filename, line);
+//                                dispError(DEFINITION_IS_WRONG, lptr[line].filename, line);
 //                                lptr[line].status = 0;
 //                            }
 //                        } else {
-//                            dispError(DEFINITION_IS_WRONG.ordinal(), lptr[line].filename, line);
+//                            dispError(DEFINITION_IS_WRONG, lptr[line].filename, line);
 //                            lptr[line].status = 0;
 //                        }
 //                    break;
@@ -1478,14 +1482,14 @@ on_error:
                     // PCM File
                     case _PCM_FILE:
                         temp = lbuf[line].str;
-                        tempPtr = str.skipSpaceOld(lbuf[line].str, lptr);
+                        tempPtr = Strings.skipSpaceOld(lbuf[line].str, lptr);
                         pcm_name = temp.substring(tempPtr); // , 1023);
                         use_pcm = 1;
                         break;
                     // PCMPACK
                     case _PCM_PACK:
                         temp = lbuf[line].str;
-                        tempPtr = str.skipSpaceOld(lbuf[line].str, lptr);
+                        tempPtr = Strings.skipSpaceOld(lbuf[line].str, lptr);
                         temp = temp.substring(tempPtr).trim().toUpperCase();
                         pcm_pack = false;
                         if (temp.equals("ON")) {
@@ -1496,9 +1500,9 @@ on_error:
                     // Inverting Octave Symbols
                     case _OCTAVE_REV:
                         temp = lbuf[line].str;
-                        tempPtr = str.skipSpace(lbuf[line].str, lptr);
+                        tempPtr = Strings.skipSpace(lbuf[line].str, lptr);
                         cnt[0] = 0;
-                        param = str.asc2Int(temp, tempPtr, /* ref */ cnt);
+                        param = Strings.asc2Int(temp, tempPtr, /* ref */ cnt);
                         if (cnt[0] != 0) {
                             if (param == 0) {
                                 octave_flag = 0;
@@ -1512,13 +1516,13 @@ on_error:
                     // q command denominator change
                     case _GATE_DENOM:
                         temp = lbuf[line].str;
-                        tempPtr = str.skipSpace(lbuf[line].str, lptr);
+                        tempPtr = Strings.skipSpace(lbuf[line].str, lptr);
                         cnt[0] = 0;
-                        param = str.asc2Int(temp, tempPtr, /* ref */ cnt);
+                        param = Strings.asc2Int(temp, tempPtr, /* ref */ cnt);
                         if (cnt[0] != 0 && param > 0) {
                             gate_denom = param;
                         } else {
-                            dispError(enmErrNum.DEFINITION_IS_WRONG.ordinal(), lbuf[lptr + line].filename, line);
+                            dispError(ErrNum.DEFINITION_IS_WRONG, lbuf[lptr + line].filename, line);
                             lbuf[lptr + line].status = 0;
                         }
                         break;
@@ -1530,12 +1534,12 @@ on_error:
                     case -1:
                         if ((lbuf[lptr + line - 1].status & _SET_EFFECT) != 0) {
                             lbuf[lptr + line].status = lbuf[lptr + line - 1].status | _SAME_LINE;
-                            lbuf[lptr + line].str = ln; // ptr;
+                            lbuf[lptr + line].str = ln[0]; // ptr;
                         } else {
                             // Error Checking
-                            dispError(enmErrNum.COMMAND_NOT_DEFINED.ordinal(), lbuf[lptr + line].filename, line);
+                            dispError(ErrNum.COMMAND_NOT_DEFINED, lbuf[lptr + line].filename, line);
                             lbuf[lptr + line].status = 0;
-                            lbuf[lptr + line].str = ln; // ptr;
+                            lbuf[lptr + line].str = ln[0]; // ptr;
                         }
                         break;
                     case _TRACK:
@@ -1552,7 +1556,7 @@ on_error:
      *
      * @param lptr
      */
-    private void getTone(LINE[] lptr) {
+    private void getTone(Line[] lptr) {
         int line, i, no, end_flag, offset, num;
         int[] cnt = new int[1];
         String ptrs;
@@ -1563,7 +1567,7 @@ on_error:
         for (line = 1; line < lptr.length; line++) { // lptr[line].line; line++)
             // It's a tone definition, but an error occurs when using _SAME_LINE.
             if (lptr[line].status == (_SET_TONE | _SAME_LINE)) {
-                dispError(enmErrNum.TONE_DEFINITION_IS_WRONG.ordinal(), lptr[line].filename, line);
+                dispError(ErrNum.TONE_DEFINITION_IS_WRONG, lptr[line].filename, line);
                 continue;
             }
 
@@ -1582,7 +1586,7 @@ on_error:
             ptr = 0;
             ptr++; // Skip the '{'
             if (tone_tbl[no][0] != 0) {
-                dispWarning(enmSys.THIS_NUMBER_IS_ALREADY_USED.ordinal(), lptr[line].filename, line);
+                dispWarning(Sys.THIS_NUMBER_IS_ALREADY_USED, lptr[line].filename, line);
             }
             tone_tbl[no][0] = 0;
             offset = 0;
@@ -1590,21 +1594,21 @@ on_error:
             end_flag = 0;
 
             while (end_flag == 0) {
-                ptr = str.skipSpace(ptrs, ptr);
+                ptr = Strings.skipSpace(ptrs, ptr);
                 switch (ptrs.charAt(ptr)) {
                     case '}':
                         if (tone_tbl[no][0] >= 1) {
-                            tone_tbl[no][i] = enmEFTBL.END.v;
+                            tone_tbl[no][i] = EFTBL.END.v;
                             tone_tbl[no][0]++;
                         } else {
-                            dispError(enmErrNum.PARAMETER_IS_LACKING.ordinal(), lptr[line].filename, line);
+                            dispError(ErrNum.PARAMETER_IS_LACKING, lptr[line].filename, line);
                             tone_tbl[no][0] = 0;
                         }
                         end_flag = 1;
                         line += offset;
                         break;
                     case '|':
-                        tone_tbl[no][i] = enmEFTBL.LOOP.v;
+                        tone_tbl[no][i] = EFTBL.LOOP.v;
                         tone_tbl[no][0]++;
                         i++;
                         ptr++;
@@ -1617,13 +1621,13 @@ on_error:
                                 ptr = 0;
                             }
                         } else {
-                            dispError(enmErrNum.TONE_DEFINITION_IS_WRONG.ordinal(), lptr[line].filename, line);
+                            dispError(ErrNum.TONE_DEFINITION_IS_WRONG, lptr[line].filename, line);
                             tone_tbl[no][0] = 0;
                             end_flag = 1;
                         }
                         break;
                     default:
-                        num = str.asc2Int(ptrs, ptr, /* ref */ cnt);
+                        num = Strings.asc2Int(ptrs, ptr, /* ref */ cnt);
                         // Remove restrictions for vrc6 (built-in square wave, MMC5 up to 3)
                         //if( cnt != 0 && (0 <= num && num <= 3) ) {
                         if (cnt[0] != 0 && (0 <= num && num <= 7)) {
@@ -1632,13 +1636,13 @@ on_error:
                             ptr += cnt[0];
                             i++;
                         } else {
-                            dispError(enmErrNum.TONE_DEFINITION_IS_WRONG.ordinal(), lptr[line + offset].filename, line);
+                            dispError(ErrNum.TONE_DEFINITION_IS_WRONG, lptr[line + offset].filename, line);
                             tone_tbl[no][0] = 0;
                             end_flag = 1;
                         }
                         break;
                 }
-                ptr = str.skipSpace(ptrs, ptr);
+                ptr = Strings.skipSpace(ptrs, ptr);
                 if (ptrs.charAt(ptr) == ',') {
                     ptr++;
                 }
@@ -1651,7 +1655,7 @@ on_error:
      *
      * @param lptr
      */
-    void getEnvelope(LINE[] lptr) {
+    void getEnvelope(Line[] lptr) {
         int line, i, no, end_flag, offset, num;
         int[] cnt = new int[1];
         String buf;
@@ -1662,7 +1666,7 @@ on_error:
         for (line = 1; line < lptr.length; line++) {
             // Envelope definition, but _SAME_LINE causes an error
             if (lptr[line].status == (_SET_ENVELOPE | _SAME_LINE)) {
-                dispError(enmErrNum.ENVELOPE_DEFINITION_IS_WRONG.ordinal(), lptr[line].filename, line);
+                dispError(ErrNum.ENVELOPE_DEFINITION_IS_WRONG, lptr[line].filename, line);
                 continue;
             }
 
@@ -1679,29 +1683,29 @@ on_error:
                 ptr = 0;
                 ptr++; // Skip the '{'
                 if (envelope_tbl[no][0] != 0) {
-                    dispWarning(enmSys.THIS_NUMBER_IS_ALREADY_USED.ordinal(), lptr[line].filename, line);
+                    dispWarning(Sys.THIS_NUMBER_IS_ALREADY_USED, lptr[line].filename, line);
                 }
                 envelope_tbl[no][0] = 0;
                 offset = 0;
                 i = 1;
                 end_flag = 0;
                 while (end_flag == 0) {
-                    ptr = str.skipSpace(buf, ptr);
+                    ptr = Strings.skipSpace(buf, ptr);
                     char c = (ptr < buf.length()) ? buf.charAt(ptr) : '\0';
                     switch (c) {
                         case '}':
                             if (envelope_tbl[no][0] >= 1) {
-                                envelope_tbl[no][i] = enmEFTBL.END.v;
+                                envelope_tbl[no][i] = EFTBL.END.v;
                                 envelope_tbl[no][0]++;
                             } else {
-                                dispError(enmErrNum.PARAMETER_IS_LACKING.ordinal(), lptr[line].filename, line);
+                                dispError(ErrNum.PARAMETER_IS_LACKING, lptr[line].filename, line);
                                 envelope_tbl[no][0] = 0;
                             }
                             end_flag = 1;
                             line += offset;
                             break;
                         case '|':
-                            envelope_tbl[no][i] = enmEFTBL.LOOP.v;
+                            envelope_tbl[no][i] = EFTBL.LOOP.v;
                             envelope_tbl[no][0]++;
                             i++;
                             ptr++;
@@ -1714,26 +1718,26 @@ on_error:
                                     ptr = 0;
                                 }
                             } else {
-                                dispError(enmErrNum.ENVELOPE_DEFINITION_IS_WRONG.ordinal(), lptr[line].filename, line);
+                                dispError(ErrNum.ENVELOPE_DEFINITION_IS_WRONG, lptr[line].filename, line);
                                 envelope_tbl[no][0] = 0;
                                 end_flag = 1;
                             }
                             break;
                         default:
-                            num = str.asc2Int(buf, ptr, /* ref */ cnt);
+                            num = Strings.asc2Int(buf, ptr, /* ref */ cnt);
                             if (cnt[0] != 0 && (0 <= num && num <= 127)) {
                                 envelope_tbl[no][i] = num;
                                 envelope_tbl[no][0]++;
                                 ptr += cnt[0];
                                 i++;
                             } else {
-                                dispError(enmErrNum.ENVELOPE_DEFINITION_IS_WRONG.ordinal(), lptr[line + offset].filename, line);
+                                dispError(ErrNum.ENVELOPE_DEFINITION_IS_WRONG, lptr[line + offset].filename, line);
                                 envelope_tbl[no][0] = 0;
                                 end_flag = 1;
                             }
                             break;
                     }
-                    ptr = str.skipSpace(buf, ptr);
+                    ptr = Strings.skipSpace(buf, ptr);
                     c = (ptr < buf.length()) ? buf.charAt(ptr) : '\0';
                     if (c == ',') {
                         ptr++;
@@ -1750,7 +1754,7 @@ on_error:
      * Output:
      * none
      */
-    private void getPitchEnv(LINE[] lptr) {
+    private void getPitchEnv(Line[] lptr) {
         int line, i, no, end_flag, offset, num;
         int[] cnt = new int[1];
         String buf;
@@ -1761,7 +1765,7 @@ on_error:
         for (line = 1; line < lptr.length; line++) {
             // Pitch envelope definition, but _SAME_LINE causes an error
             if (lptr[line].status == (_SET_PITCH_ENV | _SAME_LINE)) {
-                dispError(enmErrNum.PITCH_ENVELOPE_DEFINITION_IS_WRONG.ordinal(), lptr[line].filename, line);
+                dispError(ErrNum.PITCH_ENVELOPE_DEFINITION_IS_WRONG, lptr[line].filename, line);
                 continue;
             }
 
@@ -1780,30 +1784,30 @@ on_error:
             ptr = 0;
             ptr++; // Skip the '{'
             if (pitch_env_tbl[no][0] != 0) {
-                dispWarning(enmSys.THIS_NUMBER_IS_ALREADY_USED.ordinal(), lptr[line].filename, line);
+                dispWarning(Sys.THIS_NUMBER_IS_ALREADY_USED, lptr[line].filename, line);
             }
             pitch_env_tbl[no][0] = 0;
             offset = 0;
             i = 1;
             end_flag = 0;
             while (end_flag == 0) {
-                ptr = str.skipSpace(buf, ptr);
+                ptr = Strings.skipSpace(buf, ptr);
                 char c = (ptr < buf.length()) ? buf.charAt(ptr) : '\0';
 
                 switch (c) {
                     case '}':
                         if (pitch_env_tbl[no][0] >= 1) {
-                            pitch_env_tbl[no][i] = enmEFTBL.END.v;
+                            pitch_env_tbl[no][i] = EFTBL.END.v;
                             pitch_env_tbl[no][0]++;
                         } else {
-                            dispError(enmErrNum.PARAMETER_IS_LACKING.ordinal(), lptr[line].filename, line);
+                            dispError(ErrNum.PARAMETER_IS_LACKING, lptr[line].filename, line);
                             pitch_env_tbl[no][0] = 0;
                         }
                         end_flag = 1;
                         line += offset;
                         break;
                     case '|':
-                        pitch_env_tbl[no][i] = enmEFTBL.LOOP.v;
+                        pitch_env_tbl[no][i] = EFTBL.LOOP.v;
                         pitch_env_tbl[no][0]++;
                         i++;
                         ptr++;
@@ -1816,13 +1820,13 @@ on_error:
                                 ptr = 0;
                             }
                         } else {
-                            dispError(enmErrNum.PITCH_ENVELOPE_DEFINITION_IS_WRONG.ordinal(), lptr[line].filename, line);
+                            dispError(ErrNum.PITCH_ENVELOPE_DEFINITION_IS_WRONG, lptr[line].filename, line);
                             pitch_env_tbl[no][0] = 0;
                             end_flag = 1;
                         }
                         break;
                     default:
-                        num = str.asc2Int(buf, ptr, /* ref */ cnt);
+                        num = Strings.asc2Int(buf, ptr, /* ref */ cnt);
 
                         // Pitch direction correction
                         if (pitch_correction != 0)
@@ -1834,14 +1838,14 @@ on_error:
                             ptr += cnt[0];
                             i++;
                         } else {
-                            dispError(enmErrNum.PITCH_ENVELOPE_DEFINITION_IS_WRONG.ordinal(), lptr[line + offset].filename, line);
+                            dispError(ErrNum.PITCH_ENVELOPE_DEFINITION_IS_WRONG, lptr[line + offset].filename, line);
                             pitch_env_tbl[no][0] = 0;
                             end_flag = 1;
                         }
                         break;
                 }
 
-                ptr = str.skipSpace(buf, ptr);
+                ptr = Strings.skipSpace(buf, ptr);
                 c = (ptr < buf.length()) ? buf.charAt(ptr) : '\0';
 
                 if (c == ',') {
@@ -1858,7 +1862,7 @@ on_error:
      * Output:
      * none
      */
-    private void getPitchMod(LINE[] lptr) {
+    private void getPitchMod(Line[] lptr) {
         int line, i, no, end_flag, offset, num;
         int[] cnt = new int[1];
         String buf;
@@ -1869,7 +1873,7 @@ on_error:
         for (line = 1; line < lptr.length; line++) {
             // It's a tone definition, but an error occurs when using _SAME_LINE.
             if (lptr[line].status == (_SET_PITCH_MOD | _SAME_LINE)) {
-                dispError(enmErrNum.LFO_DEFINITION_IS_WRONG.ordinal(), lptr[line].filename, line);
+                dispError(ErrNum.LFO_DEFINITION_IS_WRONG, lptr[line].filename, line);
             }
 
             // Include File Processing
@@ -1884,21 +1888,21 @@ on_error:
                 ptr = 0;
                 ptr++; // Skip the '{'
                 if (pitch_mod_tbl[no][0] != 0) {
-                    dispWarning(enmSys.THIS_NUMBER_IS_ALREADY_USED.ordinal(), lptr[line].filename, line);
+                    dispWarning(Sys.THIS_NUMBER_IS_ALREADY_USED, lptr[line].filename, line);
                 }
                 pitch_mod_tbl[no][0] = 0;
                 offset = 0;
                 i = 1;
                 end_flag = 0;
                 while (end_flag == 0) {
-                    ptr = str.skipSpace(buf, ptr);
+                    ptr = Strings.skipSpace(buf, ptr);
                     char c = (ptr < buf.length()) ? buf.charAt(ptr) : '\0';
                     switch (c) {
                         case '}':
                             if (pitch_mod_tbl[no][0] >= 3) {
                                 //OK.
                             } else {
-                                dispError(enmErrNum.PARAMETER_IS_LACKING.ordinal(), lptr[line].filename, line);
+                                dispError(ErrNum.PARAMETER_IS_LACKING, lptr[line].filename, line);
                                 pitch_mod_tbl[no][0] = 0;
                             }
                             end_flag = 1;
@@ -1912,13 +1916,13 @@ on_error:
                                     ptr = 0;
                                 }
                             } else {
-                                dispError(enmErrNum.LFO_DEFINITION_IS_WRONG.ordinal(), lptr[line].filename, line);
+                                dispError(ErrNum.LFO_DEFINITION_IS_WRONG, lptr[line].filename, line);
                                 pitch_mod_tbl[no][0] = 0;
                                 end_flag = 1;
                             }
                             break;
                         default:
-                            num = str.asc2Int(buf, ptr, /* ref */ cnt);
+                            num = Strings.asc2Int(buf, ptr, /* ref */ cnt);
                             if (cnt[0] != 0) {
                                 switch (i) {
                                     case 1:
@@ -1930,7 +1934,7 @@ on_error:
                                             ptr += cnt[0];
                                             i++;
                                         } else {
-                                            dispError(enmErrNum.LFO_DEFINITION_IS_WRONG.ordinal(), lptr[line + offset].filename, line);
+                                            dispError(ErrNum.LFO_DEFINITION_IS_WRONG, lptr[line + offset].filename, line);
                                             pitch_mod_tbl[no][0] = 0;
                                             end_flag = 1;
                                         }
@@ -1942,25 +1946,25 @@ on_error:
                                             ptr += cnt[0];
                                             i++;
                                         } else {
-                                            dispError(enmErrNum.LFO_DEFINITION_IS_WRONG.ordinal(), lptr[line + offset].filename, line);
+                                            dispError(ErrNum.LFO_DEFINITION_IS_WRONG, lptr[line + offset].filename, line);
                                             pitch_mod_tbl[no][0] = 0;
                                             end_flag = 1;
                                         }
                                         break;
                                     default:
-                                        dispError(enmErrNum.LFO_DEFINITION_IS_WRONG.ordinal(), lptr[line + offset].filename, line);
+                                        dispError(ErrNum.LFO_DEFINITION_IS_WRONG, lptr[line + offset].filename, line);
                                         pitch_mod_tbl[no][0] = 0;
                                         end_flag = 1;
                                         break;
                                 }
                             } else {
-                                dispError(enmErrNum.LFO_DEFINITION_IS_WRONG.ordinal(), lptr[line + offset].filename, line);
+                                dispError(ErrNum.LFO_DEFINITION_IS_WRONG, lptr[line + offset].filename, line);
                                 pitch_mod_tbl[no][0] = 0;
                                 end_flag = 1;
                             }
                             break;
                     }
-                    ptr = str.skipSpace(buf, ptr);
+                    ptr = Strings.skipSpace(buf, ptr);
                     c = (ptr < buf.length()) ? buf.charAt(ptr) : '\0';
                     if (c == ',') {
                         ptr++;
@@ -1977,7 +1981,7 @@ on_error:
      * Output:
      * none
      */
-    private void getArpeggio(LINE[] lptr) {
+    private void getArpeggio(Line[] lptr) {
         int line, i, no, end_flag, offset, num;
         int[] cnt = new int[1];
         String buf;
@@ -1993,29 +1997,29 @@ on_error:
                 ptr = 0;
                 ptr++; // Skip the '{'
                 if (arpeggio_tbl[no][0] != 0) {
-                    dispWarning(enmSys.THIS_NUMBER_IS_ALREADY_USED.ordinal(), lptr[line].filename, line);
+                    dispWarning(Sys.THIS_NUMBER_IS_ALREADY_USED, lptr[line].filename, line);
                 }
                 arpeggio_tbl[no][0] = 0;
                 offset = 0;
                 i = 1;
                 end_flag = 0;
                 while (end_flag == 0) {
-                    ptr = str.skipSpace(buf, ptr);
+                    ptr = Strings.skipSpace(buf, ptr);
                     char c = (ptr < buf.length()) ? buf.charAt(ptr) : '\0';
                     switch (c) {
                         case '}':
                             if (arpeggio_tbl[no][0] >= 1) {
-                                arpeggio_tbl[no][i] = enmEFTBL.END.v;
+                                arpeggio_tbl[no][i] = EFTBL.END.v;
                                 arpeggio_tbl[no][0]++;
                             } else {
-                                dispError(enmErrNum.PARAMETER_IS_LACKING.ordinal(), lptr[line].filename, line);
+                                dispError(ErrNum.PARAMETER_IS_LACKING, lptr[line].filename, line);
                                 arpeggio_tbl[no][0] = 0;
                             }
                             end_flag = 1;
                             line += offset;
                             break;
                         case '|':
-                            arpeggio_tbl[no][i] = enmEFTBL.LOOP.v;
+                            arpeggio_tbl[no][i] = EFTBL.LOOP.v;
                             arpeggio_tbl[no][0]++;
                             i++;
                             ptr++;
@@ -2028,13 +2032,13 @@ on_error:
                                     ptr = 0;
                                 }
                             } else {
-                                dispError(enmErrNum.NOTE_ENVELOPE_DEFINITION_IS_WRONG.ordinal(), lptr[line].filename, line);
+                                dispError(ErrNum.NOTE_ENVELOPE_DEFINITION_IS_WRONG, lptr[line].filename, line);
                                 arpeggio_tbl[no][0] = 0;
                                 end_flag = 1;
                             }
                             break;
                         default:
-                            num = str.asc2Int(buf, ptr, /* ref */ cnt);
+                            num = Strings.asc2Int(buf, ptr, /* ref */ cnt);
                             if (cnt[0] != 0) {
                                 if (num >= 0) {
                                     arpeggio_tbl[no][i] = num;
@@ -2045,13 +2049,13 @@ on_error:
                                 ptr += cnt[0];
                                 i++;
                             } else {
-                                dispError(enmErrNum.NOTE_ENVELOPE_DEFINITION_IS_WRONG.ordinal(), lptr[line + offset].filename, line);
+                                dispError(ErrNum.NOTE_ENVELOPE_DEFINITION_IS_WRONG, lptr[line + offset].filename, line);
                                 arpeggio_tbl[no][0] = 0;
                                 end_flag = 1;
                             }
                             break;
                     }
-                    ptr = str.skipSpace(buf, ptr);
+                    ptr = Strings.skipSpace(buf, ptr);
                     c = (ptr < buf.length()) ? buf.charAt(ptr) : '\0';
                     if (c == ',') {
                         ptr++;
@@ -2059,7 +2063,7 @@ on_error:
                 }
                 // Arpeggio definition but error when using _SAME_LINE
             } else if (lptr[line].status == (_SET_ARPEGGIO | _SAME_LINE)) {
-                dispError(enmErrNum.NOTE_ENVELOPE_DEFINITION_IS_WRONG.ordinal(), lptr[line].filename, line);
+                dispError(ErrNum.NOTE_ENVELOPE_DEFINITION_IS_WRONG, lptr[line].filename, line);
                 // Include File Processing
             } else if (lptr[line].status == _INCLUDE) {
                 getArpeggio(lptr[line].inc_ptr);
@@ -2126,7 +2130,7 @@ on_error:
 //                                    ptr = lptr[line + offset].str;
 //                                }
 //                            } else {
-//                                dispError(DPCM_DEFINITION_IS_WRONG.ordinal(), lptr[line].filename, line);
+//                                dispError(DPCM_DEFINITION_IS_WRONG, lptr[line].filename, line);
 //                                tbl.flag = 0;
 //                                end_flag = 1;
 //                            }
@@ -2173,7 +2177,7 @@ on_error:
 //                                    if (cnt != 0 && (0 <= num && num <= 15)) {
 //                                        tbl.freq = num;
 //                                    } else {
-//                                        dispError(DPCM_DEFINITION_IS_WRONG.ordinal(), lptr[line + offset].filename, line);
+//                                        dispError(DPCM_DEFINITION_IS_WRONG, lptr[line + offset].filename, line);
 //                                        tbl.flag = 0;
 //                                        end_flag = 1;
 //                                    }
@@ -2192,7 +2196,7 @@ on_error:
 //                                    if (cnt != 0 && (0 < num && num < 16384)) {
 //                                        tbl.size = num;
 //                                    } else {
-//                                        dispError(DPCM_DEFINITION_IS_WRONG.ordinal(), lptr[line + offset].filename, line);
+//                                        dispError(DPCM_DEFINITION_IS_WRONG, lptr[line + offset].filename, line);
 //                                        tbl.flag = 0;
 //                                        end_flag = 1;
 //                                    }
@@ -2205,7 +2209,7 @@ on_error:
 //                                    if (cnt != 0 && ((0 <= num && num <= 0x7f) || num == 0xff)) {
 //                                        tbl.delta_init = num;
 //                                    } else {
-//                                        dispError(DPCM_DEFINITION_IS_WRONG.ordinal(), lptr[line + offset].filename, line);
+//                                        dispError(DPCM_DEFINITION_IS_WRONG, lptr[line + offset].filename, line);
 //                                        tbl.flag = 0;
 //                                        end_flag = 1;
 //                                    }
@@ -2218,7 +2222,7 @@ on_error:
 //                                    if (cnt != 0 && (0 <= num && num <= 2)) {
 //                                        tbl.freq |= (num << 6);
 //                                    } else {
-//                                        dispError(DPCM_DEFINITION_IS_WRONG.ordinal(), lptr[line + offset].filename, line);
+//                                        dispError(DPCM_DEFINITION_IS_WRONG, lptr[line + offset].filename, line);
 //                                        tbl.flag = 0;
 //                                        end_flag = 1;
 //                                    }
@@ -2226,7 +2230,7 @@ on_error:
 //                                    i++;
 //                                    break;
 //                                default:
-//                                    dispError(DPCM_DEFINITION_IS_WRONG.ordinal(), lptr[line + offset].filename, line);
+//                                    dispError(DPCM_DEFINITION_IS_WRONG, lptr[line + offset].filename, line);
 //                                    tbl.flag = 0;
 //                                    end_flag = 1;
 //                                    break;
@@ -2246,7 +2250,7 @@ on_error:
 //                }
 //                // DPCM definition but _SAME_LINE gives an error
 //            } else if (lptr[line].status == (_SET_DPCM_DATA | _SAME_LINE)) {
-//                dispError(DPCM_DEFINITION_IS_WRONG.ordinal(), lptr[line].filename, line);
+//                dispError(DPCM_DEFINITION_IS_WRONG, lptr[line].filename, line);
 //                // Include File Processing
 //            } else if (lptr[line].status == _INCLUDE) {
 //                getDPCM(lptr[line].inc_ptr);
@@ -2312,7 +2316,7 @@ on_error:
 //                                    ptr = lptr[line + offset].str;
 //                                }
 //                            } else {
-//                                dispError(XPCM_DEFINITION_IS_WRONG.ordinal(), lptr[line].filename, line);
+//                                dispError(XPCM_DEFINITION_IS_WRONG, lptr[line].filename, line);
 //                                tbl.flag = 0;
 //                                end_flag = 1;
 //                            }
@@ -2360,7 +2364,7 @@ on_error:
 //                                    if (cnt != 0 && (0 <= num && num <= 15)) {
 //                                        tbl.freq = num;
 //                                    } else {
-//                                        dispError(XPCM_DEFINITION_IS_WRONG.ordinal(), lptr[line + offset].filename, line);
+//                                        dispError(XPCM_DEFINITION_IS_WRONG, lptr[line + offset].filename, line);
 //                                        tbl.flag = 0;
 //                                        end_flag = 1;
 //                                    }
@@ -2379,7 +2383,7 @@ on_error:
 //                                    if (cnt != 0 && (0 < num && num < 16384)) {
 //                                        tbl.size = num;
 //                                    } else {
-//                                        dispError(XPCM_DEFINITION_IS_WRONG.ordinal(), lptr[line + offset].filename, line);
+//                                        dispError(XPCM_DEFINITION_IS_WRONG, lptr[line + offset].filename, line);
 //                                        tbl.flag = 0;
 //                                        end_flag = 1;
 //                                    }
@@ -2387,7 +2391,7 @@ on_error:
 //                                    i++;
 //                                    break;
 //                                default:
-//                                    dispError(XPCM_DEFINITION_IS_WRONG.ordinal(), lptr[line + offset].filename, line);
+//                                    dispError(XPCM_DEFINITION_IS_WRONG, lptr[line + offset].filename, line);
 //                                    tbl.flag = 0;
 //                                    end_flag = 1;
 //                                    break;
@@ -2405,7 +2409,7 @@ on_error:
 //                }
 //                // DPCM definition but _SAME_LINE gives an error
 //            } else if (lptr[line].status == (_SET_DPCM_DATA | _SAME_LINE)) {
-//                dispError(XPCM_DEFINITION_IS_WRONG.ordinal(), lptr[line].filename, line);
+//                dispError(XPCM_DEFINITION_IS_WRONG, lptr[line].filename, line);
 //                // Include File Processing
 //            } else if (lptr[line].status == _INCLUDE) {
 //                getXPCM(lptr[line].inc_ptr);
@@ -2459,7 +2463,7 @@ on_error:
 //                                    ptr = lptr[line + offset].str;
 //                                }
 //                            } else {
-//                                dispError(FM_TONE_DEFINITION_IS_WRONG.ordinal(), lptr[line].filename, line + offset);
+//                                dispError(FM_TONE_DEFINITION_IS_WRONG, lptr[line].filename, line + offset);
 //                                fm_tone_tbl[no][0] = 0;
 //                                line += offset;
 //                                end_flag = 1;
@@ -2479,7 +2483,7 @@ on_error:
 //                                    end_flag = 1;
 //                                }
 //                            } else {
-//                                dispError(FM_TONE_DEFINITION_IS_WRONG.ordinal(), lptr[line + offset].filename, line + offset);
+//                                dispError(FM_TONE_DEFINITION_IS_WRONG, lptr[line + offset].filename, line + offset);
 //                                fm_tone_tbl[no][0] = 0;
 //                                line += offset;
 //                                end_flag = 1;
@@ -2493,7 +2497,7 @@ on_error:
 //                }
 //                // It's a tone definition, but an error occurs when using _SAME_LINE.
 //            } else if (lptr[line].status == (_SET_FM_TONE | _SAME_LINE)) {
-//                dispError(FM_TONE_DEFINITION_IS_WRONG.ordinal(), lptr[line].filename, line);
+//                dispError(FM_TONE_DEFINITION_IS_WRONG, lptr[line].filename, line);
 //                // Include File Processing
 //            } else if (lptr[line].status == _INCLUDE) {
 //                getFMTone(lptr[line].inc_ptr);
@@ -2538,7 +2542,7 @@ on_error:
 //                                    ptr = lptr[line + offset].str;
 //                                }
 //                            } else {
-//                                dispError(WTB_TONE_DEFINITION_IS_WRONG.ordinal(), lptr[line].filename, line + offset);
+//                                dispError(WTB_TONE_DEFINITION_IS_WRONG, lptr[line].filename, line + offset);
 //                                wtb_tone_tbl[no][0] = 0;
 //                                line += offset;
 //                                end_flag = 1;
@@ -2558,7 +2562,7 @@ on_error:
 //                                    end_flag = 1;
 //                                }
 //                            } else {
-//                                dispError(WTB_TONE_DEFINITION_IS_WRONG.ordinal(), lptr[line + offset].filename, line + offset);
+//                                dispError(WTB_TONE_DEFINITION_IS_WRONG, lptr[line + offset].filename, line + offset);
 //                                wtb_tone_tbl[no][0] = 0;
 //                                line += offset;
 //                                end_flag = 1;
@@ -2580,7 +2584,7 @@ on_error:
 //
 //                // It's a tone definition, but an error occurs when using _SAME_LINE.
 //            } else if (lptr[line].status == (_SET_WTB_TONE | _SAME_LINE)) {
-//                dispError(WTB_TONE_DEFINITION_IS_WRONG.ordinal(), lptr[line].filename, line);
+//                dispError(WTB_TONE_DEFINITION_IS_WRONG, lptr[line].filename, line);
 //                // Include File Processing
 //            } else if (lptr[line].status == _INCLUDE) {
 //                getWTBTone(lptr[line].inc_ptr);
@@ -2595,7 +2599,7 @@ on_error:
      * Output:
      * none
      */
-    void getToneTable(LINE[] lptr) {
+    void getToneTable(Line[] lptr) {
         int line, i, no, end_flag, offset, num;
         int[] cnt = new int[1];
         String buf;
@@ -2615,7 +2619,7 @@ on_error:
                 i = 1;
                 end_flag = 0;
                 while (end_flag == 0) {
-                    ptr = str.skipSpace(buf, ptr);
+                    ptr = Strings.skipSpace(buf, ptr);
                     char c = (ptr < buf.length()) ? buf.charAt(ptr) : '\0';
 
                     switch (c) {
@@ -2632,27 +2636,27 @@ on_error:
                                     ptr = 0;
                                 }
                             } else {
-                                dispError(enmErrNum.TONETBL_DEFINITION_IS_WRONG.ordinal(), lptr[line].filename, line + offset);
+                                dispError(ErrNum.TONETBL_DEFINITION_IS_WRONG, lptr[line].filename, line + offset);
                                 tonetbl_tbl[no][0] = 0;
                                 line += offset;
                                 end_flag = 1;
                             }
                             break;
                         default:
-                            num = str.asc2Int(buf, ptr, /* ref */ cnt);
+                            num = Strings.asc2Int(buf, ptr, /* ref */ cnt);
                             if (cnt[0] != 0) {
                                 tonetbl_tbl[no][i] = num;
                                 tonetbl_tbl[no][0]++;
                                 ptr += cnt[0];
                                 i++;
                                 if (i > 1024 + 1) {
-                                    dispError(enmErrNum.ABNORMAL_PARAMETERS_OF_TONETBL.ordinal(), lptr[line + offset].filename, line + offset);
+                                    dispError(ErrNum.ABNORMAL_PARAMETERS_OF_TONETBL, lptr[line + offset].filename, line + offset);
                                     tonetbl_tbl[no][0] = 0;
                                     line += offset;
                                     end_flag = 1;
                                 }
                             } else {
-                                dispError(enmErrNum.TONETBL_DEFINITION_IS_WRONG.ordinal(), lptr[line + offset].filename, line + offset);
+                                dispError(ErrNum.TONETBL_DEFINITION_IS_WRONG, lptr[line + offset].filename, line + offset);
                                 tonetbl_tbl[no][0] = 0;
                                 line += offset;
                                 end_flag = 1;
@@ -2660,7 +2664,7 @@ on_error:
                             break;
                     }
 
-                    ptr = str.skipSpace(buf, ptr);
+                    ptr = Strings.skipSpace(buf, ptr);
                     c = (ptr < buf.length()) ? buf.charAt(ptr) : '\0';
 
                     if (c == ',') {
@@ -2669,7 +2673,7 @@ on_error:
                 }
                 if ((i % 9) != 1) {
                     if (error_flag == 0) {
-                        dispError(enmErrNum.ABNORMAL_PARAMETERS_OF_TONETBL.ordinal(), lptr[line].filename, line);
+                        dispError(ErrNum.ABNORMAL_PARAMETERS_OF_TONETBL, lptr[line].filename, line);
                         tonetbl_tbl[no][0] = 0;
                     }
                 }
@@ -2677,7 +2681,7 @@ on_error:
 
                 // It's a tone definition, but an error occurs when using _SAME_LINE.
             } else if (lptr[line].status == (_SET_TONETBL | _SAME_LINE)) {
-                dispError(enmErrNum.TONETBL_DEFINITION_IS_WRONG.ordinal(), lptr[line].filename, line);
+                dispError(ErrNum.TONETBL_DEFINITION_IS_WRONG, lptr[line].filename, line);
                 // Include File Processing
             } else if (lptr[line].status == _INCLUDE) {
                 getToneTable(lptr[line].inc_ptr);
@@ -2692,7 +2696,7 @@ on_error:
      * Output:
      * none
      */
-    void getOPL3tbl(LINE[] lptr) {
+    void getOPL3tbl(Line[] lptr) {
         int line, i, no, end_flag, offset, num;
         int[] cnt = new int[1];
         String buf;
@@ -2706,7 +2710,7 @@ on_error:
             // It's a tone definition, but an error occurs when using _SAME_LINE.
             if (lptr[line].status == (_SET_FMOP | _SAME_LINE) ||
                     lptr[line].status == (_SET_FMOP_FOUR | _SAME_LINE)) {
-                dispError(enmErrNum.FM_TONE_DEFINITION_IS_WRONG.ordinal(), lptr[line].filename, line);
+                dispError(ErrNum.FM_TONE_DEFINITION_IS_WRONG, lptr[line].filename, line);
                 continue;
             }
 
@@ -2738,7 +2742,7 @@ on_error:
             i = 1;
             end_flag = 0;
             while (end_flag == 0) {
-                ptr = str.skipSpace(buf, ptr);
+                ptr = Strings.skipSpace(buf, ptr);
                 char c = (ptr < buf.length()) ? buf.charAt(ptr) : '\0';
 
                 switch (c) {
@@ -2754,27 +2758,27 @@ on_error:
                                 ptr = 0;
                             }
                         } else {
-                            dispError(enmErrNum.FM_TONE_DEFINITION_IS_WRONG.ordinal(), lptr[line].filename, line + offset);
+                            dispError(ErrNum.FM_TONE_DEFINITION_IS_WRONG, lptr[line].filename, line + offset);
                             opl3op_tbl[no][0] = 0;
                             line += offset;
                             end_flag = 1;
                         }
                         break;
                     default:
-                        num = str.asc2Int(buf, ptr, /* ref */ cnt);
+                        num = Strings.asc2Int(buf, ptr, /* ref */ cnt);
                         if (cnt[0] != 0) {
                             opl3op_tbl[no][i] = num;
                             opl3op_tbl[no][0]++;
                             ptr += cnt[0];
                             i++;
                             if (i > 1024 + 1) {
-                                dispError(enmErrNum.ABNORMAL_PARAMETERS_OF_FM_TONE.ordinal(), lptr[line + offset].filename, line + offset);
+                                dispError(ErrNum.ABNORMAL_PARAMETERS_OF_FM_TONE, lptr[line + offset].filename, line + offset);
                                 opl3op_tbl[no][0] = 0;
                                 line += offset;
                                 end_flag = 1;
                             }
                         } else {
-                            dispError(enmErrNum.FM_TONE_DEFINITION_IS_WRONG.ordinal(), lptr[line + offset].filename, line + offset);
+                            dispError(ErrNum.FM_TONE_DEFINITION_IS_WRONG, lptr[line + offset].filename, line + offset);
                             opl3op_tbl[no][0] = 0;
                             line += offset;
                             end_flag = 1;
@@ -2782,7 +2786,7 @@ on_error:
                         break;
                 }
 
-                ptr = str.skipSpace(buf, ptr);
+                ptr = Strings.skipSpace(buf, ptr);
                 c = (ptr < buf.length()) ? buf.charAt(ptr) : '\0';
 
                 if (c == ',') {
@@ -2792,7 +2796,7 @@ on_error:
 
             if ((i % 12) != 6) {
                 if (error_flag == 0) {
-                    dispError(enmErrNum.ABNORMAL_PARAMETERS_OF_FM_TONE.ordinal(), lptr[line].filename, line);
+                    dispError(ErrNum.ABNORMAL_PARAMETERS_OF_FM_TONE, lptr[line].filename, line);
                     opl3op_tbl[no][0] = 0;
                 }
             }
@@ -2845,7 +2849,7 @@ on_error:
 //                                    ptr = lptr[line + offset].str;
 //                                }
 //                            } else {
-//                                dispError(FM_TONE_DEFINITION_IS_WRONG.ordinal(), lptr[line].filename, line + offset);
+//                                dispError(FM_TONE_DEFINITION_IS_WRONG, lptr[line].filename, line + offset);
 //                                vrc7_tone_tbl[no][0] = 0;
 //                                line += offset;
 //                                end_flag = 1;
@@ -2865,7 +2869,7 @@ on_error:
 //                                    end_flag = 1;
 //                                }
 //                            } else {
-//                                dispError(FM_TONE_DEFINITION_IS_WRONG.ordinal(), lptr[line + offset].filename, line + offset);
+//                                dispError(FM_TONE_DEFINITION_IS_WRONG, lptr[line + offset].filename, line + offset);
 //                                vrc7_tone_tbl[no][0] = 0;
 //                                line += offset;
 //                                end_flag = 1;
@@ -2886,7 +2890,7 @@ on_error:
 //
 //                // It's a tone definition, but an error occurs when using _SAME_LINE.
 //            } else if (lptr[line].status == (_SET_VRC7_TONE | _SAME_LINE)) {
-//                dispError(FM_TONE_DEFINITION_IS_WRONG.ordinal(), lptr[line].filename, line);
+//                dispError(FM_TONE_DEFINITION_IS_WRONG, lptr[line].filename, line);
 //                // Include File Processing
 //            } else if (lptr[line].status == _INCLUDE) {
 //                getVRC7Tone(lptr[line].inc_ptr);
@@ -2937,7 +2941,7 @@ on_error:
 //                                    ptr = lptr[line + offset].str;
 //                                }
 //                            } else {
-//                                dispError(N106_TONE_DEFINITION_IS_WRONG.ordinal(), lptr[line].filename, line + offset);
+//                                dispError(N106_TONE_DEFINITION_IS_WRONG, lptr[line].filename, line + offset);
 //                                n106_tone_tbl[no][0] = 0;
 //                                line += offset;
 //                                end_flag = 1;
@@ -2952,7 +2956,7 @@ on_error:
 //                                    ptr += cnt;
 //                                    i++;
 //                                } else {
-//                                    dispError(N106_TONE_DEFINITION_IS_WRONG.ordinal(), lptr[line].filename, line + offset);
+//                                    dispError(N106_TONE_DEFINITION_IS_WRONG, lptr[line].filename, line + offset);
 //                                    n106_tone_tbl[no][0] = 0;
 //                                    line += offset;
 //                                    end_flag = 1;
@@ -2970,7 +2974,7 @@ on_error:
 //                                        end_flag = 1;
 //                                    }
 //                                } else {
-//                                    dispError(N106_TONE_DEFINITION_IS_WRONG.ordinal(), lptr[line + offset].filename, line + offset);
+//                                    dispError(N106_TONE_DEFINITION_IS_WRONG, lptr[line + offset].filename, line + offset);
 //                                    n106_tone_tbl[no][0] = 0;
 //                                    line += offset;
 //                                    end_flag = 1;
@@ -3017,12 +3021,12 @@ on_error:
 //                    n106_tone_tbl[no][0] = 0;
 //                }
 //                if (n106_tone_tbl[no][1] >= n106_tone_max[n106_tone_num]) {
-//                    dispError(N106_TONE_DEFINITION_IS_WRONG.ordinal(), lptr[line].filename, line);
+//                    dispError(N106_TONE_DEFINITION_IS_WRONG, lptr[line].filename, line);
 //                    n106_tone_tbl[no][0] = 0;
 //                }
 //                // It's a tone definition, but an error occurs when using _SAME_LINE.
 //            } else if (lptr[line].status == (_SET_N106_TONE | _SAME_LINE)) {
-//                dispError(N106_TONE_DEFINITION_IS_WRONG.ordinal(), lptr[line].filename, line);
+//                dispError(N106_TONE_DEFINITION_IS_WRONG, lptr[line].filename, line);
 //                // Include File Processing
 //            } else if (lptr[line].status == _INCLUDE) {
 //                getN106Tone(lptr[line].inc_ptr);
@@ -3037,7 +3041,7 @@ on_error:
      * Output:
      * none
      */
-    private void getHardEffect(LINE[] lptr) {
+    private void getHardEffect(Line[] lptr) {
         int line, i, no, end_flag, offset, num;
         int[] cnt = new int[1];
         String buf;
@@ -3053,21 +3057,21 @@ on_error:
                 ptr = 0;
                 ptr++; // Skip the '{'
                 if (hard_effect_tbl[no][0] != 0) {
-                    dispWarning(enmSys.THIS_NUMBER_IS_ALREADY_USED.ordinal(), lptr[line].filename, line);
+                    dispWarning(Sys.THIS_NUMBER_IS_ALREADY_USED, lptr[line].filename, line);
                 }
                 hard_effect_tbl[no][0] = 0;
                 offset = 0;
                 i = 1;
                 end_flag = 0;
                 while (end_flag == 0) {
-                    ptr = str.skipSpace(buf, ptr);
+                    ptr = Strings.skipSpace(buf, ptr);
                     char c = (ptr < buf.length()) ? buf.charAt(ptr) : '\0';
                     switch (c) {
                         case '}':
                             if (hard_effect_tbl[no][0] == 4) {
                                 // OK.
                             } else {
-                                dispError(enmErrNum.PARAMETER_IS_LACKING.ordinal(), lptr[line].filename, line);
+                                dispError(ErrNum.PARAMETER_IS_LACKING, lptr[line].filename, line);
                                 hard_effect_tbl[no][0] = 0;
                             }
                             end_flag = 1;
@@ -3081,13 +3085,13 @@ on_error:
                                     ptr = 0;
                                 }
                             } else {
-                                dispError(enmErrNum.LFO_DEFINITION_IS_WRONG.ordinal(), lptr[line].filename, line);
+                                dispError(ErrNum.LFO_DEFINITION_IS_WRONG, lptr[line].filename, line);
                                 hard_effect_tbl[no][0] = 0;
                                 end_flag = 1;
                             }
                             break;
                         default:
-                            num = str.asc2Int(buf, ptr, /* ref */ cnt);
+                            num = Strings.asc2Int(buf, ptr, /* ref */ cnt);
                             if (cnt[0] != 0) {
                                 switch (i) {
                                     case 1:
@@ -3097,7 +3101,7 @@ on_error:
                                             ptr += cnt[0];
                                             i++;
                                         } else {
-                                            dispError(enmErrNum.LFO_DEFINITION_IS_WRONG.ordinal(), lptr[line + offset].filename, line);
+                                            dispError(ErrNum.LFO_DEFINITION_IS_WRONG, lptr[line + offset].filename, line);
                                             hard_effect_tbl[no][0] = 0;
                                             end_flag = 1;
                                         }
@@ -3109,7 +3113,7 @@ on_error:
                                             ptr += cnt[0];
                                             i++;
                                         } else {
-                                            dispError(enmErrNum.LFO_DEFINITION_IS_WRONG.ordinal(), lptr[line + offset].filename, line);
+                                            dispError(ErrNum.LFO_DEFINITION_IS_WRONG, lptr[line + offset].filename, line);
                                             hard_effect_tbl[no][0] = 0;
                                             end_flag = 1;
                                         }
@@ -3121,7 +3125,7 @@ on_error:
                                             ptr += cnt[0];
                                             i++;
                                         } else {
-                                            dispError(enmErrNum.LFO_DEFINITION_IS_WRONG.ordinal(), lptr[line + offset].filename, line);
+                                            dispError(ErrNum.LFO_DEFINITION_IS_WRONG, lptr[line + offset].filename, line);
                                             hard_effect_tbl[no][0] = 0;
                                             end_flag = 1;
                                         }
@@ -3133,25 +3137,25 @@ on_error:
                                             ptr += cnt[0];
                                             i++;
                                         } else {
-                                            dispError(enmErrNum.LFO_DEFINITION_IS_WRONG.ordinal(), lptr[line + offset].filename, line);
+                                            dispError(ErrNum.LFO_DEFINITION_IS_WRONG, lptr[line + offset].filename, line);
                                             hard_effect_tbl[no][0] = 0;
                                             end_flag = 1;
                                         }
                                         break;
                                     default:
-                                        dispError(enmErrNum.LFO_DEFINITION_IS_WRONG.ordinal(), lptr[line + offset].filename, line);
+                                        dispError(ErrNum.LFO_DEFINITION_IS_WRONG, lptr[line + offset].filename, line);
                                         hard_effect_tbl[no][0] = 0;
                                         end_flag = 1;
                                         break;
                                 }
                             } else {
-                                dispError(enmErrNum.LFO_DEFINITION_IS_WRONG.ordinal(), lptr[line + offset].filename, line);
+                                dispError(ErrNum.LFO_DEFINITION_IS_WRONG, lptr[line + offset].filename, line);
                                 hard_effect_tbl[no][0] = 0;
                                 end_flag = 1;
                             }
                             break;
                     }
-                    ptr = str.skipSpace(buf, ptr);
+                    ptr = Strings.skipSpace(buf, ptr);
                     c = (ptr < buf.length()) ? buf.charAt(ptr) : '\0';
                     if (c == ',') {
                         ptr++;
@@ -3159,7 +3163,7 @@ on_error:
                 }
                 // It's a tone definition, but an error occurs when using _SAME_LINE.
             } else if (lptr[line].status == (_SET_HARD_EFFECT | _SAME_LINE)) {
-                dispError(enmErrNum.LFO_DEFINITION_IS_WRONG.ordinal(), lptr[line].filename, line);
+                dispError(ErrNum.LFO_DEFINITION_IS_WRONG, lptr[line].filename, line);
                 // Include File Processing
             } else if (lptr[line].status == _INCLUDE) {
                 getHardEffect(lptr[line].inc_ptr);
@@ -3174,7 +3178,7 @@ on_error:
      * Output:
      * none
      */
-    private void getEffectWave(LINE[] lptr) {
+    private void getEffectWave(Line[] lptr) {
         int line, i, no, end_flag, offset, num;
         int[] cnt = new int[1];
         String buf;
@@ -3190,21 +3194,21 @@ on_error:
                 ptr = 0;
                 ptr++; // Skip the '{'
                 if (effect_wave_tbl[no][0] != 0) {
-                    dispWarning(enmSys.THIS_NUMBER_IS_ALREADY_USED.ordinal(), lptr[line].filename, line);
+                    dispWarning(Sys.THIS_NUMBER_IS_ALREADY_USED, lptr[line].filename, line);
                 }
                 effect_wave_tbl[no][0] = 0;
                 offset = 0;
                 i = 1;
                 end_flag = 0;
                 while (end_flag == 0) {
-                    ptr = str.skipSpace(buf, ptr);
+                    ptr = Strings.skipSpace(buf, ptr);
                     char c = (ptr < buf.length()) ? buf.charAt(ptr) : '\0';
                     switch (c) {
                         case '}':
                             if (effect_wave_tbl[no][0] == 32) {
                                 // OK.
                             } else {
-                                dispError(enmErrNum.PARAMETER_IS_LACKING.ordinal(), lptr[line].filename, line);
+                                dispError(ErrNum.PARAMETER_IS_LACKING, lptr[line].filename, line);
                                 effect_wave_tbl[no][0] = 0;
                             }
                             end_flag = 1;
@@ -3218,34 +3222,34 @@ on_error:
                                     ptr = 0;
                                 }
                             } else {
-                                dispError(enmErrNum.EFFECT_WAVE_DEFINITION_IS_WRONG.ordinal(), lptr[line].filename, line + offset);
+                                dispError(ErrNum.EFFECT_WAVE_DEFINITION_IS_WRONG, lptr[line].filename, line + offset);
                                 effect_wave_tbl[no][0] = 0;
                                 line += offset;
                                 end_flag = 1;
                             }
                             break;
                         default:
-                            num = str.asc2Int(buf, ptr, /* ref */ cnt);
+                            num = Strings.asc2Int(buf, ptr, /* ref */ cnt);
                             if (cnt[0] != 0 && (0 <= num && num <= 7)) {
                                 effect_wave_tbl[no][i] = num;
                                 effect_wave_tbl[no][0]++;
                                 ptr += cnt[0];
                                 i++;
                                 if (i > 33) {
-                                    dispError(enmErrNum.EFFECT_WAVE_DEFINITION_IS_WRONG.ordinal(), lptr[line + offset].filename, line + offset);
+                                    dispError(ErrNum.EFFECT_WAVE_DEFINITION_IS_WRONG, lptr[line + offset].filename, line + offset);
                                     effect_wave_tbl[no][0] = 0;
                                     line += offset;
                                     end_flag = 1;
                                 }
                             } else {
-                                dispError(enmErrNum.EFFECT_WAVE_DEFINITION_IS_WRONG.ordinal(), lptr[line + offset].filename, line + offset);
+                                dispError(ErrNum.EFFECT_WAVE_DEFINITION_IS_WRONG, lptr[line + offset].filename, line + offset);
                                 effect_wave_tbl[no][0] = 0;
                                 line += offset;
                                 end_flag = 1;
                             }
                             break;
                     }
-                    ptr = str.skipSpace(buf, ptr);
+                    ptr = Strings.skipSpace(buf, ptr);
                     c = (ptr < buf.length()) ? buf.charAt(ptr) : '\0';
                     if (c == ',') {
                         ptr++;
@@ -3253,7 +3257,7 @@ on_error:
                 }
                 // It's a tone definition, but an error occurs when using _SAME_LINE.
             } else if (lptr[line].status == (_SET_EFFECT_WAVE | _SAME_LINE)) {
-                dispError(enmErrNum.EFFECT_WAVE_DEFINITION_IS_WRONG.ordinal(), lptr[line].filename, line);
+                dispError(ErrNum.EFFECT_WAVE_DEFINITION_IS_WRONG, lptr[line].filename, line);
                 // Include File Processing
             } else if (lptr[line].status == _INCLUDE) {
                 getEffectWave(lptr[line].inc_ptr);
@@ -3410,13 +3414,13 @@ on_error:
             if (ptr[i][0] != 0) {
                 lp_flag = 0;
                 for (j = 1; j <= ptr[i][0]; j++) {
-                    if (ptr[i][j] == enmEFTBL.LOOP.v) lp_flag = 1;
+                    if (ptr[i][j] == EFTBL.LOOP.v) lp_flag = 1;
                 }
                 if (lp_flag == 0) {
                     j = ptr[i][0];
                     ptr[i][j + 1] = ptr[i][j];
                     ptr[i][j] = ptr[i][j - 1];
-                    ptr[i][j - 1] = enmEFTBL.LOOP.v;
+                    ptr[i][j - 1] = EFTBL.LOOP.v;
                     ptr[i][0]++;
                 }
                 ret = i + 1;
@@ -3599,7 +3603,7 @@ on_error:
                     fp.add(new MmlDatum2("\n%s\n".formatted(t), -2, t));
                     x = 0;
                     for (j = 1; j <= tbl[i][0]; j++) {
-                        if (tbl[i][j] == enmEFTBL.LOOP.v) {
+                        if (tbl[i][j] == EFTBL.LOOP.v) {
                             if (x != 0) fp.add(new MmlDatum2("\n", 0));
                             t = "%s_lp_%03d:".formatted(str, i);
                             fp.add(new MmlDatum2("%s\n".formatted(t), -2, t));
@@ -4216,14 +4220,14 @@ on_error:
      * none
      */
     private void writeSongInfo(List<MmlDatum2> fp) {
-        fp.add(new MmlDatum2("; Title: %s\n".formatted(song_name), -1));
-        fp.add(new MmlDatum2("; Composer: %s\n".formatted(composer), -1));
-        fp.add(new MmlDatum2("; Maker: %s\n".formatted(maker), -1));
+        fp.add(new MmlDatum2("; Title: %s\n".formatted(song_name), 0xff));
+        fp.add(new MmlDatum2("; Composer: %s\n".formatted(composer), 0xff));
+        fp.add(new MmlDatum2("; Maker: %s\n".formatted(maker), 0xff));
 
         if (programer != null) {
-            fp.add(new MmlDatum2("; Programer: %s\n".formatted(programer), -1));
+            fp.add(new MmlDatum2("; Programmer: %s\n".formatted(programer), 0xff));
         }
-        fp.add(new MmlDatum2("\n", -1));
+        fp.add(new MmlDatum2("\n", 0xff));
     }
 
     /**
@@ -4340,17 +4344,17 @@ on_error:
         if (n != 0) {
             for (i = 0; i < n; i++) {
                 cnt[0] = 0;
-                param[i] = str.asc2Int(buf, ptr, /* ref */ cnt);
+                param[i] = Strings.asc2Int(buf, ptr, /* ref */ cnt);
                 if (cnt[0] == 0) { // If there is no parameter, replace it with a number that will cause an error.
                     param[i] = (int) PARAM_OMITTED;
                 }
                 ptr += cnt[0];
 
                 if (i < n - 1) { // If n is 2 or more, "," is inserted.
-                    ptr = str.skipSpace(buf, ptr);
+                    ptr = Strings.skipSpace(buf, ptr);
                     if (ptr < buf.length() && buf.charAt(ptr) == ',') {
                         ptr++;
-                        ptr = str.skipSpace(buf, ptr);
+                        ptr = Strings.skipSpace(buf, ptr);
                     } else { // If there is no separator ",", the parameter is omitted.
                         for (i++; i < n; i++) // Omit from next parameter
                             param[i] = (int) PARAM_OMITTED;
@@ -4388,7 +4392,7 @@ on_error:
         // Frame specification
         if (buf.charAt(ptr) == '#') {
             ptr++;
-            len[0] = str.asc2Int(buf, ptr, /* ref */ cnt);
+            len[0] = Strings.asc2Int(buf, ptr, /* ref */ cnt);
             if (cnt[0] != 0) {
                 ptr += cnt[0];
                 len[0] = len[0] / tbase;
@@ -4398,7 +4402,7 @@ on_error:
             // Count specification
         } else if (buf.charAt(ptr) == '%') {
             ptr++;
-            len[0] = str.asc2Int(buf, ptr, /* ref */ cnt);
+            len[0] = Strings.asc2Int(buf, ptr, /* ref */ cnt);
             if (cnt[0] != 0) {
                 ptr += cnt[0];
             } else {
@@ -4406,7 +4410,7 @@ on_error:
             }
             // Musical note length designation
         } else {
-            len[0] = str.asc2Int(buf, ptr, /* ref */ cnt);
+            len[0] = Strings.asc2Int(buf, ptr, /* ref */ cnt);
             if (cnt[0] != 0) {
                 ptr += cnt[0];
                 if (len[0] > 0)
@@ -4466,7 +4470,7 @@ on_error:
                 length = cmd[cmdPtr].len;
             }
         } else {
-            dispError(enmErrNum.ABNORMAL_NOTE_LENGTH_VALUE.ordinal(), cmd[cmdPtr].filename, line);
+            dispError(ErrNum.ABNORMAL_NOTE_LENGTH_VALUE, cmd[cmdPtr].filename, line);
         }
 
         return ptr;
@@ -4478,7 +4482,6 @@ on_error:
     private int setCommandBufN(CMD[] cmd, int cmdPtr, int com_no, String buf, int ptr, int line, int enable) {
         int oct_ofs, note;
         double[] len = new double[] {0};
-
         com_no += transpose;
 
         // Take measures to allow things like c+-++-++-- (not something that's usually done)
@@ -4519,7 +4522,7 @@ on_error:
 
         ptr = getLength(buf, ptr, /* ref */ len, length);
         if (len[0] <= 0) {
-            dispError(enmErrNum.ABNORMAL_NOTE_LENGTH_VALUE.ordinal(), cmd[cmdPtr].filename, line);
+            dispError(ErrNum.ABNORMAL_NOTE_LENGTH_VALUE, cmd[cmdPtr].filename, line);
             len[0] = 0.0;
         }
         if (enable != 0) {
@@ -4567,7 +4570,7 @@ on_error:
         // The default duration is 0
         ptr = getLength(buf, ptr, /* ref */ len, 0);
         if (len[0] < 0) {
-            dispError(enmErrNum.ABNORMAL_NOTE_LENGTH_VALUE.ordinal(), cmd[cmdPtr].filename, line);
+            dispError(ErrNum.ABNORMAL_NOTE_LENGTH_VALUE, cmd[cmdPtr].filename, line);
             len[0] = 0.0;
         }
 
@@ -4591,9 +4594,9 @@ on_error:
         double[] len = new double[] {0};
 
         cnt[0] = 0;
-        note = str.asc2Int(buf, ptr, /* ref */ cnt);
+        note = Strings.asc2Int(buf, ptr, /* ref */ cnt);
         if (cnt[0] == 0) {
-            dispError(enmErrNum.ABNORMAL_PITCH_VALUE.ordinal(), cmd[cmdPtr].filename, line);
+            dispError(ErrNum.ABNORMAL_PITCH_VALUE, cmd[cmdPtr].filename, line);
             return ptr + 1;
         }
         ptr += cnt[0];
@@ -4605,15 +4608,15 @@ on_error:
             note = MAX_NOTE;
         }
 
-        ptr = str.skipSpace(buf, ptr); // Skip extra spaces
+        ptr = Strings.skipSpace(buf, ptr); // Skip extra spaces
         // When there is a ",", there is a sound length.
         if (buf.charAt(ptr) == ',') {
             ptr++;
-            ptr = str.skipSpace(buf, ptr); // Skip extra spaces
+            ptr = Strings.skipSpace(buf, ptr); // Skip extra spaces
 
             ptr = getLength(buf, ptr, /* ref */ len, length);
             if (len[0] <= 0) {
-                dispError(enmErrNum.ABNORMAL_NOTE_LENGTH_VALUE.ordinal(), cmd[cmdPtr].filename, line);
+                dispError(ErrNum.ABNORMAL_NOTE_LENGTH_VALUE, cmd[cmdPtr].filename, line);
                 len[0] = 0.0;
             }
             // Use default duration when "," is not present
@@ -4640,26 +4643,26 @@ on_error:
         double[] len = new double[] {0};
 
         cnt[0] = 0;
-        freq = str.asc2Int(buf, ptr, /* ref */ cnt);
+        freq = Strings.asc2Int(buf, ptr, /* ref */ cnt);
         // Character count check
         if (cnt[0] == 0) {
-            dispError(enmErrNum.ABNORMAL_PITCH_VALUE.ordinal(), cmd[cmdPtr].filename, line);
+            dispError(ErrNum.ABNORMAL_PITCH_VALUE, cmd[cmdPtr].filename, line);
             return ptr + 1;
         }
         ptr += cnt[0];
         // Parameter Range Checking
         if (0x0008 <= freq || freq >= 0x07f2) {
-            dispError(enmErrNum.ABNORMAL_PITCH_VALUE.ordinal(), cmd[cmdPtr].filename, line);
+            dispError(ErrNum.ABNORMAL_PITCH_VALUE, cmd[cmdPtr].filename, line);
             return ptr + 1;
         }
         // If there is a ",", get the note length
-        ptr = str.skipSpace(buf, ptr);
+        ptr = Strings.skipSpace(buf, ptr);
         if (buf.charAt(ptr) == ',') {
             ptr++;
-            ptr = str.skipSpace(buf, ptr);
+            ptr = Strings.skipSpace(buf, ptr);
             ptr = getLength(buf, ptr, /* ref */ len, length);
             if (len[0] <= 0) {
-                dispError(enmErrNum.ABNORMAL_NOTE_LENGTH_VALUE.ordinal(), cmd[cmdPtr].filename, line);
+                dispError(ErrNum.ABNORMAL_NOTE_LENGTH_VALUE, cmd[cmdPtr].filename, line);
                 len[0] = 0.0;
             }
             // If there is no ",", it will default to the default length.
@@ -4690,7 +4693,7 @@ on_error:
 
         ptr = getLength(buf, ptr, /* ref */ len, length);
         if (len[0] <= 0) {
-            dispError(enmErrNum.ABNORMAL_NOTE_LENGTH_VALUE.ordinal(), cmd[cmdPtr].filename, line);
+            dispError(ErrNum.ABNORMAL_NOTE_LENGTH_VALUE, cmd[cmdPtr].filename, line);
             len[0] = 0.0;
         }
 
@@ -4716,7 +4719,7 @@ on_error:
 
         ptr = getLength(buf, ptr, /* ref */ len, length);
         if (len[0] < 0) { // With sound length 0
-            dispError(enmErrNum.ABNORMAL_NOTE_LENGTH_VALUE.ordinal(), cmd[cmdPtr].filename, line);
+            dispError(ErrNum.ABNORMAL_NOTE_LENGTH_VALUE, cmd[cmdPtr].filename, line);
             len[0] = 0.0;
         }
 
@@ -4736,7 +4739,7 @@ on_error:
      * Output:
      * none
      */
-    private CMD[] analyzeData(int trk, CMD[] cmd, /* ref */ int cmdPtr, LINE[] lptr) {
+    private CMD[] analyzeData(int trk, CMD[] cmd, /* ref */ int[] cmdPtr, Line[] lptr) {
         int i, line, com;
         int[] cnt = new int[1];
         String buf;
@@ -4752,17 +4755,17 @@ on_error:
                 buf = lptr[line].str; // .substring(ptr);
 
                 while (ptr < buf.length() && buf.charAt(ptr) != '\0') {
-                    ptr = str.skipSpace(buf, ptr); // Skip extra spaces
+                    ptr = Strings.skipSpace(buf, ptr); // Skip extra spaces
                     if (ptr == buf.length() || buf.charAt(ptr) == '\0') break; // Is this the end of the line?
                     // Search for a command
-                    for (i = 0; mml[i].num != enmMML._TRACK_END.v; i++) {
+                    for (i = 0; mml[i].num != Mml._TRACK_END.v; i++) {
                         int n = mml[i].cmd.length();
                         n = Math.min(n, buf.length() - ptr);
-                        if (mml[i].cmd.equals(buf.substring(ptr, n))) break;
+                        if (mml[i].cmd.equals(buf.substring(ptr, ptr + n))) break;
                     }
 
                     ptr += mml[i].cmd.length(); // Skip the number of characters in the command
-                    cmd[cmdPtr].filename = lptr[line].shortname; // Get file name when error occurs
+                    cmd[cmdPtr[0]].filename = lptr[line].shortname; // Get file name when error occurs
 
                     switch (mml[i].num) {
                         // note
@@ -4773,16 +4776,16 @@ on_error:
                         case _NOTE_G:
                         case _NOTE_A:
                         case _NOTE_B:
-                            ptr = setCommandBufN(cmd, cmdPtr, mml[i].num, buf, ptr, line, mml[i].check.apply(trk));
+                            ptr = setCommandBufN(cmd, cmdPtr[0], mml[i].num, buf, ptr, line, mml[i].check.apply(trk));
                             if ((mml[i].check.apply(trk)) == 0) {
-                                dispError(enmErrNum.UNUSE_COMMAND_IN_THIS_TRACK.ordinal(), lptr[line].filename, line);
+                                dispError(ErrNum.UNUSE_COMMAND_IN_THIS_TRACK, lptr[line].filename, line);
                             }
                             break;
                         default:
-                            switch (enmMML.values()[mml[i].num]) {
+                            switch (Mml.valueOf(mml[i].num)) {
                                 // octave
                                 case _OCTAVE:
-                                    com = str.asc2Int(buf, ptr, /* ref */ cnt);
+                                    com = Strings.asc2Int(buf, ptr, /* ref */ cnt);
                                     if (cnt[0] != 0) {
                                         // When the command is valid, it registers the action.
                                         if ((mml[i].check.apply(trk)) != 0) {
@@ -4804,7 +4807,7 @@ on_error:
                                             octave--;
                                         }
                                     } else {
-                                        dispError(enmErrNum.UNUSE_COMMAND_IN_THIS_TRACK.ordinal(), lptr[line].filename, line);
+                                        dispError(ErrNum.UNUSE_COMMAND_IN_THIS_TRACK, lptr[line].filename, line);
                                     }
                                     break;
                                 // Octave Down
@@ -4816,37 +4819,37 @@ on_error:
                                             octave++;
                                         }
                                     } else {
-                                        dispError(enmErrNum.UNUSE_COMMAND_IN_THIS_TRACK.ordinal(), lptr[line].filename, line);
+                                        dispError(ErrNum.UNUSE_COMMAND_IN_THIS_TRACK, lptr[line].filename, line);
                                     }
                                     break;
                                 // Sound length setting
                                 case _LENGTH:
-                                    ptr = setCommandBufL(cmd, cmdPtr, enmMML._LENGTH.v, buf, ptr, line, mml[i].check.apply(trk));
+                                    ptr = setCommandBufL(cmd, cmdPtr[0], Mml._LENGTH.v, buf, ptr, line, mml[i].check.apply(trk));
                                     if ((mml[i].check.apply(trk)) == 0) {
-                                        dispError(enmErrNum.UNUSE_COMMAND_IN_THIS_TRACK.ordinal(), lptr[line].filename, line);
+                                        dispError(ErrNum.UNUSE_COMMAND_IN_THIS_TRACK, lptr[line].filename, line);
                                     }
                                     break;
                                 // Notes (n command)
                                 case _NOTE:
-                                    ptr = setCommandBufN0(cmd, cmdPtr, buf, ptr, line, mml[i].check.apply(trk));
+                                    ptr = setCommandBufN0(cmd, cmdPtr[0], buf, ptr, line, mml[i].check.apply(trk));
                                     if ((mml[i].check.apply(trk)) == 0) {
-                                        dispError(enmErrNum.UNUSE_COMMAND_IN_THIS_TRACK.ordinal(), lptr[line].filename, line);
+                                        dispError(ErrNum.UNUSE_COMMAND_IN_THIS_TRACK, lptr[line].filename, line);
                                     }
                                     break;
                                 // Notes (@n command)
                                 case _KEY:
-                                    ptr = setCommandBufN1(cmd, cmdPtr, enmMML._KEY.v, buf, ptr, line, mml[i].check.apply(trk));
+                                    ptr = setCommandBufN1(cmd, cmdPtr[0], Mml._KEY.v, buf, ptr, line, mml[i].check.apply(trk));
                                     if ((mml[i].check.apply(trk)) == 0) {
-                                        dispError(enmErrNum.UNUSE_COMMAND_IN_THIS_TRACK.ordinal(), lptr[line].filename, line);
+                                        dispError(ErrNum.UNUSE_COMMAND_IN_THIS_TRACK, lptr[line].filename, line);
                                     }
                                     break;
                                 // Drum Bits
                                 // Drum Notes
                                 case _DRUM_BIT:
                                 case _DRUM_NOTE:
-                                    ptr = setCommandBufD(cmd, cmdPtr, mml[i].num, buf, ptr, line, mml[i].check.apply(trk));
+                                    ptr = setCommandBufD(cmd, cmdPtr[0], mml[i].num, buf, ptr, line, mml[i].check.apply(trk));
                                     if ((mml[i].check.apply(trk)) == 0) {
-                                        dispError(enmErrNum.UNUSE_COMMAND_IN_THIS_TRACK.ordinal(), lptr[line].filename, line);
+                                        dispError(ErrNum.UNUSE_COMMAND_IN_THIS_TRACK, lptr[line].filename, line);
                                     }
                                     break;
 
@@ -4855,16 +4858,16 @@ on_error:
                                 case _CONT_END:
                                 case _TIE:
                                 case _WAIT:
-                                    ptr = setCommandBufR(cmd, cmdPtr, mml[i].num, buf, ptr, line, mml[i].check.apply(trk));
+                                    ptr = setCommandBufR(cmd, cmdPtr[0], mml[i].num, buf, ptr, line, mml[i].check.apply(trk));
                                     if ((mml[i].check.apply(trk)) == 0) {
-                                        dispError(enmErrNum.UNUSE_COMMAND_IN_THIS_TRACK.ordinal(), lptr[line].filename, line);
+                                        dispError(ErrNum.UNUSE_COMMAND_IN_THIS_TRACK, lptr[line].filename, line);
                                     }
                                     break;
                                 // Key Off
                                 case _KEY_OFF:
-                                    ptr = setCommandBufK(cmd, cmdPtr, mml[i].num, buf, ptr, line, mml[i].check.apply(trk));
+                                    ptr = setCommandBufK(cmd, cmdPtr[0], mml[i].num, buf, ptr, line, mml[i].check.apply(trk));
                                     if ((mml[i].check.apply(trk)) == 0) {
-                                        dispError(enmErrNum.UNUSE_COMMAND_IN_THIS_TRACK.ordinal(), lptr[line].filename, line);
+                                        dispError(ErrNum.UNUSE_COMMAND_IN_THIS_TRACK, lptr[line].filename, line);
                                     }
                                     break;
                                 // Command parameters are 0
@@ -4883,306 +4886,306 @@ on_error:
 //                                case _SHUFFLE_QUONTIZE_OFF:
                                 case _SELF_DELAY_OFF:
                                 case _SELF_DELAY_QUEUE_RESET:
-                                    setCommandBuf(0, cmd, cmdPtr, mml[i].num, buf, ptr, line, mml[i].check.apply(trk));
+                                    setCommandBuf(0, cmd, cmdPtr[0], mml[i].num, buf, ptr, line, mml[i].check.apply(trk));
                                     if ((mml[i].check.apply(trk)) == 0) {
-                                        dispError(enmErrNum.UNUSE_COMMAND_IN_THIS_TRACK.ordinal(), lptr[line].filename, line);
+                                        dispError(ErrNum.UNUSE_COMMAND_IN_THIS_TRACK, lptr[line].filename, line);
                                     }
                                     break;
                                 case _JUMP_FLAG:
                                     use_jump = 1;
-                                    setCommandBuf(0, cmd, cmdPtr, mml[i].num, buf, ptr, line, mml[i].check.apply(trk));
+                                    setCommandBuf(0, cmd, cmdPtr[0], mml[i].num, buf, ptr, line, mml[i].check.apply(trk));
                                     if ((mml[i].check.apply(trk)) == 0) {
-                                        dispError(enmErrNum.UNUSE_COMMAND_IN_THIS_TRACK.ordinal(), lptr[line].filename, line);
+                                        dispError(ErrNum.UNUSE_COMMAND_IN_THIS_TRACK, lptr[line].filename, line);
                                     }
                                     break;
 
 
                                 // Commands with one parameter
                                 case _TEMPO: // tempo
-                                    ptr = setCommandBuf(1, cmd, cmdPtr, mml[i].num, buf, ptr, line, mml[i].check.apply(trk));
+                                    ptr = setCommandBuf(1, cmd, cmdPtr[0], mml[i].num, buf, ptr, line, mml[i].check.apply(trk));
                                     if ((mml[i].check.apply(trk)) != 0) {
-                                        if (cmd[cmdPtr].param[0] <= 0) {
-                                            dispError(enmErrNum.ABNORMAL_TEMPO_VALUE.ordinal(), lptr[line].filename, line);
-                                            cmd[cmdPtr].cmd = enmMML._NOP.v;
+                                        if (cmd[cmdPtr[0]].param[0] <= 0) {
+                                            dispError(ErrNum.ABNORMAL_TEMPO_VALUE, lptr[line].filename, line);
+                                            cmd[cmdPtr[0]].cmd = Mml._NOP.v;
                                         } else {
-                                            tbase = (double) _BASETEMPO / (double) cmd[cmdPtr].param[0];
+                                            tbase = (double) _BASETEMPO / (double) cmd[cmdPtr[0]].param[0];
                                         }
                                     } else {
-                                        dispError(enmErrNum.UNUSE_COMMAND_IN_THIS_TRACK.ordinal(), lptr[line].filename, line);
+                                        dispError(ErrNum.UNUSE_COMMAND_IN_THIS_TRACK, lptr[line].filename, line);
                                     }
                                     break;
                                 case _TONE: // Tone switching
-                                    ptr = setCommandBuf(1, cmd, cmdPtr, mml[i].num, buf, ptr, line, mml[i].check.apply(trk));
+                                    ptr = setCommandBuf(1, cmd, cmdPtr[0], mml[i].num, buf, ptr, line, mml[i].check.apply(trk));
                                     if ((mml[i].check.apply(trk)) != 0) {
                                         // Remove restrictions for vrc6 (built-in square wave, MMC5 up to @3)
                                         //if (cmd[cmdPtr].param[0] < 0 || cmd[cmdPtr].param[0] > 3) {
-                                        if (cmd[cmdPtr].param[0] < 0 || cmd[cmdPtr].param[0] > 127) {
-                                            dispError(enmErrNum.ABNORMAL_TONE_NUMBER.ordinal(), lptr[line].filename, line);
-                                            cmd[cmdPtr].cmd = 0;
-                                            cmd[cmdPtr].line = 0;
+                                        if (cmd[cmdPtr[0]].param[0] < 0 || cmd[cmdPtr[0]].param[0] > 127) {
+                                            dispError(ErrNum.ABNORMAL_TONE_NUMBER, lptr[line].filename, line);
+                                            cmd[cmdPtr[0]].cmd = 0;
+                                            cmd[cmdPtr[0]].line = 0;
                                         }
                                     } else {
-                                        dispError(enmErrNum.UNUSE_COMMAND_IN_THIS_TRACK.ordinal(), lptr[line].filename, line);
+                                        dispError(ErrNum.UNUSE_COMMAND_IN_THIS_TRACK, lptr[line].filename, line);
                                     }
                                     break;
                                 case _REL_ORG_TONE: // Release tone
                                 case _ORG_TONE:     // Tone switching
-                                    ptr = setCommandBuf(1, cmd, cmdPtr, mml[i].num, buf, ptr, line, mml[i].check.apply(trk));
+                                    ptr = setCommandBuf(1, cmd, cmdPtr[0], mml[i].num, buf, ptr, line, mml[i].check.apply(trk));
                                     if ((mml[i].check.apply(trk)) != 0) {
-                                        if ((mml[i].num == enmMML._REL_ORG_TONE.v) && (cmd[cmdPtr].param[0] == 255)) {
+                                        if ((mml[i].num == Mml._REL_ORG_TONE.v) && (cmd[cmdPtr[0]].param[0] == 255)) {
                                             // ok
-                                        } else if (cmd[cmdPtr].param[0] < 0 || cmd[cmdPtr].param[0] > 127) {
-                                            dispError(enmErrNum.ABNORMAL_TONE_NUMBER.ordinal(), lptr[line].filename, line);
-                                            cmd[cmdPtr].cmd = 0;
-                                            cmd[cmdPtr].line = 0;
+                                        } else if (cmd[cmdPtr[0]].param[0] < 0 || cmd[cmdPtr[0]].param[0] > 127) {
+                                            dispError(ErrNum.ABNORMAL_TONE_NUMBER, lptr[line].filename, line);
+                                            cmd[cmdPtr[0]].cmd = 0;
+                                            cmd[cmdPtr[0]].line = 0;
                                         }
                                     } else {
-                                        dispError(enmErrNum.UNUSE_COMMAND_IN_THIS_TRACK.ordinal(), lptr[line].filename, line);
+                                        dispError(ErrNum.UNUSE_COMMAND_IN_THIS_TRACK, lptr[line].filename, line);
                                     }
                                     break;
                                 case _ENVELOPE: // Envelope Specification
-                                    cmd[cmdPtr].filename = lptr[line].filename;
-                                    ptr = setCommandBuf(1, cmd, cmdPtr, mml[i].num, buf, ptr, line, mml[i].check.apply(trk));
+                                    cmd[cmdPtr[0]].filename = lptr[line].filename;
+                                    ptr = setCommandBuf(1, cmd, cmdPtr[0], mml[i].num, buf, ptr, line, mml[i].check.apply(trk));
                                     if ((mml[i].check.apply(trk)) != 0) {
-                                        if (cmd[cmdPtr].param[0] == 255) {
+                                        if (cmd[cmdPtr[0]].param[0] == 255) {
                                             volume_flag = 0x0000;
-                                        } else if (0 <= cmd[cmdPtr].param[0] && cmd[cmdPtr].param[0] <= 127) {
+                                        } else if (0 <= cmd[cmdPtr[0]].param[0] && cmd[cmdPtr[0]].param[0] <= 127) {
                                             volume_flag = 0x8000;
                                         } else {
-                                            dispError(enmErrNum.ABNORMAL_ENVELOPE_NUMBER.ordinal(), lptr[line].filename, line);
-                                            cmd[cmdPtr].cmd = 0;
-                                            cmd[cmdPtr].line = 0;
+                                            dispError(ErrNum.ABNORMAL_ENVELOPE_NUMBER, lptr[line].filename, line);
+                                            cmd[cmdPtr[0]].cmd = 0;
+                                            cmd[cmdPtr[0]].line = 0;
                                         }
                                     } else {
-                                        dispError(enmErrNum.UNUSE_COMMAND_IN_THIS_TRACK.ordinal(), lptr[line].filename, line);
+                                        dispError(ErrNum.UNUSE_COMMAND_IN_THIS_TRACK, lptr[line].filename, line);
                                     }
                                     break;
                                 case _REL_ENV: // Release envelope specification
-                                    cmd[cmdPtr].filename = lptr[line].filename;
-                                    ptr = setCommandBuf(1, cmd, cmdPtr, mml[i].num, buf, ptr, line, mml[i].check.apply(trk));
+                                    cmd[cmdPtr[0]].filename = lptr[line].filename;
+                                    ptr = setCommandBuf(1, cmd, cmdPtr[0], mml[i].num, buf, ptr, line, mml[i].check.apply(trk));
                                     if ((mml[i].check.apply(trk)) != 0) {
-                                        if (cmd[cmdPtr].param[0] == 255) {
+                                        if (cmd[cmdPtr[0]].param[0] == 255) {
                                             volume_flag = 0x0000;
-                                        } else if (0 <= cmd[cmdPtr].param[0] && cmd[cmdPtr].param[0] <= 127) {
+                                        } else if (0 <= cmd[cmdPtr[0]].param[0] && cmd[cmdPtr[0]].param[0] <= 127) {
                                             volume_flag = 0x8000;
                                         } else {
-                                            dispError(enmErrNum.ABNORMAL_ENVELOPE_NUMBER.ordinal(), lptr[line].filename, line);
-                                            cmd[cmdPtr].cmd = 0;
-                                            cmd[cmdPtr].line = 0;
+                                            dispError(ErrNum.ABNORMAL_ENVELOPE_NUMBER, lptr[line].filename, line);
+                                            cmd[cmdPtr[0]].cmd = 0;
+                                            cmd[cmdPtr[0]].line = 0;
                                         }
                                     } else {
-                                        dispError(enmErrNum.UNUSE_COMMAND_IN_THIS_TRACK.ordinal(), lptr[line].filename, line);
+                                        dispError(ErrNum.UNUSE_COMMAND_IN_THIS_TRACK, lptr[line].filename, line);
                                     }
                                     break;
                                 case _VOL_PLUS: // Volume setting
-                                    ptr = setCommandBuf(1, cmd, cmdPtr, mml[i].num, buf, ptr, line, mml[i].check.apply(trk));
+                                    ptr = setCommandBuf(1, cmd, cmdPtr[0], mml[i].num, buf, ptr, line, mml[i].check.apply(trk));
                                     if ((mml[i].check.apply(trk)) != 0) {
-                                        if (cmd[cmdPtr].param[0] == PARAM_OMITTED) {
-                                            cmd[cmdPtr].param[0] = 1;
+                                        if (cmd[cmdPtr[0]].param[0] == (int) PARAM_OMITTED) {
+                                            cmd[cmdPtr[0]].param[0] = 1;
                                         }
                                         if ((0 <= volume_flag && volume_flag <= MAX_VOLUME)) {
-                                            cmd[cmdPtr].cmd = enmMML._VOLUME.v;
-                                            cmd[cmdPtr].param[0] = volume_flag + cmd[cmdPtr].param[0];
-                                            if (((cmd[cmdPtr].param[0] < 0 || cmd[cmdPtr].param[0] > MAX_VOLUME))) {
-                                                dispError(enmErrNum.VOLUME_RANGE_OVER_OF_RELATIVE_VOLUME.ordinal(), lptr[line].filename, line);
-                                                cmd[cmdPtr].cmd = 0;
-                                                cmd[cmdPtr].line = 0;
+                                            cmd[cmdPtr[0]].cmd = Mml._VOLUME.v;
+                                            cmd[cmdPtr[0]].param[0] = volume_flag + cmd[cmdPtr[0]].param[0];
+                                            if (((cmd[cmdPtr[0]].param[0] < 0 || cmd[cmdPtr[0]].param[0] > MAX_VOLUME))) {
+                                                dispError(ErrNum.VOLUME_RANGE_OVER_OF_RELATIVE_VOLUME, lptr[line].filename, line);
+                                                cmd[cmdPtr[0]].cmd = 0;
+                                                cmd[cmdPtr[0]].line = 0;
                                             } else {
-                                                volume_flag = cmd[cmdPtr].param[0];
+                                                volume_flag = cmd[cmdPtr[0]].param[0];
                                             }
                                         } else {
-                                            dispError(enmErrNum.RELATIVE_VOLUME_WAS_USED_WITHOUT_SPECIFYING_VOLUME.ordinal(), lptr[line].filename, line);
-                                            cmd[cmdPtr].cmd = 0;
-                                            cmd[cmdPtr].line = 0;
+                                            dispError(ErrNum.RELATIVE_VOLUME_WAS_USED_WITHOUT_SPECIFYING_VOLUME, lptr[line].filename, line);
+                                            cmd[cmdPtr[0]].cmd = 0;
+                                            cmd[cmdPtr[0]].line = 0;
                                         }
                                     } else {
-                                        dispError(enmErrNum.UNUSE_COMMAND_IN_THIS_TRACK.ordinal(), lptr[line].filename, line);
+                                        dispError(ErrNum.UNUSE_COMMAND_IN_THIS_TRACK, lptr[line].filename, line);
                                     }
                                     break;
                                 case _VOL_MINUS: // Volume setting
-                                    ptr = setCommandBuf(1, cmd, cmdPtr, mml[i].num, buf, ptr, line, mml[i].check.apply(trk));
+                                    ptr = setCommandBuf(1, cmd, cmdPtr[0], mml[i].num, buf, ptr, line, mml[i].check.apply(trk));
                                     if ((mml[i].check.apply(trk)) != 0) {
-                                        if (cmd[cmdPtr].param[0] == PARAM_OMITTED) {
-                                            cmd[cmdPtr].param[0] = 1;
+                                        if (cmd[cmdPtr[0]].param[0] == (int) PARAM_OMITTED) {
+                                            cmd[cmdPtr[0]].param[0] = 1;
                                         }
                                         if ((0 <= volume_flag && volume_flag <= MAX_VOLUME)) {
-                                            cmd[cmdPtr].cmd = enmMML._VOLUME.v;
-                                            cmd[cmdPtr].param[0] = volume_flag - cmd[cmdPtr].param[0];
-                                            if (cmd[cmdPtr].param[0] < 0) {
-                                                dispError(enmErrNum.VOLUME_RANGE_UNDER_OF_RELATIVE_VOLUME.ordinal(), lptr[line].filename, line);
-                                                cmd[cmdPtr].cmd = 0;
-                                                cmd[cmdPtr].line = 0;
+                                            cmd[cmdPtr[0]].cmd = Mml._VOLUME.v;
+                                            cmd[cmdPtr[0]].param[0] = volume_flag - cmd[cmdPtr[0]].param[0];
+                                            if (cmd[cmdPtr[0]].param[0] < 0) {
+                                                dispError(ErrNum.VOLUME_RANGE_UNDER_OF_RELATIVE_VOLUME, lptr[line].filename, line);
+                                                cmd[cmdPtr[0]].cmd = 0;
+                                                cmd[cmdPtr[0]].line = 0;
                                             } else {
-                                                volume_flag = cmd[cmdPtr].param[0];
+                                                volume_flag = cmd[cmdPtr[0]].param[0];
                                             }
                                         } else {
-                                            dispError(enmErrNum.RELATIVE_VOLUME_WAS_USED_WITHOUT_SPECIFYING_VOLUME.ordinal(), lptr[line].filename, line);
-                                            cmd[cmdPtr].cmd = 0;
-                                            cmd[cmdPtr].line = 0;
+                                            dispError(ErrNum.RELATIVE_VOLUME_WAS_USED_WITHOUT_SPECIFYING_VOLUME, lptr[line].filename, line);
+                                            cmd[cmdPtr[0]].cmd = 0;
+                                            cmd[cmdPtr[0]].line = 0;
                                         }
                                     } else {
-                                        dispError(enmErrNum.UNUSE_COMMAND_IN_THIS_TRACK.ordinal(), lptr[line].filename, line);
+                                        dispError(ErrNum.UNUSE_COMMAND_IN_THIS_TRACK, lptr[line].filename, line);
                                     }
                                     break;
                                 case _VOLUME: // Volume setting HuSIC
-                                    ptr = setCommandBuf(1, cmd, cmdPtr, mml[i].num, buf, ptr, line, mml[i].check.apply(trk));
+                                    ptr = setCommandBuf(1, cmd, cmdPtr[0], mml[i].num, buf, ptr, line, mml[i].check.apply(trk));
                                     if ((mml[i].check.apply(trk)) != 0) {
-                                        if (((cmd[cmdPtr].param[0] < 0 || cmd[cmdPtr].param[0] > MAX_VOLUME))) {
-                                            dispError(enmErrNum.ABNORMAL_VOLUME_VALUE.ordinal(), lptr[line].filename, line);
-                                            cmd[cmdPtr].cmd = 0;
-                                            cmd[cmdPtr].line = 0;
+                                        if (((cmd[cmdPtr[0]].param[0] < 0 || cmd[cmdPtr[0]].param[0] > MAX_VOLUME))) {
+                                            dispError(ErrNum.ABNORMAL_VOLUME_VALUE, lptr[line].filename, line);
+                                            cmd[cmdPtr[0]].cmd = 0;
+                                            cmd[cmdPtr[0]].line = 0;
                                         } else {
-                                            volume_flag = cmd[cmdPtr].param[0];
+                                            volume_flag = cmd[cmdPtr[0]].param[0];
                                         }
                                     } else {
-                                        dispError(enmErrNum.UNUSE_COMMAND_IN_THIS_TRACK.ordinal(), lptr[line].filename, line);
+                                        dispError(ErrNum.UNUSE_COMMAND_IN_THIS_TRACK, lptr[line].filename, line);
                                     }
                                     break;
                                 case _HARD_ENVELOPE:
-                                    ptr = setCommandBuf(2, cmd, cmdPtr, mml[i].num, buf, ptr, line, mml[i].check.apply(trk));
+                                    ptr = setCommandBuf(2, cmd, cmdPtr[0], mml[i].num, buf, ptr, line, mml[i].check.apply(trk));
                                     if ((mml[i].check.apply(trk)) != 0) {
-                                        if ((cmd[cmdPtr].param[0] < 0 || cmd[cmdPtr].param[0] > 1)
-                                                && (cmd[cmdPtr].param[1] < 0 || cmd[cmdPtr].param[1] > 63)) {
-                                            dispError(enmErrNum.ABNORMAL_ENVELOPE_VALUE.ordinal(), lptr[line].filename, line);
-                                            cmd[cmdPtr].cmd = 0;
-                                            cmd[cmdPtr].line = 0;
+                                        if ((cmd[cmdPtr[0]].param[0] < 0 || cmd[cmdPtr[0]].param[0] > 1)
+                                                && (cmd[cmdPtr[0]].param[1] < 0 || cmd[cmdPtr[0]].param[1] > 63)) {
+                                            dispError(ErrNum.ABNORMAL_ENVELOPE_VALUE, lptr[line].filename, line);
+                                            cmd[cmdPtr[0]].cmd = 0;
+                                            cmd[cmdPtr[0]].line = 0;
                                         } else {
                                             volume_flag = 0x8000;
                                         }
                                     } else {
-                                        dispError(enmErrNum.UNUSE_COMMAND_IN_THIS_TRACK.ordinal(), lptr[line].filename, line);
+                                        dispError(ErrNum.UNUSE_COMMAND_IN_THIS_TRACK, lptr[line].filename, line);
                                     }
                                     break;
                                 case _QUONTIZE: // Quantize(length*n/gate_denom)
-                                    ptr = setCommandBuf(2, cmd, cmdPtr, mml[i].num, buf, ptr, line, mml[i].check.apply(trk));
+                                    ptr = setCommandBuf(2, cmd, cmdPtr[0], mml[i].num, buf, ptr, line, mml[i].check.apply(trk));
                                     if ((mml[i].check.apply(trk)) != 0) {
-                                        if (cmd[cmdPtr].param[1] == (int) PARAM_OMITTED) {
-                                            cmd[cmdPtr].param[1] = 0;
+                                        if (cmd[cmdPtr[0]].param[1] == (int) PARAM_OMITTED) {
+                                            cmd[cmdPtr[0]].param[1] = 0;
                                         }
-                                        if (cmd[cmdPtr].param[0] < 0
-                                                || cmd[cmdPtr].param[0] > gate_denom
-                                                || (cmd[cmdPtr].param[0] == 0 && cmd[cmdPtr].param[1] <= 0)
-                                                || (cmd[cmdPtr].param[0] == gate_denom && cmd[cmdPtr].param[1] > 0)) {
-                                            dispError(enmErrNum.ABNORMAL_QUANTIZE_VALUE.ordinal(), lptr[line].filename, line);
-                                            cmd[cmdPtr].cmd = 0;
-                                            cmd[cmdPtr].line = 0;
+                                        if (cmd[cmdPtr[0]].param[0] < 0
+                                                || cmd[cmdPtr[0]].param[0] > gate_denom
+                                                || (cmd[cmdPtr[0]].param[0] == 0 && cmd[cmdPtr[0]].param[1] <= 0)
+                                                || (cmd[cmdPtr[0]].param[0] == gate_denom && cmd[cmdPtr[0]].param[1] > 0)) {
+                                            dispError(ErrNum.ABNORMAL_QUANTIZE_VALUE, lptr[line].filename, line);
+                                            cmd[cmdPtr[0]].cmd = 0;
+                                            cmd[cmdPtr[0]].line = 0;
                                         }
                                     } else {
-                                        dispError(enmErrNum.UNUSE_COMMAND_IN_THIS_TRACK.ordinal(), lptr[line].filename, line);
+                                        dispError(ErrNum.UNUSE_COMMAND_IN_THIS_TRACK, lptr[line].filename, line);
                                     }
                                     break;
                                 case _QUONTIZE2: // Quantize(length-n)
-                                    ptr = setCommandBuf(1, cmd, cmdPtr, mml[i].num, buf, ptr, line, mml[i].check.apply(trk));
+                                    ptr = setCommandBuf(1, cmd, cmdPtr[0], mml[i].num, buf, ptr, line, mml[i].check.apply(trk));
                                     if ((mml[i].check.apply(trk)) == 0) {
-                                        dispError(enmErrNum.UNUSE_COMMAND_IN_THIS_TRACK.ordinal(), lptr[line].filename, line);
+                                        dispError(ErrNum.UNUSE_COMMAND_IN_THIS_TRACK, lptr[line].filename, line);
                                     }
                                     break;
 //#if false
 //                                case _SHUFFLE_QUONTIZE: // Shuffle Quantize Settings
 //                                    ptr = setCommandBuf(3, cmd, mml[i].num, ptr, line, mml[i].check.apply(trk));
 //                                    if ((mml[i].check.apply(trk)) != 0) {
-//                                        if (cmd[cmdPtr].param[0] <= 0
-//                                                || cmd[cmdPtr].param[1] <= 0
-//                                                || cmd[cmdPtr].param[2] <= 0
-//                                                || cmd[cmdPtr].param[0] == PARAM_OMITTED
-//                                                || cmd[cmdPtr].param[1] == PARAM_OMITTED
-//                                                || cmd[cmdPtr].param[2] == PARAM_OMITTED) {
-//                                            dispError(enmErrNum.ABNORMAL_SHUFFLE_QUANTIZE_VALUE.ordinal(), lptr[line].filename, line);
-//                                            cmd[cmdPtr].cmd = enmMML._NOP.v;
-//                                            cmd[cmdPtr].line = 0;
+//                                        if (cmd[cmdPtr[0]].param[0] <= 0
+//                                                || cmd[cmdPtr[0]].param[1] <= 0
+//                                                || cmd[cmdPtr[0]].param[2] <= 0
+//                                                || cmd[cmdPtr[0]].param[0] == PARAM_OMITTED
+//                                                || cmd[cmdPtr[0]].param[1] == PARAM_OMITTED
+//                                                || cmd[cmdPtr[0]].param[2] == PARAM_OMITTED) {
+//                                            dispError(enmErrNum.ABNORMAL_SHUFFLE_QUANTIZE_VALUE, lptr[line].filename, line);
+//                                            cmd[cmdPtr[0]].cmd = enmMML._NOP.v;
+//                                            cmd[cmdPtr[0]].line = 0;
 //                                        }
 //                                    } else {
-//                                        dispError(enmErrNum.UNUSE_COMMAND_IN_THIS_TRACK.ordinal(), lptr[line].filename, line);
+//                                        dispError(enmErrNum.UNUSE_COMMAND_IN_THIS_TRACK, lptr[line].filename, line);
 //                                    }
 //                                    break;
 //#endif
                                 case _LFO_ON: // Soft LFO
-                                    ptr = setCommandBuf(1, cmd, cmdPtr, mml[i].num, buf, ptr, line, mml[i].check.apply(trk));
+                                    ptr = setCommandBuf(1, cmd, cmdPtr[0], mml[i].num, buf, ptr, line, mml[i].check.apply(trk));
                                     if ((mml[i].check.apply(trk)) != 0) {
-                                        if ((cmd[cmdPtr].param[0] != 255)
-                                                && (cmd[cmdPtr].param[0] < 0 || cmd[cmdPtr].param[0] > 63)) {
-                                            dispError(enmErrNum.ABNORMAL_LFO_NUMBER.ordinal(), lptr[line].filename, line);
-                                            cmd[cmdPtr].cmd = 0;
-                                            cmd[cmdPtr].line = 0;
+                                        if ((cmd[cmdPtr[0]].param[0] != 255)
+                                                && (cmd[cmdPtr[0]].param[0] < 0 || cmd[cmdPtr[0]].param[0] > 63)) {
+                                            dispError(ErrNum.ABNORMAL_LFO_NUMBER, lptr[line].filename, line);
+                                            cmd[cmdPtr[0]].cmd = 0;
+                                            cmd[cmdPtr[0]].line = 0;
                                         }
                                     } else {
-                                        dispError(enmErrNum.UNUSE_COMMAND_IN_THIS_TRACK.ordinal(), lptr[line].filename, line);
+                                        dispError(ErrNum.UNUSE_COMMAND_IN_THIS_TRACK, lptr[line].filename, line);
                                     }
                                     break;
 
                                 // HuSIC
                                 case _FMLFO_SET: // LFO Trig Command
-                                    ptr = setCommandBuf(1, cmd, cmdPtr, mml[i].num, buf, ptr, line, mml[i].check.apply(trk));
+                                    ptr = setCommandBuf(1, cmd, cmdPtr[0], mml[i].num, buf, ptr, line, mml[i].check.apply(trk));
                                     if ((mml[i].check.apply(trk)) != 0) {
-                                        if (cmd[cmdPtr].param[0] < 0 || cmd[cmdPtr].param[0] > 255) {
-                                            dispError(enmErrNum.FMLFO_PARAM_IS_WRONG.ordinal(), lptr[line].filename, line);
-                                            cmd[cmdPtr].cmd = 0;
-                                            cmd[cmdPtr].line = 0;
+                                        if (cmd[cmdPtr[0]].param[0] < 0 || cmd[cmdPtr[0]].param[0] > 255) {
+                                            dispError(ErrNum.FMLFO_PARAM_IS_WRONG, lptr[line].filename, line);
+                                            cmd[cmdPtr[0]].cmd = 0;
+                                            cmd[cmdPtr[0]].line = 0;
                                         }
                                     } else {
-                                        dispWarning(enmErrNum.UNUSE_COMMAND_IN_THIS_TRACK.ordinal(), lptr[line].filename, line);
+                                        dispWarning(ErrNum.UNUSE_COMMAND_IN_THIS_TRACK, lptr[line].filename, line);
                                     }
                                     break;
                                 case _FMLFO_FRQ: // LFO Freq Command
-                                    ptr = setCommandBuf(1, cmd, cmdPtr, mml[i].num, buf, ptr, line, mml[i].check.apply(trk));
+                                    ptr = setCommandBuf(1, cmd, cmdPtr[0], mml[i].num, buf, ptr, line, mml[i].check.apply(trk));
                                     if ((mml[i].check.apply(trk)) != 0) {
-                                        if (cmd[cmdPtr].param[0] < 0 || cmd[cmdPtr].param[0] > 255) {
-                                            dispError(enmErrNum.FMLFO_PARAM_IS_WRONG.ordinal(), lptr[line].filename, line);
-                                            cmd[cmdPtr].cmd = 0;
-                                            cmd[cmdPtr].line = 0;
+                                        if (cmd[cmdPtr[0]].param[0] < 0 || cmd[cmdPtr[0]].param[0] > 255) {
+                                            dispError(ErrNum.FMLFO_PARAM_IS_WRONG, lptr[line].filename, line);
+                                            cmd[cmdPtr[0]].cmd = 0;
+                                            cmd[cmdPtr[0]].line = 0;
                                         }
                                     } else {
-                                        dispWarning(enmErrNum.UNUSE_COMMAND_IN_THIS_TRACK.ordinal(), lptr[line].filename, line);
+                                        dispWarning(ErrNum.UNUSE_COMMAND_IN_THIS_TRACK, lptr[line].filename, line);
                                     }
                                     break;
 
                                 case _NOISE_SW: // Noise Command
-                                    ptr = setCommandBuf(1, cmd, cmdPtr, mml[i].num, buf, ptr, line, mml[i].check.apply(trk));
+                                    ptr = setCommandBuf(1, cmd, cmdPtr[0], mml[i].num, buf, ptr, line, mml[i].check.apply(trk));
                                     if ((mml[i].check.apply(trk)) != 0) {
-                                        if (cmd[cmdPtr].param[0] < 0 || cmd[cmdPtr].param[0] > 1) {
-                                            dispError(enmErrNum.ABNORMAL_TONE_NUMBER.ordinal(), lptr[line].filename, line);
-                                            cmd[cmdPtr].cmd = 0;
-                                            cmd[cmdPtr].line = 0;
+                                        if (cmd[cmdPtr[0]].param[0] < 0 || cmd[cmdPtr[0]].param[0] > 1) {
+                                            dispError(ErrNum.ABNORMAL_TONE_NUMBER, lptr[line].filename, line);
+                                            cmd[cmdPtr[0]].cmd = 0;
+                                            cmd[cmdPtr[0]].line = 0;
                                         }
                                     } else {
-                                        dispWarning(enmErrNum.UNUSE_COMMAND_IN_THIS_TRACK.ordinal(), lptr[line].filename, line);
+                                        dispWarning(ErrNum.UNUSE_COMMAND_IN_THIS_TRACK, lptr[line].filename, line);
                                     }
                                     break;
                                 case _MODE_CHG: // Mode Change Command
-                                    ptr = setCommandBuf(1, cmd, cmdPtr, mml[i].num, buf, ptr, line, mml[i].check.apply(trk));
+                                    ptr = setCommandBuf(1, cmd, cmdPtr[0], mml[i].num, buf, ptr, line, mml[i].check.apply(trk));
                                     if ((mml[i].check.apply(trk)) != 0) {
-                                        if (cmd[cmdPtr].param[0] < 0) {
-                                            dispError(enmErrNum.ABNORMAL_TONE_NUMBER.ordinal(), lptr[line].filename, line);
-                                            cmd[cmdPtr].cmd = 0;
-                                            cmd[cmdPtr].line = 0;
+                                        if (cmd[cmdPtr[0]].param[0] < 0) {
+                                            dispError(ErrNum.ABNORMAL_TONE_NUMBER, lptr[line].filename, line);
+                                            cmd[cmdPtr[0]].cmd = 0;
+                                            cmd[cmdPtr[0]].line = 0;
                                         }
                                     } else {
-                                        dispWarning(enmErrNum.UNUSE_COMMAND_IN_THIS_TRACK.ordinal(), lptr[line].filename, line);
+                                        dispWarning(ErrNum.UNUSE_COMMAND_IN_THIS_TRACK, lptr[line].filename, line);
                                     }
                                     break;
                                 case _WAVE_CHG: // Wave Change Command
-                                    ptr = setCommandBuf(1, cmd, cmdPtr, mml[i].num, buf, ptr, line, mml[i].check.apply(trk));
+                                    ptr = setCommandBuf(1, cmd, cmdPtr[0], mml[i].num, buf, ptr, line, mml[i].check.apply(trk));
                                     if ((mml[i].check.apply(trk)) != 0) {
-                                        if (cmd[cmdPtr].param[0] < 0) {
-                                            dispError(enmErrNum.ABNORMAL_TONE_NUMBER.ordinal(), lptr[line].filename, line);
-                                            cmd[cmdPtr].cmd = 0;
-                                            cmd[cmdPtr].line = 0;
+                                        if (cmd[cmdPtr[0]].param[0] < 0) {
+                                            dispError(ErrNum.ABNORMAL_TONE_NUMBER, lptr[line].filename, line);
+                                            cmd[cmdPtr[0]].cmd = 0;
+                                            cmd[cmdPtr[0]].line = 0;
                                         }
                                     } else {
-                                        dispWarning(enmErrNum.UNUSE_COMMAND_IN_THIS_TRACK.ordinal(), lptr[line].filename, line);
+                                        dispWarning(ErrNum.UNUSE_COMMAND_IN_THIS_TRACK, lptr[line].filename, line);
                                     }
                                     break;
 
                                 case _PAN: // PAN Command
-                                    ptr = setCommandBuf(1, cmd, cmdPtr, mml[i].num, buf, ptr, line, mml[i].check.apply(trk));
+                                    ptr = setCommandBuf(1, cmd, cmdPtr[0], mml[i].num, buf, ptr, line, mml[i].check.apply(trk));
                                     if ((mml[i].check.apply(trk)) != 0) {
-                                        if (cmd[cmdPtr].param[0] < 0 || cmd[cmdPtr].param[0] > 255) {
-                                            dispError(enmErrNum.ABNORMAL_VOLUME_VALUE.ordinal(), lptr[line].filename, line);
-                                            cmd[cmdPtr].cmd = 0;
-                                            cmd[cmdPtr].line = 0;
+                                        if (cmd[cmdPtr[0]].param[0] < 0 || cmd[cmdPtr[0]].param[0] > 255) {
+                                            dispError(ErrNum.ABNORMAL_VOLUME_VALUE, lptr[line].filename, line);
+                                            cmd[cmdPtr[0]].cmd = 0;
+                                            cmd[cmdPtr[0]].line = 0;
                                         }
                                     } else {
-                                        dispWarning(enmErrNum.UNUSE_COMMAND_IN_THIS_TRACK.ordinal(), lptr[line].filename, line);
+                                        dispWarning(ErrNum.UNUSE_COMMAND_IN_THIS_TRACK, lptr[line].filename, line);
                                     }
                                     break;
 
@@ -5190,372 +5193,372 @@ on_error:
                                 case _R_PAN: // Right PAN Command
                                 case _C_PAN: // Center PAN Command
 
-                                    ptr = setCommandBuf(1, cmd, cmdPtr, mml[i].num, buf, ptr, line, mml[i].check.apply(trk));
+                                    ptr = setCommandBuf(1, cmd, cmdPtr[0], mml[i].num, buf, ptr, line, mml[i].check.apply(trk));
                                     if ((mml[i].check.apply(trk)) != 0) {
-                                        if (cmd[cmdPtr].param[0] < 0 || cmd[cmdPtr].param[0] > 15) {
-                                            dispError(enmErrNum.ABNORMAL_VOLUME_VALUE.ordinal(), lptr[line].filename, line);
-                                            cmd[cmdPtr].cmd = 0;
-                                            cmd[cmdPtr].line = 0;
+                                        if (cmd[cmdPtr[0]].param[0] < 0 || cmd[cmdPtr[0]].param[0] > 15) {
+                                            dispError(ErrNum.ABNORMAL_VOLUME_VALUE, lptr[line].filename, line);
+                                            cmd[cmdPtr[0]].cmd = 0;
+                                            cmd[cmdPtr[0]].line = 0;
                                         }
                                     } else {
-                                        dispWarning(enmErrNum.UNUSE_COMMAND_IN_THIS_TRACK.ordinal(), lptr[line].filename, line);
+                                        dispWarning(ErrNum.UNUSE_COMMAND_IN_THIS_TRACK, lptr[line].filename, line);
                                     }
                                     break;
                                 // ----
 
                                 case _REVERB_SET: // Reverb command
-                                    ptr = setCommandBuf(1, cmd, cmdPtr, mml[i].num, buf, ptr, line, mml[i].check.apply(trk));
+                                    ptr = setCommandBuf(1, cmd, cmdPtr[0], mml[i].num, buf, ptr, line, mml[i].check.apply(trk));
                                     if ((mml[i].check.apply(trk)) != 0) {
-                                        if (cmd[cmdPtr].param[0] < 0) {
-                                            dispError(enmErrNum.ABNORMAL_PARAMETERS.ordinal(), lptr[line].filename, line);
-                                            cmd[cmdPtr].cmd = 0;
-                                            cmd[cmdPtr].line = 0;
+                                        if (cmd[cmdPtr[0]].param[0] < 0) {
+                                            dispError(ErrNum.ABNORMAL_PARAMETERS, lptr[line].filename, line);
+                                            cmd[cmdPtr[0]].cmd = 0;
+                                            cmd[cmdPtr[0]].line = 0;
                                         }
                                     } else {
-                                        dispWarning(enmErrNum.UNUSE_COMMAND_IN_THIS_TRACK.ordinal(), lptr[line].filename, line);
+                                        dispWarning(ErrNum.UNUSE_COMMAND_IN_THIS_TRACK, lptr[line].filename, line);
                                     }
                                     break;
 
                                 case _DAMP_SET: // Damp command
-                                    ptr = setCommandBuf(1, cmd, cmdPtr, mml[i].num, buf, ptr, line, mml[i].check.apply(trk));
+                                    ptr = setCommandBuf(1, cmd, cmdPtr[0], mml[i].num, buf, ptr, line, mml[i].check.apply(trk));
                                     if ((mml[i].check.apply(trk)) != 0) {
-                                        if (cmd[cmdPtr].param[0] < 0) {
-                                            dispError(enmErrNum.ABNORMAL_PARAMETERS.ordinal(), lptr[line].filename, line);
-                                            cmd[cmdPtr].cmd = 0;
-                                            cmd[cmdPtr].line = 0;
+                                        if (cmd[cmdPtr[0]].param[0] < 0) {
+                                            dispError(ErrNum.ABNORMAL_PARAMETERS, lptr[line].filename, line);
+                                            cmd[cmdPtr[0]].cmd = 0;
+                                            cmd[cmdPtr[0]].line = 0;
                                         }
                                     } else {
-                                        dispWarning(enmErrNum.UNUSE_COMMAND_IN_THIS_TRACK.ordinal(), lptr[line].filename, line);
+                                        dispWarning(ErrNum.UNUSE_COMMAND_IN_THIS_TRACK, lptr[line].filename, line);
                                     }
                                     break;
 
                                 case _SET_OPBASE: // opbase command
-                                    ptr = setCommandBuf(1, cmd, cmdPtr, mml[i].num, buf, ptr, line, mml[i].check.apply(trk));
+                                    ptr = setCommandBuf(1, cmd, cmdPtr[0], mml[i].num, buf, ptr, line, mml[i].check.apply(trk));
                                     if ((mml[i].check.apply(trk)) != 0) {
-                                        if (cmd[cmdPtr].param[0] < 0) {
-                                            dispError(enmErrNum.ABNORMAL_PARAMETERS.ordinal(), lptr[line].filename, line);
-                                            cmd[cmdPtr].cmd = 0;
-                                            cmd[cmdPtr].line = 0;
+                                        if (cmd[cmdPtr[0]].param[0] < 0) {
+                                            dispError(ErrNum.ABNORMAL_PARAMETERS, lptr[line].filename, line);
+                                            cmd[cmdPtr[0]].cmd = 0;
+                                            cmd[cmdPtr[0]].line = 0;
                                         }
                                     } else {
-                                        dispWarning(enmErrNum.UNUSE_COMMAND_IN_THIS_TRACK.ordinal(), lptr[line].filename, line);
+                                        dispWarning(ErrNum.UNUSE_COMMAND_IN_THIS_TRACK, lptr[line].filename, line);
                                     }
                                     break;
 
                                 case _LOAD_OP2: // Load op2 command
-                                    ptr = setCommandBuf(1, cmd, cmdPtr, mml[i].num, buf, ptr, line, mml[i].check.apply(trk));
+                                    ptr = setCommandBuf(1, cmd, cmdPtr[0], mml[i].num, buf, ptr, line, mml[i].check.apply(trk));
                                     if ((mml[i].check.apply(trk)) != 0) {
-                                        if (cmd[cmdPtr].param[0] < 0) {
-                                            dispError(enmErrNum.ABNORMAL_PARAMETERS.ordinal(), lptr[line].filename, line);
-                                            cmd[cmdPtr].cmd = 0;
-                                            cmd[cmdPtr].line = 0;
+                                        if (cmd[cmdPtr[0]].param[0] < 0) {
+                                            dispError(ErrNum.ABNORMAL_PARAMETERS, lptr[line].filename, line);
+                                            cmd[cmdPtr[0]].cmd = 0;
+                                            cmd[cmdPtr[0]].line = 0;
                                         }
                                     } else {
-                                        dispWarning(enmErrNum.UNUSE_COMMAND_IN_THIS_TRACK.ordinal(), lptr[line].filename, line);
+                                        dispWarning(ErrNum.UNUSE_COMMAND_IN_THIS_TRACK, lptr[line].filename, line);
                                     }
                                     break;
 
                                 case _SET_TVP: // TVP command
-                                    ptr = setCommandBuf(1, cmd, cmdPtr, mml[i].num, buf, ptr, line, mml[i].check.apply(trk));
+                                    ptr = setCommandBuf(1, cmd, cmdPtr[0], mml[i].num, buf, ptr, line, mml[i].check.apply(trk));
                                     if ((mml[i].check.apply(trk)) != 0) {
-                                        if (cmd[cmdPtr].param[0] < 0) {
-                                            dispError(enmErrNum.ABNORMAL_PARAMETERS.ordinal(), lptr[line].filename, line);
-                                            cmd[cmdPtr].cmd = 0;
-                                            cmd[cmdPtr].line = 0;
+                                        if (cmd[cmdPtr[0]].param[0] < 0) {
+                                            dispError(ErrNum.ABNORMAL_PARAMETERS, lptr[line].filename, line);
+                                            cmd[cmdPtr[0]].cmd = 0;
+                                            cmd[cmdPtr[0]].line = 0;
                                         }
                                     } else {
-                                        dispWarning(enmErrNum.UNUSE_COMMAND_IN_THIS_TRACK.ordinal(), lptr[line].filename, line);
+                                        dispWarning(ErrNum.UNUSE_COMMAND_IN_THIS_TRACK, lptr[line].filename, line);
                                     }
                                     break;
                                 case _DRUM_SW: // drum command
-                                    ptr = setCommandBuf(1, cmd, cmdPtr, mml[i].num, buf, ptr, line, mml[i].check.apply(trk));
+                                    ptr = setCommandBuf(1, cmd, cmdPtr[0], mml[i].num, buf, ptr, line, mml[i].check.apply(trk));
                                     if ((mml[i].check.apply(trk)) != 0) {
-                                        if (cmd[cmdPtr].param[0] < 0) {
-                                            dispError(enmErrNum.ABNORMAL_PARAMETERS.ordinal(), lptr[line].filename, line);
-                                            cmd[cmdPtr].cmd = 0;
-                                            cmd[cmdPtr].line = 0;
+                                        if (cmd[cmdPtr[0]].param[0] < 0) {
+                                            dispError(ErrNum.ABNORMAL_PARAMETERS, lptr[line].filename, line);
+                                            cmd[cmdPtr[0]].cmd = 0;
+                                            cmd[cmdPtr[0]].line = 0;
                                         }
                                     } else {
-                                        dispWarning(enmErrNum.UNUSE_COMMAND_IN_THIS_TRACK.ordinal(), lptr[line].filename, line);
+                                        dispWarning(ErrNum.UNUSE_COMMAND_IN_THIS_TRACK, lptr[line].filename, line);
                                     }
                                     break;
                                 case _SET_FBS: // FBS command
-                                    ptr = setCommandBuf(1, cmd, cmdPtr, mml[i].num, buf, ptr, line, mml[i].check.apply(trk));
+                                    ptr = setCommandBuf(1, cmd, cmdPtr[0], mml[i].num, buf, ptr, line, mml[i].check.apply(trk));
                                     if ((mml[i].check.apply(trk)) != 0) {
-                                        if (cmd[cmdPtr].param[0] < 0) {
-                                            dispError(enmErrNum.ABNORMAL_PARAMETERS.ordinal(), lptr[line].filename, line);
-                                            cmd[cmdPtr].cmd = 0;
-                                            cmd[cmdPtr].line = 0;
+                                        if (cmd[cmdPtr[0]].param[0] < 0) {
+                                            dispError(ErrNum.ABNORMAL_PARAMETERS, lptr[line].filename, line);
+                                            cmd[cmdPtr[0]].cmd = 0;
+                                            cmd[cmdPtr[0]].line = 0;
                                         }
                                     } else {
-                                        dispWarning(enmErrNum.UNUSE_COMMAND_IN_THIS_TRACK.ordinal(), lptr[line].filename, line);
+                                        dispWarning(ErrNum.UNUSE_COMMAND_IN_THIS_TRACK, lptr[line].filename, line);
                                     }
                                     break;
                                 case _SET_OPM: // opmode command
-                                    ptr = setCommandBuf(1, cmd, cmdPtr, mml[i].num, buf, ptr, line, mml[i].check.apply(trk));
+                                    ptr = setCommandBuf(1, cmd, cmdPtr[0], mml[i].num, buf, ptr, line, mml[i].check.apply(trk));
                                     if ((mml[i].check.apply(trk)) != 0) {
-                                        if (cmd[cmdPtr].param[0] < 0) {
-                                            dispError(enmErrNum.ABNORMAL_PARAMETERS.ordinal(), lptr[line].filename, line);
-                                            cmd[cmdPtr].cmd = 0;
-                                            cmd[cmdPtr].line = 0;
+                                        if (cmd[cmdPtr[0]].param[0] < 0) {
+                                            dispError(ErrNum.ABNORMAL_PARAMETERS, lptr[line].filename, line);
+                                            cmd[cmdPtr[0]].cmd = 0;
+                                            cmd[cmdPtr[0]].line = 0;
                                         }
                                     } else {
-                                        dispWarning(enmErrNum.UNUSE_COMMAND_IN_THIS_TRACK.ordinal(), lptr[line].filename, line);
+                                        dispWarning(ErrNum.UNUSE_COMMAND_IN_THIS_TRACK, lptr[line].filename, line);
                                     }
                                     break;
 
                                 // ----
 
                                 case _EP_ON: // Pitch Envelope
-                                    ptr = setCommandBuf(1, cmd, cmdPtr, mml[i].num, buf, ptr, line, mml[i].check.apply(trk));
+                                    ptr = setCommandBuf(1, cmd, cmdPtr[0], mml[i].num, buf, ptr, line, mml[i].check.apply(trk));
                                     if ((mml[i].check.apply(trk)) != 0) {
-                                        if ((cmd[cmdPtr].param[0] != 255)
-                                                && (cmd[cmdPtr].param[0] < 0 || cmd[cmdPtr].param[0] > 127)) {
-                                            dispError(enmErrNum.ABNORMAL_PITCH_ENVELOPE_NUMBER.ordinal(), lptr[line].filename, line);
-                                            cmd[cmdPtr].cmd = 0;
-                                            cmd[cmdPtr].line = 0;
+                                        if ((cmd[cmdPtr[0]].param[0] != 255)
+                                                && (cmd[cmdPtr[0]].param[0] < 0 || cmd[cmdPtr[0]].param[0] > 127)) {
+                                            dispError(ErrNum.ABNORMAL_PITCH_ENVELOPE_NUMBER, lptr[line].filename, line);
+                                            cmd[cmdPtr[0]].cmd = 0;
+                                            cmd[cmdPtr[0]].line = 0;
                                         }
                                     } else {
-                                        dispError(enmErrNum.UNUSE_COMMAND_IN_THIS_TRACK.ordinal(), lptr[line].filename, line);
+                                        dispError(ErrNum.UNUSE_COMMAND_IN_THIS_TRACK, lptr[line].filename, line);
                                     }
                                     break;
                                 case _EN_ON: // Note Envelope
-                                    ptr = setCommandBuf(1, cmd, cmdPtr, mml[i].num, buf, ptr, line, mml[i].check.apply(trk));
+                                    ptr = setCommandBuf(1, cmd, cmdPtr[0], mml[i].num, buf, ptr, line, mml[i].check.apply(trk));
                                     if ((mml[i].check.apply(trk)) != 0) {
-                                        if ((cmd[cmdPtr].param[0] != 255)
-                                                && (cmd[cmdPtr].param[0] < 0 || cmd[cmdPtr].param[0] > 127)) {
-                                            dispError(enmErrNum.ABNORMAL_NOTE_ENVELOPE_NUMBER.ordinal(), lptr[line].filename, line);
-                                            cmd[cmdPtr].cmd = 0;
-                                            cmd[cmdPtr].line = 0;
+                                        if ((cmd[cmdPtr[0]].param[0] != 255)
+                                                && (cmd[cmdPtr[0]].param[0] < 0 || cmd[cmdPtr[0]].param[0] > 127)) {
+                                            dispError(ErrNum.ABNORMAL_NOTE_ENVELOPE_NUMBER, lptr[line].filename, line);
+                                            cmd[cmdPtr[0]].cmd = 0;
+                                            cmd[cmdPtr[0]].line = 0;
                                         }
                                     } else {
-                                        dispError(enmErrNum.UNUSE_COMMAND_IN_THIS_TRACK.ordinal(), lptr[line].filename, line);
+                                        dispError(ErrNum.UNUSE_COMMAND_IN_THIS_TRACK, lptr[line].filename, line);
                                     }
                                     break;
                                 case _MH_ON: // Hardware Effects
-                                    ptr = setCommandBuf(1, cmd, cmdPtr, mml[i].num, buf, ptr, line, mml[i].check.apply(trk));
+                                    ptr = setCommandBuf(1, cmd, cmdPtr[0], mml[i].num, buf, ptr, line, mml[i].check.apply(trk));
                                     if ((mml[i].check.apply(trk)) != 0) {
-                                        if ((cmd[cmdPtr].param[0] != 255)
-                                                && (cmd[cmdPtr].param[0] < 0 || cmd[cmdPtr].param[0] > 15)) {
-                                            dispError(enmErrNum.ABNORMAL_HARD_EFFECT_NUMBER.ordinal(), lptr[line].filename, line);
-                                            cmd[cmdPtr].cmd = 0;
-                                            cmd[cmdPtr].line = 0;
+                                        if ((cmd[cmdPtr[0]].param[0] != 255)
+                                                && (cmd[cmdPtr[0]].param[0] < 0 || cmd[cmdPtr[0]].param[0] > 15)) {
+                                            dispError(ErrNum.ABNORMAL_HARD_EFFECT_NUMBER, lptr[line].filename, line);
+                                            cmd[cmdPtr[0]].cmd = 0;
+                                            cmd[cmdPtr[0]].line = 0;
                                         }
                                     } else {
-                                        dispError(enmErrNum.UNUSE_COMMAND_IN_THIS_TRACK.ordinal(), lptr[line].filename, line);
+                                        dispError(ErrNum.UNUSE_COMMAND_IN_THIS_TRACK, lptr[line].filename, line);
                                     }
                                     break;
                                 case _DETUNE: // Detune
-                                    ptr = setCommandBuf(1, cmd, cmdPtr, mml[i].num, buf, ptr, line, mml[i].check.apply(trk));
+                                    ptr = setCommandBuf(1, cmd, cmdPtr[0], mml[i].num, buf, ptr, line, mml[i].check.apply(trk));
                                     if ((mml[i].check.apply(trk)) != 0) {
                                         // Pitch direction correction
-                                        if (cmd[cmdPtr].param[0] != 255 && pitch_correction != 0)
-                                            cmd[cmdPtr].param[0] = 0 - cmd[cmdPtr].param[0];
+                                        if (cmd[cmdPtr[0]].param[0] != 255 && pitch_correction != 0)
+                                            cmd[cmdPtr[0]].param[0] = 0 - cmd[cmdPtr[0]].param[0];
 
-                                        if ((cmd[cmdPtr].param[0] != 255)
-                                                && (cmd[cmdPtr].param[0] < -127 || cmd[cmdPtr].param[0] > 126)) {
-                                            dispError(enmErrNum.ABNORMAL_DETUNE_VALUE.ordinal(), lptr[line].filename, line);
-                                            cmd[cmdPtr].cmd = 0;
-                                            cmd[cmdPtr].line = 0;
+                                        if ((cmd[cmdPtr[0]].param[0] != 255)
+                                                && (cmd[cmdPtr[0]].param[0] < -127 || cmd[cmdPtr[0]].param[0] > 126)) {
+                                            dispError(ErrNum.ABNORMAL_DETUNE_VALUE, lptr[line].filename, line);
+                                            cmd[cmdPtr[0]].cmd = 0;
+                                            cmd[cmdPtr[0]].line = 0;
                                         }
                                     } else {
-                                        dispError(enmErrNum.UNUSE_COMMAND_IN_THIS_TRACK.ordinal(), lptr[line].filename, line);
+                                        dispError(ErrNum.UNUSE_COMMAND_IN_THIS_TRACK, lptr[line].filename, line);
                                     }
                                     break;
                                 case _TRANSPOSE: // Transpose
-                                    ptr = setCommandBuf(1, cmd, cmdPtr, mml[i].num, buf, ptr, line, mml[i].check.apply(trk));
+                                    ptr = setCommandBuf(1, cmd, cmdPtr[0], mml[i].num, buf, ptr, line, mml[i].check.apply(trk));
                                     if ((mml[i].check.apply(trk)) != 0) {
-                                        if ((cmd[cmdPtr].param[0] != 255)
-                                                && (cmd[cmdPtr].param[0] < -127 || cmd[cmdPtr].param[0] > 126)) {
-                                            dispError(enmErrNum.ABNORMAL_TRANSPOSE_VALUE.ordinal(), lptr[line].filename, line);
-                                            cmd[cmdPtr].cmd = 0;
-                                            cmd[cmdPtr].line = 0;
+                                        if ((cmd[cmdPtr[0]].param[0] != 255)
+                                                && (cmd[cmdPtr[0]].param[0] < -127 || cmd[cmdPtr[0]].param[0] > 126)) {
+                                            dispError(ErrNum.ABNORMAL_TRANSPOSE_VALUE, lptr[line].filename, line);
+                                            cmd[cmdPtr[0]].cmd = 0;
+                                            cmd[cmdPtr[0]].line = 0;
                                         }
-                                        transpose = cmd[cmdPtr].param[0];
+                                        transpose = cmd[cmdPtr[0]].param[0];
                                     } else {
-                                        dispError(enmErrNum.UNUSE_COMMAND_IN_THIS_TRACK.ordinal(), lptr[line].filename, line);
+                                        dispError(ErrNum.UNUSE_COMMAND_IN_THIS_TRACK, lptr[line].filename, line);
                                     }
                                     break;
                                 case _REPEAT_END: // Repeat End
                                 case _REPEAT_END2: // Repeat End
-                                    ptr = setCommandBuf(1, cmd, cmdPtr, mml[i].num, buf, ptr, line, mml[i].check.apply(trk));
+                                    ptr = setCommandBuf(1, cmd, cmdPtr[0], mml[i].num, buf, ptr, line, mml[i].check.apply(trk));
                                     if ((mml[i].check.apply(trk)) != 0) {
-                                        if (cmd[cmdPtr].param[0] < 2) {
-                                            dispError(enmErrNum.ABNORMAL_VALUE_OF_REPEAT_COUNT.ordinal(), lptr[line].filename, line);
-                                            cmd[cmdPtr].param[0] = 2;
+                                        if (cmd[cmdPtr[0]].param[0] < 2) {
+                                            dispError(ErrNum.ABNORMAL_VALUE_OF_REPEAT_COUNT, lptr[line].filename, line);
+                                            cmd[cmdPtr[0]].param[0] = 2;
                                         }
                                     } else {
-                                        dispError(enmErrNum.UNUSE_COMMAND_IN_THIS_TRACK.ordinal(), lptr[line].filename, line);
+                                        dispError(ErrNum.UNUSE_COMMAND_IN_THIS_TRACK, lptr[line].filename, line);
                                     }
                                     break;
                                 case _VRC7_TONE: // VRC7 User Tone Switching
-                                    ptr = setCommandBuf(1, cmd, cmdPtr, mml[i].num, buf, ptr, line, mml[i].check.apply(trk));
+                                    ptr = setCommandBuf(1, cmd, cmdPtr[0], mml[i].num, buf, ptr, line, mml[i].check.apply(trk));
                                     if ((mml[i].check.apply(trk)) != 0) {
-                                        if (cmd[cmdPtr].param[0] < 0 || cmd[cmdPtr].param[0] > 63) {
-                                            dispError(enmErrNum.ABNORMAL_TONE_NUMBER.ordinal(), lptr[line].filename, line);
-                                            cmd[cmdPtr].cmd = 0;
-                                            cmd[cmdPtr].line = 0;
+                                        if (cmd[cmdPtr[0]].param[0] < 0 || cmd[cmdPtr[0]].param[0] > 63) {
+                                            dispError(ErrNum.ABNORMAL_TONE_NUMBER, lptr[line].filename, line);
+                                            cmd[cmdPtr[0]].cmd = 0;
+                                            cmd[cmdPtr[0]].line = 0;
                                         }
                                     } else {
-                                        dispError(enmErrNum.UNUSE_COMMAND_IN_THIS_TRACK.ordinal(), lptr[line].filename, line);
+                                        dispError(ErrNum.UNUSE_COMMAND_IN_THIS_TRACK, lptr[line].filename, line);
                                     }
                                     break;
                                 case _SUN5B_HARD_SPEED: // PSG Hardware Envelope Speed
-                                    ptr = setCommandBuf(1, cmd, cmdPtr, mml[i].num, buf, ptr, line, mml[i].check.apply(trk));
+                                    ptr = setCommandBuf(1, cmd, cmdPtr[0], mml[i].num, buf, ptr, line, mml[i].check.apply(trk));
                                     if ((mml[i].check.apply(trk)) != 0) {
-                                        if (cmd[cmdPtr].param[0] < 0 || cmd[cmdPtr].param[0] > 65535) {
-                                            dispError(enmErrNum.ABNORMAL_ENVELOPE_VALUE.ordinal(), lptr[line].filename, line);
-                                            cmd[cmdPtr].cmd = 0;
-                                            cmd[cmdPtr].line = 0;
+                                        if (cmd[cmdPtr[0]].param[0] < 0 || cmd[cmdPtr[0]].param[0] > 65535) {
+                                            dispError(ErrNum.ABNORMAL_ENVELOPE_VALUE, lptr[line].filename, line);
+                                            cmd[cmdPtr[0]].cmd = 0;
+                                            cmd[cmdPtr[0]].line = 0;
                                         }
                                     } else {
-                                        dispError(enmErrNum.UNUSE_COMMAND_IN_THIS_TRACK.ordinal(), lptr[line].filename, line);
+                                        dispError(ErrNum.UNUSE_COMMAND_IN_THIS_TRACK, lptr[line].filename, line);
                                     }
                                     break;
                                 case _SUN5B_HARD_ENV: // PSG Hardware Envelope Selection
-                                    ptr = setCommandBuf(1, cmd, cmdPtr, mml[i].num, buf, ptr, line, mml[i].check.apply(trk));
+                                    ptr = setCommandBuf(1, cmd, cmdPtr[0], mml[i].num, buf, ptr, line, mml[i].check.apply(trk));
                                     if ((mml[i].check.apply(trk)) != 0) {
-                                        if (cmd[cmdPtr].param[0] < 0 || cmd[cmdPtr].param[0] > 15) {
-                                            dispError(enmErrNum.ABNORMAL_ENVELOPE_VALUE.ordinal(), lptr[line].filename, line);
-                                            cmd[cmdPtr].cmd = 0;
-                                            cmd[cmdPtr].line = 0;
+                                        if (cmd[cmdPtr[0]].param[0] < 0 || cmd[cmdPtr[0]].param[0] > 15) {
+                                            dispError(ErrNum.ABNORMAL_ENVELOPE_VALUE, lptr[line].filename, line);
+                                            cmd[cmdPtr[0]].cmd = 0;
+                                            cmd[cmdPtr[0]].line = 0;
                                         } else {
                                             volume_flag = 0x8000;
                                         }
                                     } else {
-                                        dispError(enmErrNum.UNUSE_COMMAND_IN_THIS_TRACK.ordinal(), lptr[line].filename, line);
+                                        dispError(ErrNum.UNUSE_COMMAND_IN_THIS_TRACK, lptr[line].filename, line);
                                     }
                                     break;
                                 case _SUN5B_NOISE_FREQ: // PSG Noise Frequency
-                                    ptr = setCommandBuf(1, cmd, cmdPtr, mml[i].num, buf, ptr, line, mml[i].check.apply(trk));
+                                    ptr = setCommandBuf(1, cmd, cmdPtr[0], mml[i].num, buf, ptr, line, mml[i].check.apply(trk));
                                     if ((mml[i].check.apply(trk)) != 0) {
-                                        if (cmd[cmdPtr].param[0] < 0 || cmd[cmdPtr].param[0] > 31) {
-                                            dispError(enmErrNum.ABNORMAL_PITCH_VALUE.ordinal(), lptr[line].filename, line);
-                                            cmd[cmdPtr].cmd = 0;
-                                            cmd[cmdPtr].line = 0;
+                                        if (cmd[cmdPtr[0]].param[0] < 0 || cmd[cmdPtr[0]].param[0] > 31) {
+                                            dispError(ErrNum.ABNORMAL_PITCH_VALUE, lptr[line].filename, line);
+                                            cmd[cmdPtr[0]].cmd = 0;
+                                            cmd[cmdPtr[0]].line = 0;
                                         } else {
                                             volume_flag = 0x8000;
                                         }
                                     } else {
-                                        dispError(enmErrNum.UNUSE_COMMAND_IN_THIS_TRACK.ordinal(), lptr[line].filename, line);
+                                        dispError(ErrNum.UNUSE_COMMAND_IN_THIS_TRACK, lptr[line].filename, line);
                                     }
                                     break;
                                 case _TEMPO2: // Frame Based Tempo
-                                    ptr = setCommandBuf(2, cmd, cmdPtr, mml[i].num, buf, ptr, line, mml[i].check.apply(trk));
+                                    ptr = setCommandBuf(2, cmd, cmdPtr[0], mml[i].num, buf, ptr, line, mml[i].check.apply(trk));
                                     if ((mml[i].check.apply(trk)) != 0) {
-                                        if ((cmd[cmdPtr].param[0] <= 0) || (cmd[cmdPtr].param[1] <= 0)) {
-                                            dispError(enmErrNum.ABNORMAL_TEMPO_VALUE.ordinal(), lptr[line].filename, line);
-                                            cmd[cmdPtr].cmd = enmMML._NOP.v;
+                                        if ((cmd[cmdPtr[0]].param[0] <= 0) || (cmd[cmdPtr[0]].param[1] <= 0)) {
+                                            dispError(ErrNum.ABNORMAL_TEMPO_VALUE, lptr[line].filename, line);
+                                            cmd[cmdPtr[0]].cmd = Mml._NOP.v;
                                         } else {
-                                            tbase = (double) cmd[cmdPtr].param[0] * (double) cmd[cmdPtr].param[1] / _BASE;
+                                            tbase = (double) cmd[cmdPtr[0]].param[0] * (double) cmd[cmdPtr[0]].param[1] / _BASE;
                                         }
                                     } else {
-                                        dispError(enmErrNum.UNUSE_COMMAND_IN_THIS_TRACK.ordinal(), lptr[line].filename, line);
+                                        dispError(ErrNum.UNUSE_COMMAND_IN_THIS_TRACK, lptr[line].filename, line);
                                     }
                                     break;
                                 case _SWEEP: // Sweep
-                                    ptr = setCommandBuf(2, cmd, cmdPtr, enmMML._SWEEP.v, buf, ptr, line, mml[i].check.apply(trk));
+                                    ptr = setCommandBuf(2, cmd, cmdPtr[0], Mml._SWEEP.v, buf, ptr, line, mml[i].check.apply(trk));
                                     if ((mml[i].check.apply(trk)) != 0) {
-                                        if ((cmd[cmdPtr].param[0] < 0 || cmd[cmdPtr].param[0] > 15)
-                                                || (cmd[cmdPtr].param[1] < 0 || cmd[cmdPtr].param[1] > 15)) {
-                                            dispError(enmErrNum.ABNORMAL_SWEEP_VALUE.ordinal(), lptr[line].filename, line);
-                                            cmd[cmdPtr].cmd = 0;
-                                            cmd[cmdPtr].line = 0;
+                                        if ((cmd[cmdPtr[0]].param[0] < 0 || cmd[cmdPtr[0]].param[0] > 15)
+                                                || (cmd[cmdPtr[0]].param[1] < 0 || cmd[cmdPtr[0]].param[1] > 15)) {
+                                            dispError(ErrNum.ABNORMAL_SWEEP_VALUE, lptr[line].filename, line);
+                                            cmd[cmdPtr[0]].cmd = 0;
+                                            cmd[cmdPtr[0]].line = 0;
                                         }
                                     } else {
-                                        dispError(enmErrNum.UNUSE_COMMAND_IN_THIS_TRACK.ordinal(), lptr[line].filename, line);
+                                        dispError(ErrNum.UNUSE_COMMAND_IN_THIS_TRACK, lptr[line].filename, line);
                                     }
                                     break;
                                 case _DATA_WRITE: // Write data (register)
-                                    ptr = setCommandBuf(2, cmd, cmdPtr, enmMML._DATA_WRITE.v, buf, ptr, line, mml[i].check.apply(trk));
+                                    ptr = setCommandBuf(2, cmd, cmdPtr[0], Mml._DATA_WRITE.v, buf, ptr, line, mml[i].check.apply(trk));
                                     if ((mml[i].check.apply(trk)) == 0) {
-                                        dispError(enmErrNum.UNUSE_COMMAND_IN_THIS_TRACK.ordinal(), lptr[line].filename, line);
+                                        dispError(ErrNum.UNUSE_COMMAND_IN_THIS_TRACK, lptr[line].filename, line);
                                     }
                                     break;
                                 case _DATA_WRITE_OFS: // Write register with offset
-                                    ptr = setCommandBuf(2, cmd, cmdPtr, enmMML._DATA_WRITE_OFS.v, buf, ptr, line, mml[i].check.apply(trk));
+                                    ptr = setCommandBuf(2, cmd, cmdPtr[0], Mml._DATA_WRITE_OFS.v, buf, ptr, line, mml[i].check.apply(trk));
                                     if ((mml[i].check.apply(trk)) == 0) {
-                                        dispError(enmErrNum.UNUSE_COMMAND_IN_THIS_TRACK.ordinal(), lptr[line].filename, line);
+                                        dispError(ErrNum.UNUSE_COMMAND_IN_THIS_TRACK, lptr[line].filename, line);
                                     }
                                     break;
 
                                 case _DATA_THRUE: // Direct data writing
-                                    ptr = setCommandBuf(2, cmd, cmdPtr, enmMML._DATA_THRUE.v, buf, ptr, line, mml[i].check.apply(trk));
+                                    ptr = setCommandBuf(2, cmd, cmdPtr[0], Mml._DATA_THRUE.v, buf, ptr, line, mml[i].check.apply(trk));
                                     if ((mml[i].check.apply(trk)) == 0) {
-                                        dispError(enmErrNum.UNUSE_COMMAND_IN_THIS_TRACK.ordinal(), lptr[line].filename, line);
+                                        dispError(ErrNum.UNUSE_COMMAND_IN_THIS_TRACK, lptr[line].filename, line);
                                     }
                                     break;
 //#if false
-//                        case _XX_COMMAND: // For debugging
-//                            ptr = setCommandBuf(2, cmd, _XX_COMMAND, ptr, line, mml[i].check.apply(trk));
-//                            if ((mml[i].check.apply(trk)) == 0) {
-//                                dispError(UNUSE_COMMAND_IN_THIS_TRACK, lptr[line].filename, line);
-//                            }
-//                            break;
+//                                case _XX_COMMAND: // For debugging
+//                                    ptr = setCommandBuf(2, cmd, _XX_COMMAND, ptr, line, mml[i].check.apply(trk));
+//                                    if ((mml[i].check.apply(trk)) == 0) {
+//                                        dispError(UNUSE_COMMAND_IN_THIS_TRACK, lptr[line].filename, line);
+//                                    }
+//                                    break;
 //#endif
                                 case _SELF_DELAY_ON: // Self Delay
-                                    ptr = setCommandBuf(1, cmd, cmdPtr, mml[i].num, buf, ptr, line, mml[i].check.apply(trk));
+                                    ptr = setCommandBuf(1, cmd, cmdPtr[0], mml[i].num, buf, ptr, line, mml[i].check.apply(trk));
                                     if ((mml[i].check.apply(trk)) != 0) {
-                                        if ((cmd[cmdPtr].param[0] != 255)
-                                                && (cmd[cmdPtr].param[0] < 0 || cmd[cmdPtr].param[0] > SELF_DELAY_MAX)) {
-                                            dispError(enmErrNum.ABNORMAL_SELFDELAY_VALUE.ordinal(), lptr[line].filename, line);
-                                            cmd[cmdPtr].cmd = 0;
-                                            cmd[cmdPtr].line = 0;
+                                        if ((cmd[cmdPtr[0]].param[0] != 255)
+                                                && (cmd[cmdPtr[0]].param[0] < 0 || cmd[cmdPtr[0]].param[0] > SELF_DELAY_MAX)) {
+                                            dispError(ErrNum.ABNORMAL_SELFDELAY_VALUE, lptr[line].filename, line);
+                                            cmd[cmdPtr[0]].cmd = 0;
+                                            cmd[cmdPtr[0]].line = 0;
                                         }
                                     } else {
-                                        cmd[cmdPtr].cmd = enmMML._NOP.v;
-                                        dispError(enmErrNum.UNUSE_COMMAND_IN_THIS_TRACK.ordinal(), lptr[line].filename, line);
+                                        cmd[cmdPtr[0]].cmd = Mml._NOP.v;
+                                        dispError(ErrNum.UNUSE_COMMAND_IN_THIS_TRACK, lptr[line].filename, line);
                                     }
                                     break;
                                 case _DATA_BREAK: // Data conversion stopped
-                                    setCommandBuf(0, cmd, cmdPtr, enmMML._TRACK_END.v, buf, ptr, line, mml[i].check.apply(trk));
+                                    setCommandBuf(0, cmd, cmdPtr[0], Mml._TRACK_END.v, buf, ptr, line, mml[i].check.apply(trk));
                                     if ((mml[i].check.apply(trk)) == 0) {
-                                        dispError(enmErrNum.UNUSE_COMMAND_IN_THIS_TRACK.ordinal(), lptr[line].filename, line);
+                                        dispError(ErrNum.UNUSE_COMMAND_IN_THIS_TRACK, lptr[line].filename, line);
                                     }
                                     break;
 
                                 case _NEW_BANK:
                                     // Even if ignored, ptr will continue to read
-                                    ptr = setCommandBuf(1, cmd, cmdPtr, mml[i].num, buf, ptr, line, mml[i].check.apply(trk));
+                                    ptr = setCommandBuf(1, cmd, cmdPtr[0], mml[i].num, buf, ptr, line, mml[i].check.apply(trk));
                                     if (auto_bankswitch == 0) {
                                         if ((mml[i].check.apply(trk)) != 0) {
-                                            if (cmd[cmdPtr].param[0] == PARAM_OMITTED) {
+                                            if (cmd[cmdPtr[0]].param[0] == (int) PARAM_OMITTED) {
                                                 // There are cases like that.
                                             }
                                         } else {
-                                            dispError(enmErrNum.UNUSE_COMMAND_IN_THIS_TRACK.ordinal(), lptr[line].filename, line);
+                                            dispError(ErrNum.UNUSE_COMMAND_IN_THIS_TRACK, lptr[line].filename, line);
                                         }
                                     } else {
-                                        cmd[cmdPtr].cmd = enmMML._NOP.v;
+                                        cmd[cmdPtr[0]].cmd = Mml._NOP.v;
                                     }
                                     break;
 
                                 case _SHIFT_AMOUNT: // Pitch shift amount (0 to 8)
-                                    ptr = setCommandBuf(1, cmd, cmdPtr, mml[i].num, buf, ptr, line, mml[i].check.apply(trk));
+                                    ptr = setCommandBuf(1, cmd, cmdPtr[0], mml[i].num, buf, ptr, line, mml[i].check.apply(trk));
                                     if (pitch_correction != 0) {
                                         if ((mml[i].check.apply(trk)) != 0) {
-                                            if ((cmd[cmdPtr].param[0] < 0 || cmd[cmdPtr].param[0] > 8)) {
-                                                dispError(enmErrNum.ABNORMAL_SHIFT_AMOUNT.ordinal(), lptr[line].filename, line);
-                                                cmd[cmdPtr].cmd = 0;
-                                                cmd[cmdPtr].line = 0;
+                                            if ((cmd[cmdPtr[0]].param[0] < 0 || cmd[cmdPtr[0]].param[0] > 8)) {
+                                                dispError(ErrNum.ABNORMAL_SHIFT_AMOUNT, lptr[line].filename, line);
+                                                cmd[cmdPtr[0]].cmd = 0;
+                                                cmd[cmdPtr[0]].line = 0;
                                             }
                                         } else {
-                                            dispError(enmErrNum.UNUSE_COMMAND_IN_THIS_TRACK.ordinal(), lptr[line].filename, line);
+                                            dispError(ErrNum.UNUSE_COMMAND_IN_THIS_TRACK, lptr[line].filename, line);
                                         }
                                     } else {
-                                        dispError(enmErrNum.CANT_USE_SHIFT_AMOUNT_WITHOUT_PITCH_CORRECTION.ordinal(), lptr[line].filename, line);
+                                        dispError(ErrNum.CANT_USE_SHIFT_AMOUNT_WITHOUT_PITCH_CORRECTION, lptr[line].filename, line);
                                     }
                                     break;
 
                                 default: // Other (Error)
-                                    dispError(enmErrNum.COMMAND_NOT_DEFINED.ordinal(), lptr[line].filename, line);
+                                    dispError(ErrNum.COMMAND_NOT_DEFINED, lptr[line].filename, line);
                                     ptr++;
                                     break;
                             }
                             break;
                     }
-                    if (cmd[cmdPtr].line != 0) {
-                        cmdPtr++;
+                    if (cmd[cmdPtr[0]].line != 0) {
+                        cmdPtr[0]++;
                     }
                 }
             } else if (lptr[line].status == _INCLUDE) {
@@ -5680,7 +5683,7 @@ on_error:
      * Output:
      * *cmd
      */
-    private int translateData(CMD[] cmd, /* ref */ int cmdPtr, CMD[] ptr, int ptrPtr) {
+    private int translateData(CMD[] cmd, /* ref */ int[] cmdPtr, CMD[] ptr, int ptrPtr) {
         CMD[] top, end, temp;
         int topPtr, endPtr, tempPtr;
         int cnt, i, loop;
@@ -5694,7 +5697,7 @@ on_error:
         endPtr = -1;
 
         while (true) {
-            switch (enmMML.values()[ptr[ptrPtr].cmd]) {
+            switch (Mml.valueOf(ptr[ptrPtr].cmd)) {
                 case _REPEAT_ST:
                     ptrPtr++;
                     nest++;
@@ -5707,8 +5710,8 @@ on_error:
                     break;
                 case _REPEAT_END:
                     if (nest <= 0) {
-                        dispError(enmErrNum.DATA_ENDED_BY_LOOP_DEPTH_EXCEPT_0.ordinal(), ptr[ptrPtr].filename, ptr[ptrPtr].line);
-                        ptr[ptrPtr].cmd = enmMML._NOP.v;
+                        dispError(ErrNum.DATA_ENDED_BY_LOOP_DEPTH_EXCEPT_0, ptr[ptrPtr].filename, ptr[ptrPtr].line);
+                        ptr[ptrPtr].cmd = Mml._NOP.v;
                         ptrPtr++;
                         break;
                     }
@@ -5726,8 +5729,8 @@ on_error:
                     break;
                 case _REPEAT_ESC:
                     if (nest <= 0) {
-                        dispError(enmErrNum.DATA_ENDED_BY_LOOP_DEPTH_EXCEPT_0.ordinal(), ptr[ptrPtr].filename, ptr[ptrPtr].line);
-                        ptr[ptrPtr].cmd = enmMML._NOP.v;
+                        dispError(ErrNum.DATA_ENDED_BY_LOOP_DEPTH_EXCEPT_0, ptr[ptrPtr].filename, ptr[ptrPtr].line);
+                        ptr[ptrPtr].cmd = Mml._NOP.v;
                         ptrPtr++;
                         break;
                     }
@@ -5746,13 +5749,13 @@ on_error:
                     cnt = 0;
                     len = 0;
                     while (true) {
-                        if (temp[tempPtr].cmd == enmMML._TRACK_END.v) {
-                            dispError(enmErrNum.DATA_ENDED_BY_CONTINUATION_NOTE.ordinal(), wk.mml_names[mml_idx], ptr[(ptrPtr - 1)].line);
-                            setCommandBuf(0, cmd, cmdPtr, enmMML._TRACK_END.v, null, 0, ptr[ptrPtr].line, 1);
+                        if (temp[tempPtr].cmd == Mml._TRACK_END.v) {
+                            dispError(ErrNum.DATA_ENDED_BY_CONTINUATION_NOTE, wk.mml_names[mml_idx], ptr[(ptrPtr - 1)].line);
+                            setCommandBuf(0, cmd, cmdPtr[0], Mml._TRACK_END.v, null, 0, ptr[ptrPtr].line, 1);
                             break;
-                        } else if (temp[tempPtr].cmd == enmMML._CONT_END.v) {
+                        } else if (temp[tempPtr].cmd == Mml._CONT_END.v) {
                             if (cnt == 0) {
-                                dispError(enmErrNum.TUPLET_BRACE_EMPTY.ordinal(), wk.mml_names[mml_idx], ptr[(ptrPtr - 1)].line);
+                                dispError(ErrNum.TUPLET_BRACE_EMPTY, wk.mml_names[mml_idx], ptr[(ptrPtr - 1)].line);
                                 len = 0;
                             } else {
                                 // All contents of '{}' will be this length
@@ -5761,100 +5764,103 @@ on_error:
                             break;
                         } else if (
                                 temp[tempPtr].cmd <= MAX_NOTE ||
-                                        temp[tempPtr].cmd == enmMML._DRUM_BIT.v ||
-                                        temp[tempPtr].cmd == enmMML._DRUM_NOTE.v ||
-                                        temp[tempPtr].cmd == enmMML._REST.v ||
-                                        temp[tempPtr].cmd == enmMML._KEY.v ||
-                                        temp[tempPtr].cmd == enmMML._NOTE.v ||
-                                        temp[tempPtr].cmd == enmMML._WAIT.v ||
-                                        temp[tempPtr].cmd == enmMML._KEY_OFF.v) {
+                                        temp[tempPtr].cmd == Mml._DRUM_BIT.v ||
+                                        temp[tempPtr].cmd == Mml._DRUM_NOTE.v ||
+                                        temp[tempPtr].cmd == Mml._REST.v ||
+                                        temp[tempPtr].cmd == Mml._KEY.v ||
+                                        temp[tempPtr].cmd == Mml._NOTE.v ||
+                                        temp[tempPtr].cmd == Mml._WAIT.v ||
+                                        temp[tempPtr].cmd == Mml._KEY_OFF.v) {
                             cnt++;
                         }
                         tempPtr++;
                     }
-                    if (temp[tempPtr].cmd != enmMML._TRACK_END.v) {
-                        while (ptr[ptrPtr].cmd != enmMML._TRACK_END.v) {
-                            if (ptr[ptrPtr].cmd == enmMML._CONT_END.v) {
+                    if (temp[tempPtr].cmd != Mml._TRACK_END.v) {
+                        while (ptr[ptrPtr].cmd != Mml._TRACK_END.v) {
+                            if (ptr[ptrPtr].cmd == Mml._CONT_END.v) {
                                 ptrPtr++;
                                 break;
                             } else if (
                                     ptr[ptrPtr].cmd <= MAX_NOTE ||
-                                            ptr[ptrPtr].cmd == enmMML._DRUM_BIT.v ||
-                                            ptr[ptrPtr].cmd == enmMML._DRUM_NOTE.v ||
-                                            ptr[ptrPtr].cmd == enmMML._REST.v ||
-                                            ptr[ptrPtr].cmd == enmMML._KEY.v ||
-                                            ptr[ptrPtr].cmd == enmMML._NOTE.v ||
-                                            ptr[ptrPtr].cmd == enmMML._WAIT.v ||
-                                            temp[tempPtr].cmd == enmMML._KEY_OFF.v) {
+                                            ptr[ptrPtr].cmd == Mml._DRUM_BIT.v ||
+                                            ptr[ptrPtr].cmd == Mml._DRUM_NOTE.v ||
+                                            ptr[ptrPtr].cmd == Mml._REST.v ||
+                                            ptr[ptrPtr].cmd == Mml._KEY.v ||
+                                            ptr[ptrPtr].cmd == Mml._NOTE.v ||
+                                            ptr[ptrPtr].cmd == Mml._WAIT.v ||
+                                            temp[tempPtr].cmd == Mml._KEY_OFF.v) {
                                 gate += len;
-                                if (cmd[cmdPtr] == null) cmd[cmdPtr] = new CMD();
-                                cmd[cmdPtr].filename = ptr[ptrPtr].filename;
-                                cmd[cmdPtr].cnt = ptr[ptrPtr].cnt;
-                                cmd[cmdPtr].frm = ptr[ptrPtr].frm;
-                                cmd[cmdPtr].line = ptr[ptrPtr].line;
-                                cmd[cmdPtr].cmd = ptr[ptrPtr].cmd;
-                                cmd[cmdPtr].len = len;
+                                if (cmd[cmdPtr[0]] == null) cmd[cmdPtr[0]] = new CMD();
+                                cmd[cmdPtr[0]].filename = ptr[ptrPtr].filename;
+                                cmd[cmdPtr[0]].cnt = ptr[ptrPtr].cnt;
+                                cmd[cmdPtr[0]].frm = ptr[ptrPtr].frm;
+                                cmd[cmdPtr[0]].line = ptr[ptrPtr].line;
+                                cmd[cmdPtr[0]].cmd = ptr[ptrPtr].cmd;
+                                cmd[cmdPtr[0]].len = len;
                                 for (i = 0; i < 8; i++) {
-                                    cmd[cmdPtr].param[i] = ptr[ptrPtr].param[i];
+                                    cmd[cmdPtr[0]].param[i] = ptr[ptrPtr].param[i];
                                 }
-                                gate -= cmd[cmdPtr].len;
-                            } else if (ptr[ptrPtr].cmd == enmMML._TIE.v) {
+                                gate -= cmd[cmdPtr[0]].len;
+                            } else if (ptr[ptrPtr].cmd == Mml._TIE.v) {
                                 // Remove ties within tuplets
-                                if (cmd[cmdPtr] == null) cmd[cmdPtr] = new CMD();
-                                cmd[cmdPtr].filename = ptr[ptrPtr].filename;
-                                cmd[cmdPtr].cnt = 0;
-                                cmd[cmdPtr].frm = 0;
-                                cmd[cmdPtr].line = ptr[ptrPtr].line;
-                                cmd[cmdPtr].cmd = enmMML._NOP.v;
-                                cmd[cmdPtr].len = 0;
+                                if (cmd[cmdPtr[0]] == null) cmd[cmdPtr[0]] = new CMD();
+                                cmd[cmdPtr[0]].filename = ptr[ptrPtr].filename;
+                                cmd[cmdPtr[0]].cnt = 0;
+                                cmd[cmdPtr[0]].frm = 0;
+                                cmd[cmdPtr[0]].line = ptr[ptrPtr].line;
+                                cmd[cmdPtr[0]].cmd = Mml._NOP.v;
+                                cmd[cmdPtr[0]].len = 0;
                             } else {
-                                if (cmd[cmdPtr] == null) cmd[cmdPtr] = new CMD();
-                                cmd[cmdPtr].filename = ptr[ptrPtr].filename;
-                                cmd[cmdPtr].cnt = ptr[ptrPtr].cnt;
-                                cmd[cmdPtr].frm = ptr[ptrPtr].frm;
-                                cmd[cmdPtr].line = ptr[ptrPtr].line;
-                                cmd[cmdPtr].cmd = ptr[ptrPtr].cmd;
-                                cmd[cmdPtr].len = ptr[ptrPtr].len;
+                                if (cmd[cmdPtr[0]] == null) cmd[cmdPtr[0]] = new CMD();
+                                cmd[cmdPtr[0]].filename = ptr[ptrPtr].filename;
+                                cmd[cmdPtr[0]].cnt = ptr[ptrPtr].cnt;
+                                cmd[cmdPtr[0]].frm = ptr[ptrPtr].frm;
+                                cmd[cmdPtr[0]].line = ptr[ptrPtr].line;
+                                cmd[cmdPtr[0]].cmd = ptr[ptrPtr].cmd;
+                                cmd[cmdPtr[0]].len = ptr[ptrPtr].len;
                                 for (i = 0; i < 8; i++) {
-                                    cmd[cmdPtr].param[i] = ptr[ptrPtr].param[i];
+                                    cmd[cmdPtr[0]].param[i] = ptr[ptrPtr].param[i];
                                 }
                             }
-                            cmdPtr++;
+                            cmdPtr[0]++;
                             ptrPtr++;
                         }
                     }
                     break;
                 case _TRACK_END:
-                    if (cmd[cmdPtr] == null) cmd[cmdPtr] = new CMD();
-                    cmd[cmdPtr].filename = ptr[ptrPtr].filename;
-                    cmd[cmdPtr].cnt = ptr[ptrPtr].cnt;
-                    cmd[cmdPtr].frm = ptr[ptrPtr].frm;
-                    cmd[cmdPtr].line = ptr[ptrPtr].line;
-                    cmd[cmdPtr].cmd = ptr[ptrPtr].cmd;
-                    cmd[cmdPtr].len = ptr[ptrPtr].len;
+                    if (cmd[cmdPtr[0]] == null) cmd[cmdPtr[0]] = new CMD();
+                    cmd[cmdPtr[0]].filename = ptr[ptrPtr].filename;
+                    cmd[cmdPtr[0]].cnt = ptr[ptrPtr].cnt;
+                    cmd[cmdPtr[0]].frm = ptr[ptrPtr].frm;
+                    cmd[cmdPtr[0]].line = ptr[ptrPtr].line;
+                    cmd[cmdPtr[0]].cmd = ptr[ptrPtr].cmd;
+                    cmd[cmdPtr[0]].len = ptr[ptrPtr].len;
                     for (i = 0; i < 8; i++) {
-                        cmd[cmdPtr].param[i] = ptr[ptrPtr].param[i];
+                        cmd[cmdPtr[0]].param[i] = ptr[ptrPtr].param[i];
                     }
-                    cmdPtr++;
+                    cmdPtr[0]++;
                     ptrPtr++;
                     if (nest != 0) {
-                        dispError(enmErrNum.DATA_ENDED_BY_LOOP_DEPTH_EXCEPT_0.ordinal(), wk.mml_names[mml_idx], ptr[(ptrPtr - 1)].line);
+                        dispError(ErrNum.DATA_ENDED_BY_LOOP_DEPTH_EXCEPT_0, wk.mml_names[mml_idx], ptr[(ptrPtr - 1)].line);
                     }
                     return -1;
                 default:
-                    if (cmd[cmdPtr] == null) cmd[cmdPtr] = new CMD();
-                    cmd[cmdPtr].filename = ptr[ptrPtr].filename;
-                    cmd[cmdPtr].cnt = ptr[ptrPtr].cnt;
-                    cmd[cmdPtr].frm = ptr[ptrPtr].frm;
-                    cmd[cmdPtr].line = ptr[ptrPtr].line;
-                    cmd[cmdPtr].cmd = ptr[ptrPtr].cmd;
-                    cmd[cmdPtr].len = ptr[ptrPtr].len;
+                    if (cmd[cmdPtr[0]] == null) cmd[cmdPtr[0]] = new CMD();
+                    cmd[cmdPtr[0]].filename = ptr[ptrPtr].filename;
+                    cmd[cmdPtr[0]].cnt = ptr[ptrPtr].cnt;
+                    cmd[cmdPtr[0]].frm = ptr[ptrPtr].frm;
+                    cmd[cmdPtr[0]].line = ptr[ptrPtr].line;
+                    cmd[cmdPtr[0]].cmd = ptr[ptrPtr].cmd;
+                    cmd[cmdPtr[0]].len = ptr[ptrPtr].len;
                     for (i = 0; i < 8; i++) {
-                        cmd[cmdPtr].param[i] = ptr[ptrPtr].param[i];
+                        cmd[cmdPtr[0]].param[i] = ptr[ptrPtr].param[i];
                     }
-                    cmdPtr++;
+                    cmdPtr[0]++;
                     ptrPtr++;
                     break;
+//                case Undefined:
+//                    logger.log(Level.WARNING, "undefined cmd: " + ptr[ptrPtr].cmd);
+//                    break;
             }
         }
     }
@@ -5981,19 +5987,19 @@ on_error:
      * Return:
      * CMD *cmd; Since cmd has been read in this function, return the new cmd position.
      */
-    private int getDeltaTime(CMD[] cmd, int cmdPtr, /* ref */ int delta, int allow_slur) {
-        delta = 0;
+    private int getDeltaTime(CMD[] cmd, int cmdPtr, /* ref */ int[] delta, int allow_slur) {
+        delta[0] = 0;
         while (true) {
             if (loop_flag == 0) {
-                delta += (cmd[(cmdPtr + 1)].frm - cmd[cmdPtr].frm);
+                delta[0] += (cmd[(cmdPtr + 1)].frm - cmd[cmdPtr].frm);
             } else {
-                delta += (cmd[(cmdPtr + 1)].lfrm - cmd[cmdPtr].lfrm);
+                delta[0] += (cmd[(cmdPtr + 1)].lfrm - cmd[cmdPtr].lfrm);
             }
             cmdPtr++;
 //            if (cmd.cmd == _SLAR && allow_slur) {
 //                cmd++;
 //            } else
-            if (cmd[cmdPtr].cmd != enmMML._TIE.v) {
+            if (cmd[cmdPtr].cmd != Mml._TIE.v) {
                 break;
             }
         }
@@ -6002,14 +6008,10 @@ on_error:
 
     /**
      * Calculate gate time from q and note length
-     * Input:
-     * <p>
-     * Output:
-     * <p>
-     * Return:
-     * int gate;
+     *
+     * @return gate;
      */
-    private int calcGateTime(int delta_time, /* ref */ GATE_Q gate_q) {
+    private int calcGateTime(int delta_time, GateQ gate_q) {
         int gate;
         gate = (delta_time * gate_q.rate) / gate_denom + gate_q.adjust;
         if (gate > delta_time) {
@@ -6025,19 +6027,18 @@ on_error:
 
     /**
      * Output of the sound length part of commands with sound length (processing when the frame length is 256 or more)
-     * Input:
-     * int wait_com_no; Command to connect when 256 frames or more (w or r)
-     * int len; Frame Length
-     * Output:
+     *
+     * @param wait_com_no Command to connect when 256 frames or more (w or r)
+     * @param len Frame Length
      */
-    private void putLengthAndWait(List<MmlDatum2> fp, int wait_com_no, int len, /* ref */ CMD cmd) {
+    private void putLengthAndWait(List<MmlDatum2> fp, int wait_com_no, int len, CMD cmd) {
         int len_nokori = len; // Remaining sound length to be output (number of frames)
 
         if (len == 0) {
-            dispWarning(enmSys.FRAME_LENGTH_IS_0.ordinal(), cmd.filename, cmd.line);
+            dispWarning(Sys.FRAME_LENGTH_IS_0, cmd.filename, cmd.line);
             return;
         } else if (len < 0) {
-            dispError(enmErrNum.FRAME_LENGTH_LESSTHAN_0.ordinal(), cmd.filename, cmd.line);
+            dispError(ErrNum.FRAME_LENGTH_LESSTHAN_0, cmd.filename, cmd.line);
             return;
         }
 
@@ -6063,24 +6064,34 @@ on_error:
         }
     }
 
-    public static class PLAYSTATE {
+    public static class PlayState {
 
-        public GATE_Q gate_q;
-        public int env;            // Current normal (key-on) envelope number or volume
-        public int rel_env;        // Current release envelope number (-1: unused)
-        public int last_written_env;   // Last written envelope number or volume
-        public int tone;           //
-        public int rel_tone;       //
-        public int last_written_tone;  //
-        public int key_pressed;        // Key on/off status
-        public final int[] last_note = new int[SELF_DELAY_MAX + 1];      // Last note I wrote (ignore @n)
-        public final int[] last_note_keep = new int[SELF_DELAY_MAX + 1]; // last_note state when using '¥' command
-        public int self_delay;     // How many previous notes to use? (no self-delay if negative)
+        public GateQ gate_q;
+        /** Current normal (key-on) envelope number or volume */
+        public int env;
+        /** Current release envelope number (-1: unused) */
+        public int rel_env;
+        /** Last written envelope number or volume */
+        public int last_written_env;
+        /** */
+        public int tone;
+        /** */
+        public int rel_tone;
+        /** */
+        public int last_written_tone;
+        /** Key on/off status */
+        public int key_pressed;
+        /** Last note I wrote (ignore @n) */
+        public final int[] last_note = new int[SELF_DELAY_MAX + 1];
+        /** last_note state when using '¥' command */
+        public final int[] last_note_keep = new int[SELF_DELAY_MAX + 1];
+        /** How many previous notes to use? (no self-delay if negative) */
+        public int self_delay;
     }
 
-    private void defaultPlayState(PLAYSTATE[] ps, int psPtr) {
+    private void defaultPlayState(PlayState[] ps, int psPtr) {
         int i;
-        if (ps[psPtr].gate_q == null) ps[psPtr].gate_q = new GATE_Q();
+        if (ps[psPtr].gate_q == null) ps[psPtr].gate_q = new GateQ();
         ps[psPtr].gate_q.rate = gate_denom;
         ps[psPtr].gate_q.adjust = 0;
         ps[psPtr].env = -1;
@@ -6099,44 +6110,44 @@ on_error:
 
     /**
      * Release envelope & tone output, fill remaining time with r or w
-     * Input:
+     * <p>
      * It exists only to display an error message for cmd putLengthWait
      */
-    private void putReleaseEffect(List<MmlDatum2> fp, int left_time, /* ref */ CMD cmd, /* ref */ PLAYSTATE ps) {
-        int note = enmMCK.MCK_REST.v; // The default is to connect the remaining time with rests.
+    private void putReleaseEffect(List<MmlDatum2> fp, int left_time, CMD cmd, PlayState ps) {
+        int note = MCK.MCK_REST.v; // The default is to connect the remaining time with rests.
 
         // Double key off check
         if (ps.key_pressed == 0) {
             putAsm(fp, note);
-            putLengthAndWait(fp, enmMCK.MCK_WAIT.v, left_time, /* ref */ cmd);
+            putLengthAndWait(fp, MCK.MCK_WAIT.v, left_time, cmd);
             return;
         }
 
         if ((ps.rel_env != -1) // Release envelope in progress
                 && (ps.last_written_env != ps.rel_env)) { // The current envelope and the envelope being converted are different
-            putAsm(fp, enmMCK.MCK_SET_VOL.v); // Release Envelope Output
+            putAsm(fp, MCK.MCK_SET_VOL.v); // Release Envelope Output
             putAsm(fp, ps.rel_env);
             ps.last_written_env = ps.rel_env;
-            note = enmMCK.MCK_WAIT.v; // Remaining time is waiting
+            note = MCK.MCK_WAIT.v; // Remaining time is waiting
         }
         if ((ps.rel_tone != -1) // Release tone active
                 && (ps.last_written_tone != ps.rel_tone)) { // The current envelope and the tone being converted are different
-            putAsm(fp, enmMCK.MCK_SET_TONE.v); // Release tone output
+            putAsm(fp, MCK.MCK_SET_TONE.v); // Release tone output
             putAsm(fp, ps.rel_tone);
             ps.last_written_tone = ps.rel_tone;
-            note = enmMCK.MCK_WAIT.v; //Remaining time is waiting
+            note = MCK.MCK_WAIT.v; //Remaining time is waiting
         }
-        if (note == enmMCK.MCK_WAIT.v && ps.self_delay >= 0 && ps.last_note[ps.self_delay] >= 0) {
+        if (note == MCK.MCK_WAIT.v && ps.self_delay >= 0 && ps.last_note[ps.self_delay] >= 0) {
             // Self Delay
             note = ps.last_note[ps.self_delay];
         }
         if (left_time != 0) {
             putAsm(fp, note);
-            putLengthAndWait(fp, note, left_time, /* ref */ cmd);
+            putLengthAndWait(fp, note, left_time, cmd);
         }
     }
 
-    private void doNewBank(List<MmlDatum2> fp, int trk, /* ref */ CMD cmd) {
+    private void doNewBank(List<MmlDatum2> fp, int trk, CMD cmd) {
         int banktemp = curr_bank;
         if (cmd.param[0] == (int) PARAM_OMITTED) {
             // Defaults
@@ -6146,14 +6157,14 @@ on_error:
         }
 
         if (checkBankRange(banktemp) == 0) {
-            dispError(enmErrNum.BANK_IDX_OUT_OF_RANGE.ordinal(), cmd.filename, cmd.line);
+            dispError(ErrNum.BANK_IDX_OUT_OF_RANGE, cmd.filename, cmd.line);
             return;
         }
         if ((banktemp == 2 || banktemp == 3) && dpcm_bankswitch != 0) {
-            dispError(enmErrNum.CANT_USE_BANK_2_OR_3_WITH_DPCMBANKSWITCH.ordinal(), cmd.filename, cmd.line);
+            dispError(ErrNum.CANT_USE_BANK_2_OR_3_WITH_DPCMBANKSWITCH, cmd.filename, cmd.line);
             return;
         }
-        putAsm(fp, enmMCK.MCK_GOTO.v);
+        putAsm(fp, MCK.MCK_GOTO.v);
         String t = "bank(%s_%02d_bnk%03d)".formatted(songlabel, trk, banktemp);
         fp.add(new MmlDatum2("\n\tdb\t%s\n".formatted(t), -3, t));
         bank_usage[curr_bank]++;
@@ -6177,21 +6188,20 @@ on_error:
         t = "%s_%02d_bnk%03d:".formatted(songlabel, trk, curr_bank);
         fp.add(new MmlDatum2("%s\n".formatted(t), -2, t));
         putAsm_pos = 0; // Clear output position
-        return;
     }
 
-    private static int isCmdNotOutput(CMD[] cmd, int cmdPtr) {
-        return switch (enmMML.values()[cmd[cmdPtr].cmd]) {
-            case _NOP, _TEMPO, _TEMPO2, _OCTAVE, _OCT_UP, _OCT_DW, _LENGTH, _TRANSPOSE -> 1;
-            default -> 0;
+    private static boolean isCmdNotOutput(CMD[] cmd, int cmdPtr) {
+        return switch (Mml.valueOf(cmd[cmdPtr].cmd)) {
+            case _NOP, _TEMPO, _TEMPO2, _OCTAVE, _OCT_UP, _OCT_DW, _LENGTH, _TRANSPOSE -> true;
+            default -> false;
         };
     }
 
     private static int isNextSlar(CMD[] cmd, int cmdPtr) {
-        while (cmd[cmdPtr].cmd != enmMML._TRACK_END.v
-                && isCmdNotOutput(cmd, cmdPtr) != 0) cmdPtr++;
+        while (cmd[cmdPtr].cmd != Mml._TRACK_END.v && isCmdNotOutput(cmd, cmdPtr))
+            cmdPtr++;
 
-        if (cmd[cmdPtr].cmd == enmMML._SLAR.v)
+        if (cmd[cmdPtr].cmd == Mml._SLAR.v)
             return 1;
 
         return 0;
@@ -6212,7 +6222,7 @@ on_error:
         if (vop == 0)
             return;
 
-        putAsm(fp, enmMCK.MDR_REVERB.v);
+        putAsm(fp, MCK.MDR_REVERB.v);
         putAsm(fp, vop & 0xff);
     }
 
@@ -6222,7 +6232,7 @@ on_error:
      * Output:
      * none
      */
-    private void developeData(List<MmlDatum2> fp, int trk, CMD[] cmdtop, LINE[] lptr) {
+    private void developeData(List<MmlDatum2> fp, int trk, CMD[] cmdtop, Line[] lptr) {
         tbase = 0.625;
         length = 48;
         volume_flag = -1;
@@ -6231,33 +6241,33 @@ on_error:
         {
             // Create a temporary work
             CMD[] cmd = cmdtop;
-            int cmdPtr = 0;
+            int[] cmdPtr = {0};
             CMD[] temp = new CMD[32 * 1024]; // malloc(sizeof(CMD) * 32 * 1024);
-            int tempPtr = 0;
+            int[] tempPtr = {0};
             CMD[] tempback = temp;
             int tempbackPtr = 0;
 
             int i, j;
             for (i = 0; i < 32 * 1024; i++) {
-                temp[tempPtr] = new CMD();
-                temp[tempPtr].cmd = 0;
-                temp[tempPtr].cnt = 0;
-                temp[tempPtr].frm = 0;
-                temp[tempPtr].line = 0;
+                temp[tempPtr[0]] = new CMD();
+                temp[tempPtr[0]].cmd = 0;
+                temp[tempPtr[0]].cnt = 0;
+                temp[tempPtr[0]].frm = 0;
+                temp[tempPtr[0]].line = 0;
                 for (j = 0; j < 8; j++) {
-                    temp[tempPtr].param[0] = 0;
+                    temp[tempPtr[0]].param[0] = 0;
                 }
-                tempPtr++;
+                tempPtr[0]++;
             }
 
-            tempPtr = tempbackPtr;
+            tempPtr[0] = tempbackPtr;
             // Analyze commands from the beginning of the channel data and store them in a buffer
             temp = analyzeData(trk, temp, /* ref */ tempPtr, lptr);
-            setCommandBuf(0, temp, tempPtr, enmMML._TRACK_END.v, null, 0, 0, 1);
-            tempPtr = tempbackPtr;
+            setCommandBuf(0, temp, tempPtr[0], Mml._TRACK_END.v, null, 0, 0, 1);
+            tempPtr[0] = tempbackPtr;
             //shuffleQuontize(temp, tempPtr);
             nest = 0;
-            translateData(cmd, /* ref */ cmdPtr, temp, tempPtr);
+            translateData(cmd, /* ref */ cmdPtr, temp, tempPtr[0]);
             cmd = cmdtop;
             tempback = null;
         }
@@ -6299,7 +6309,7 @@ on_error:
 
 //logger.log(Level.TRACE, "%s:%d:%4x %f %d %f\n".formatted(cmd.filename, cmd.line, cmd.cmd, cmd.cnt, cmd.frm, cmd.len));
 
-                if (cmd[cmdPtr].cmd == enmMML._REPEAT_ST2.v) {
+                if (cmd[cmdPtr].cmd == Mml._REPEAT_ST2.v) {
                     double rcount = 0;
                     double rcount_esc = 0; // Up to just before '¥'
                     double rcount_t = 0;
@@ -6317,7 +6327,7 @@ on_error:
                         cmd[cmdPtr].frm = frame;
                         cmd[cmdPtr].lcnt = lcount;
                         cmd[cmdPtr].lfrm = lframe;
-                        if (cmd[cmdPtr].cmd == enmMML._REPEAT_END2.v) {
+                        if (cmd[cmdPtr].cmd == Mml._REPEAT_END2.v) {
                             count_t += rcount_t * (cmd[cmdPtr].param[0] - 2) + rcount_esc_t;
                             count += rcount * (cmd[cmdPtr].param[0] - 2) + rcount_esc;
                             frame += rframe * (cmd[cmdPtr].param[0] - 2) + rframe_esc;
@@ -6331,7 +6341,7 @@ on_error:
                             if (rframe_err > 0) {
                                 //logger.log(Level.TRACE, "frame-correct: %d frame\n", rframe_err );
                                 if (rframe_err >= 3) {
-                                    dispWarning(enmSys.REPEAT2_FRAME_ERROR_OVER_3.ordinal(), cmd[cmdPtr].filename, cmd[cmdPtr].line);
+                                    dispWarning(Sys.REPEAT2_FRAME_ERROR_OVER_3, cmd[cmdPtr].filename, cmd[cmdPtr].line);
                                 }
 //                                // 2004.09.02 stop after all
 //                                cmd.param[1] = rframe_err;
@@ -6348,20 +6358,20 @@ on_error:
                             }
                             break;
 
-                        } else if (cmd[cmdPtr].cmd == enmMML._REPEAT_ESC2.v) {
+                        } else if (cmd[cmdPtr].cmd == Mml._REPEAT_ESC2.v) {
                             repeat_esc_flag = 1;
                             repeat_esc2_cmd_ptr = cmd;
                             repeat_esc2_cmd_ptrPtr = cmdPtr;
                         } else if (
                                 cmd[cmdPtr].cmd <= MAX_NOTE ||
-                                        cmd[cmdPtr].cmd == enmMML._REST.v ||
-                                        cmd[cmdPtr].cmd == enmMML._DRUM_BIT.v ||
-                                        cmd[cmdPtr].cmd == enmMML._DRUM_NOTE.v ||
-                                        cmd[cmdPtr].cmd == enmMML._TIE.v ||
-                                        cmd[cmdPtr].cmd == enmMML._KEY.v ||
-                                        cmd[cmdPtr].cmd == enmMML._NOTE.v ||
-                                        cmd[cmdPtr].cmd == enmMML._WAIT.v ||
-                                        cmd[cmdPtr].cmd == enmMML._KEY_OFF.v) {
+                                        cmd[cmdPtr].cmd == Mml._REST.v ||
+                                        cmd[cmdPtr].cmd == Mml._DRUM_BIT.v ||
+                                        cmd[cmdPtr].cmd == Mml._DRUM_NOTE.v ||
+                                        cmd[cmdPtr].cmd == Mml._TIE.v ||
+                                        cmd[cmdPtr].cmd == Mml._KEY.v ||
+                                        cmd[cmdPtr].cmd == Mml._NOTE.v ||
+                                        cmd[cmdPtr].cmd == Mml._WAIT.v ||
+                                        cmd[cmdPtr].cmd == Mml._KEY_OFF.v) {
                             count_t += cmd[cmdPtr].len;
                             rcount_t += cmd[cmdPtr].len;
                             frame_p = rframe;
@@ -6381,35 +6391,36 @@ on_error:
                                 rcount_esc += cmd[cmdPtr].len;
                                 rframe_esc += frame_d;
                             }
-                        } else if (cmd[cmdPtr].cmd == enmMML._TEMPO.v) {
+                        } else if (cmd[cmdPtr].cmd == Mml._TEMPO.v) {
                             tbase_p = tbase;
                             tbase = (double) _BASETEMPO / (double) cmd[cmdPtr].param[0];
                             count_t = count_t * tbase / tbase_p;
                             rcount_t = rcount_t * tbase / tbase_p;
                             rcount_esc_t = rcount_esc_t * tbase / tbase_p;
-                        } else if (cmd[cmdPtr].cmd == enmMML._TEMPO2.v) {
+                        } else if (cmd[cmdPtr].cmd == Mml._TEMPO2.v) {
                             tbase_p = tbase;
                             tbase = (double) cmd[cmdPtr].param[0] * (double) cmd[cmdPtr].param[1] / _BASE;
                             count_t = count_t * tbase / tbase_p;
                             rcount_t = rcount_t * tbase / tbase_p;
                             rcount_esc_t = rcount_esc_t * tbase / tbase_p;
-                        } else if (cmd[cmdPtr].cmd == enmMML._SONG_LOOP.v) {
+                        } else if (cmd[cmdPtr].cmd == Mml._SONG_LOOP.v) {
                             loop_flag = 1;
                         }
                         cmdPtr++;
                     }
                 } else if (
                         cmd[cmdPtr].cmd <= MAX_NOTE ||
-                                cmd[cmdPtr].cmd == enmMML._DRUM_BIT.v ||
-                                cmd[cmdPtr].cmd == enmMML._DRUM_NOTE.v ||
-                                cmd[cmdPtr].cmd == enmMML._REST.v ||
-                                cmd[cmdPtr].cmd == enmMML._TIE.v ||
-                                cmd[cmdPtr].cmd == enmMML._KEY.v ||
-                                cmd[cmdPtr].cmd == enmMML._NOTE.v ||
-                                cmd[cmdPtr].cmd == enmMML._WAIT.v ||
-                                cmd[cmdPtr].cmd == enmMML._KEY_OFF.v) {
+                                cmd[cmdPtr].cmd == Mml._DRUM_BIT.v ||
+                                cmd[cmdPtr].cmd == Mml._DRUM_NOTE.v ||
+                                cmd[cmdPtr].cmd == Mml._REST.v ||
+                                cmd[cmdPtr].cmd == Mml._TIE.v ||
+                                cmd[cmdPtr].cmd == Mml._KEY.v ||
+                                cmd[cmdPtr].cmd == Mml._NOTE.v ||
+                                cmd[cmdPtr].cmd == Mml._WAIT.v ||
+                                cmd[cmdPtr].cmd == Mml._KEY_OFF.v) {
                     count_t += cmd[cmdPtr].len;
                     frame_p = frame;
+                    logger.log(Level.TRACE, "FRAME cmd=%d count_t=%f tbase=%f len=%f frame_p=%d frame_new=%d".formatted(cmd[cmdPtr].cmd, count_t, tbase, cmd[cmdPtr].len, frame_p, double2int(count_t * tbase)));
                     frame = double2int(count_t * tbase);
                     frame_d = frame - frame_p;
                     count += cmd[cmdPtr].len;
@@ -6418,25 +6429,25 @@ on_error:
                         lcount += cmd[cmdPtr].len;
                         lframe += frame_d;
                     }
-                } else if (cmd[cmdPtr].cmd == enmMML._TEMPO.v) {
+                } else if (cmd[cmdPtr].cmd == Mml._TEMPO.v) {
                     tbase_p = tbase;
                     tbase = (double) _BASETEMPO / (double) cmd[cmdPtr].param[0];
                     count_t = count_t * tbase_p / tbase;
-                } else if (cmd[cmdPtr].cmd == enmMML._TEMPO2.v) {
+                } else if (cmd[cmdPtr].cmd == Mml._TEMPO2.v) {
                     tbase_p = tbase;
                     tbase = (double) cmd[cmdPtr].param[0] * (double) cmd[cmdPtr].param[1] / _BASE;
                     count_t = count_t * tbase_p / tbase;
-                } else if (cmd[cmdPtr].cmd == enmMML._SONG_LOOP.v) {
+                } else if (cmd[cmdPtr].cmd == Mml._SONG_LOOP.v) {
                     loop_flag = 1;
                 }
-            } while (cmd[cmdPtr++].cmd != enmMML._TRACK_END.v);
+            } while (cmd[cmdPtr++].cmd != Mml._TRACK_END.v);
         }
 
         // Expand
         {
             CMD[] cmd = cmdtop;
             int cmdPtr = 0;
-            PLAYSTATE ps = new PLAYSTATE();
+            PlayState ps = new PlayState();
             int repeat_depth = 0;
             int repeat_index = 0;
             int repeat_esc_flag = 0;
@@ -6446,7 +6457,7 @@ on_error:
             int drum_note_flag = 0;
             int drum_note_count = 0;
 
-            defaultPlayState(new PLAYSTATE[] {ps}, 0);
+            defaultPlayState(new PlayState[] {ps}, 0);
 
             cmd = cmdtop;
             putAsm_pos = 0;
@@ -6465,7 +6476,7 @@ on_error:
             if (use_jump != 0) {
                 fp.add(new MmlDatum2("\n;jump\n", 0));
 
-                putAsm(fp, enmMCK.MDR_JUMP.v);
+                putAsm(fp, MCK.MDR_JUMP.v);
                 putAsm(fp, 0x01);
                 use_jump = 0;
             }
@@ -6497,7 +6508,7 @@ on_error:
                     }
                 }
 
-                switch (enmMML.values()[cmd[cmdtempPtr].cmd]) {
+                switch (Mml.valueOf(cmd[cmdtempPtr].cmd)) {
                     case _NOP:
                     case _TEMPO:
                     case _TEMPO2:
@@ -6509,11 +6520,11 @@ on_error:
                         cmdPtr++;
                         break;
                     case _SLAR:
-                        putAsm(fp, enmMCK.MCK_SLAR.v);
+                        putAsm(fp, MCK.MCK_SLAR.v);
                         cmdPtr++;
                         break;
                     case _ENVELOPE:
-                        putAsm(fp, enmMCK.MCK_SET_VOL.v);
+                        putAsm(fp, MCK.MCK_SET_VOL.v);
                         ps.env = cmd[cmdPtr].param[0] & 0x7f;
                         ps.last_written_env = ps.env;
                         putAsm(fp, ps.env);
@@ -6529,14 +6540,14 @@ on_error:
                         cmdPtr++;
                         break;
                     case _VOLUME:
-                        putAsm(fp, enmMCK.MCK_SET_VOL.v);
+                        putAsm(fp, MCK.MCK_SET_VOL.v);
                         ps.env = (cmd[cmdPtr].param[0] & 0x7f) | 0x80;
                         putAsm(fp, ps.env);
                         ps.last_written_env = ps.env;
                         cmdPtr++;
                         break;
                     case _HARD_ENVELOPE:
-                        putAsm(fp, enmMCK.MCK_SET_FDS_HWENV.v);
+                        putAsm(fp, MCK.MCK_SET_FDS_HWENV.v);
                         ps.env = ((cmd[cmdPtr].param[0] & 1) << 6) | (cmd[cmdPtr].param[1] & 0x3f);
                         putAsm(fp, (ps.env & 0xff));
                         ps.last_written_env = ps.env;
@@ -6544,14 +6555,14 @@ on_error:
                         break;
                     case _TONE:
                         ps.tone = cmd[cmdPtr].param[0] | 0x80;
-                        putAsm(fp, enmMCK.MCK_SET_TONE.v);
+                        putAsm(fp, MCK.MCK_SET_TONE.v);
                         putAsm(fp, ps.tone);
                         ps.last_written_tone = ps.tone;
                         cmdPtr++;
                         break;
                     case _ORG_TONE:
                         ps.tone = cmd[cmdPtr].param[0] & 0x7f;
-                        putAsm(fp, enmMCK.MCK_SET_TONE.v);
+                        putAsm(fp, MCK.MCK_SET_TONE.v);
                         putAsm(fp, ps.tone);
                         ps.last_written_tone = ps.tone;
                         cmdPtr++;
@@ -6585,73 +6596,73 @@ on_error:
                         break;
                     case _DRUM_NOTE: {
                         if (drum_note_flag != 0) {
-                            dispError(enmErrNum.COMMAND_REDUNDANT.ordinal(), cmd[cmdtempPtr].filename, cmd[cmdtempPtr].line);
+                            dispError(ErrNum.COMMAND_REDUNDANT, cmd[cmdtempPtr].filename, cmd[cmdtempPtr].line);
                             cmdPtr++;
                             break;
 
                         }
                         drum_note_flag = 1;
                         drum_note_count = 0;
-                        putAsm(fp, enmMCK.MDR_DRUM_NOTE.v);
+                        putAsm(fp, MCK.MDR_DRUM_NOTE.v);
                         putAsm(fp, cmd[cmdPtr].param[0] & 0x1f);
                         cmdPtr++;
                     }
                     break;
                     case _DRUM_BIT: {
                         if (cmd[cmdPtr].len == 0) {
-                            putAsm(fp, enmMCK.MDR_DRUM_BIT.v);
+                            putAsm(fp, MCK.MDR_DRUM_BIT.v);
                             putAsm(fp, cmd[cmdPtr].param[0] & 0x1f);
                             cmdPtr++;
                         } else {
                             int param = cmd[cmdPtr].param[0];
-                            int delta_time = 0;
+                            int[] delta_time = {0};
                             cmdPtr = getDeltaTime(cmd, cmdPtr, /* ref */ delta_time, 0);
-                            if (delta_time == 0) {
-                                dispWarning(enmSys.FRAME_LENGTH_IS_0.ordinal(), cmd[cmdtempPtr].filename, cmd[cmdtempPtr].line);
+                            if (delta_time[0] == 0) {
+                                dispWarning(Sys.FRAME_LENGTH_IS_0, cmd[cmdtempPtr].filename, cmd[cmdtempPtr].line);
                                 break;
                             }
-                            putAsm(fp, enmMCK.MDR_DRUM_BIT.v);
+                            putAsm(fp, MCK.MDR_DRUM_BIT.v);
                             putAsm(fp, (param & 0x1f) | 0x80);
-                            putLengthAndWait(fp, enmMCK.MCK_WAIT.v, delta_time, /* ref */ cmd[cmdtempPtr]);
+                            putLengthAndWait(fp, MCK.MCK_WAIT.v, delta_time[0], cmd[cmdtempPtr]);
                         }
                     }
                     break;
 
                     case _REST: {
-                        int delta_time = 0;
+                        int[] delta_time = {0};
                         cmdPtr = getDeltaTime(cmd, cmdPtr, /* ref */ delta_time, 0);
-                        if (delta_time == 0) {
-                            dispWarning(enmSys.FRAME_LENGTH_IS_0.ordinal(), cmd[cmdtempPtr].filename, cmd[cmdtempPtr].line);
+                        if (delta_time[0] == 0) {
+                            dispWarning(Sys.FRAME_LENGTH_IS_0, cmd[cmdtempPtr].filename, cmd[cmdtempPtr].line);
                             break;
                         }
-                        putAsm(fp, enmMCK.MCK_REST.v);
-                        putLengthAndWait(fp, enmMCK.MCK_REST.v, delta_time, /* ref */ cmd[cmdtempPtr]);
+                        putAsm(fp, MCK.MCK_REST.v);
+                        putLengthAndWait(fp, MCK.MCK_REST.v, delta_time[0], cmd[cmdtempPtr]);
                         ps.key_pressed = 0;
                     }
                     break;
                     case _WAIT: {
-                        int delta_time = 0;
+                        int[] delta_time = {0};
                         cmdPtr = getDeltaTime(cmd, cmdPtr, /* ref */ delta_time, 0);
-                        if (delta_time == 0) {
-                            dispWarning(enmSys.FRAME_LENGTH_IS_0.ordinal(), cmd[cmdtempPtr].filename, cmd[cmdtempPtr].line);
+                        if (delta_time[0] == 0) {
+                            dispWarning(Sys.FRAME_LENGTH_IS_0, cmd[cmdtempPtr].filename, cmd[cmdtempPtr].line);
                             break;
                         }
-                        putAsm(fp, enmMCK.MCK_WAIT.v);
-                        putLengthAndWait(fp, enmMCK.MCK_WAIT.v, delta_time, /* ref */ cmd[cmdtempPtr]);
+                        putAsm(fp, MCK.MCK_WAIT.v);
+                        putLengthAndWait(fp, MCK.MCK_WAIT.v, delta_time[0], cmd[cmdtempPtr]);
                     }
                     break;
                     case _KEY_OFF: { // Key off with length
-                        int delta_time = 0;
+                        int[] delta_time = {0};
                         cmdPtr = getDeltaTime(cmd, cmdPtr, /* ref */ delta_time, 0);
-                        if (delta_time == 0) {
+                        if (delta_time[0] == 0) {
                             // Allow note length 0
                         }
-                        putReleaseEffect(fp, delta_time, /* ref */ cmd[cmdtempPtr], /* ref */ ps);
+                        putReleaseEffect(fp, delta_time[0], cmd[cmdtempPtr], ps);
                         ps.key_pressed = 0;
                     }
                     break;
                     case _LFO_ON:
-                        putAsm(fp, enmMCK.MCK_SET_LFO.v);
+                        putAsm(fp, MCK.MCK_SET_LFO.v);
                         if ((cmd[cmdPtr].param[0] & 0xff) == 0xff) {
                             putAsm(fp, 0xff);
                         } else {
@@ -6660,12 +6671,12 @@ on_error:
                         cmdPtr++;
                         break;
                     case _LFO_OFF:
-                        putAsm(fp, enmMCK.MCK_SET_LFO.v);
+                        putAsm(fp, MCK.MCK_SET_LFO.v);
                         putAsm(fp, 0xff);
                         cmdPtr++;
                         break;
                     case _DETUNE:
-                        putAsm(fp, enmMCK.MCK_SET_DETUNE.v);
+                        putAsm(fp, MCK.MCK_SET_DETUNE.v);
                         if (cmd[cmdPtr].param[0] >= 0) {
                             putAsm(fp, (cmd[cmdPtr].param[0] & 0x7f) | 0x80);
                         } else {
@@ -6674,42 +6685,42 @@ on_error:
                         cmdPtr++;
                         break;
                     case _SWEEP:
-                        putAsm(fp, enmMCK.MCK_SET_HWSWEEP.v);
+                        putAsm(fp, MCK.MCK_SET_HWSWEEP.v);
                         putAsm(fp, ((cmd[cmdPtr].param[0] & 0xf) << 4) + (cmd[cmdPtr].param[1] & 0xf));
                         cmdPtr++;
                         break;
                     case _EP_ON:
-                        putAsm(fp, enmMCK.MCK_SET_PITCHENV.v);
+                        putAsm(fp, MCK.MCK_SET_PITCHENV.v);
                         putAsm(fp, cmd[cmdPtr].param[0] & 0xff);
                         cmdPtr++;
                         break;
                     case _EP_OFF:
-                        putAsm(fp, enmMCK.MCK_SET_PITCHENV.v);
+                        putAsm(fp, MCK.MCK_SET_PITCHENV.v);
                         putAsm(fp, 0xff);
                         cmdPtr++;
                         break;
                     case _EN_ON:
-                        putAsm(fp, enmMCK.MCK_SET_NOTEENV.v);
+                        putAsm(fp, MCK.MCK_SET_NOTEENV.v);
                         putAsm(fp, cmd[cmdPtr].param[0] & 0xff);
                         cmdPtr++;
                         break;
                     case _EN_OFF:
-                        putAsm(fp, enmMCK.MCK_SET_NOTEENV.v);
+                        putAsm(fp, MCK.MCK_SET_NOTEENV.v);
                         putAsm(fp, 0xff);
                         cmdPtr++;
                         break;
                     case _MH_ON:
-                        putAsm(fp, enmMCK.MCK_SET_FDS_HWEFFECT.v);
+                        putAsm(fp, MCK.MCK_SET_FDS_HWEFFECT.v);
                         putAsm(fp, cmd[cmdPtr].param[0] & 0xff);
                         cmdPtr++;
                         break;
                     case _MH_OFF:
-                        putAsm(fp, enmMCK.MCK_SET_FDS_HWEFFECT.v);
+                        putAsm(fp, MCK.MCK_SET_FDS_HWEFFECT.v);
                         putAsm(fp, 0xff);
                         cmdPtr++;
                         break;
                     case _VRC7_TONE:
-                        putAsm(fp, enmMCK.MCK_SET_TONE.v);
+                        putAsm(fp, MCK.MCK_SET_TONE.v);
                         putAsm(fp, cmd[cmdPtr].param[0] | 0x40);
                         cmdPtr++;
                         break;
@@ -6775,28 +6786,28 @@ on_error:
 
                     // MoonDriver
                     case _JUMP_FLAG:
-                        putAsm(fp, enmMCK.MDR_JUMP.v);
+                        putAsm(fp, MCK.MDR_JUMP.v);
                         putAsm(fp, 0x00);
                         cmdPtr++;
                         break;
                     case _REVERB_SET:
-                        putAsm(fp, enmMCK.MDR_REVERB.v);
+                        putAsm(fp, MCK.MDR_REVERB.v);
                         putAsm(fp, cmd[cmdPtr].param[0] & 0xff);
                         cmdPtr++;
                         break;
                     case _DAMP_SET:
-                        putAsm(fp, enmMCK.MDR_DAMP.v);
+                        putAsm(fp, MCK.MDR_DAMP.v);
                         putAsm(fp, cmd[cmdPtr].param[0] & 0xff);
                         cmdPtr++;
                         break;
 
                     case _SET_OPBASE:
-                        putAsm(fp, enmMCK.MDR_OPBASE.v);
+                        putAsm(fp, MCK.MDR_OPBASE.v);
                         putAsm(fp, cmd[cmdPtr].param[0] & 0xff);
                         cmdPtr++;
                         break;
                     case _LOAD_OP2:
-                        putAsm(fp, enmMCK.MDR_LDOP2.v);
+                        putAsm(fp, MCK.MDR_LDOP2.v);
                         putAsm(fp, cmd[cmdPtr].param[0] & 0xff);
                         // Exporting VOP Settings
                         putVOPData(fp, trk, cmd[cmdPtr].param[0] & 0xff);
@@ -6804,41 +6815,41 @@ on_error:
 
                         break;
                     case _SET_TVP:
-                        putAsm(fp, enmMCK.MDR_TVP.v);
+                        putAsm(fp, MCK.MDR_TVP.v);
                         putAsm(fp, cmd[cmdPtr].param[0] & 0xff);
                         cmdPtr++;
                         break;
                     case _DRUM_SW:
-                        putAsm(fp, enmMCK.MDR_DRUM.v);
+                        putAsm(fp, MCK.MDR_DRUM.v);
                         putAsm(fp, cmd[cmdPtr].param[0] & 0xff);
                         cmdPtr++;
                         break;
                     case _SET_FBS:
-                        putAsm(fp, enmMCK.MDR_FBS.v);
+                        putAsm(fp, MCK.MDR_FBS.v);
                         putAsm(fp, cmd[cmdPtr].param[0] & 0xff);
                         cmdPtr++;
                         break;
                     case _SET_OPM:
-                        putAsm(fp, enmMCK.MDR_OPMODE.v);
+                        putAsm(fp, MCK.MDR_OPMODE.v);
                         putAsm(fp, cmd[cmdPtr].param[0] & 0xff);
                         cmdPtr++;
                         break;
 
 
                     case _SUN5B_HARD_SPEED:
-                        putAsm(fp, enmMCK.MCK_SET_SUN5B_HARD_SPEED.v);
+                        putAsm(fp, MCK.MCK_SET_SUN5B_HARD_SPEED.v);
                         putAsm(fp, cmd[cmdPtr].param[0] & 0xff);
                         putAsm(fp, (cmd[cmdPtr].param[0] >> 8) & 0xff);
                         cmdPtr++;
                         break;
                     case _SUN5B_HARD_ENV:
-                        putAsm(fp, enmMCK.MCK_SUN5B_HARD_ENV.v);
+                        putAsm(fp, MCK.MCK_SUN5B_HARD_ENV.v);
                         ps.env = (cmd[cmdPtr].param[0] & 0x0f) | 0x10 | 0x80;
                         putAsm(fp, ps.env);
                         cmdPtr++;
                         break;
                     case _SUN5B_NOISE_FREQ:
-                        putAsm(fp, enmMCK.MCK_SET_SUN5B_NOISE_FREQ.v);
+                        putAsm(fp, MCK.MCK_SET_SUN5B_NOISE_FREQ.v);
                         putAsm(fp, cmd[cmdPtr].param[0] & 0x1f);
                         cmdPtr++;
                         break;
@@ -6847,7 +6858,7 @@ on_error:
                         cmdPtr++;
                         break;
                     case _DATA_WRITE:
-                        putAsm(fp, enmMCK.MCK_DATA_WRITE.v);
+                        putAsm(fp, MCK.MCK_DATA_WRITE.v);
                         putAsm(fp, cmd[cmdPtr].param[0] & 0xff);
                         putAsm(fp, (cmd[cmdPtr].param[0] >> 8) & 0xff);
                         putAsm(fp, cmd[cmdPtr].param[1] & 0xff);
@@ -6882,7 +6893,7 @@ on_error:
 
                         }
 
-                        putAsm(fp, enmMCK.MCK_DATA_WRITE.v);
+                        putAsm(fp, MCK.MCK_DATA_WRITE.v);
                         putAsm(fp, addr & 0xff);
                         putAsm(fp, sel & 0xff);
                         putAsm(fp, data & 0xff);
@@ -6904,13 +6915,13 @@ on_error:
                         break;
                     case _REPEAT_END2:
                         if (--repeat_depth < 0) {
-                            dispError(enmErrNum.DATA_ENDED_BY_LOOP_DEPTH_EXCEPT_0.ordinal(), cmd[cmdPtr].filename, cmd[cmdPtr].line);
+                            dispError(ErrNum.DATA_ENDED_BY_LOOP_DEPTH_EXCEPT_0, cmd[cmdPtr].filename, cmd[cmdPtr].line);
                         } else {
                             if (repeat_esc_flag != 0) {
                                 // Always back
-                                putAsm(fp, enmMCK.MCK_GOTO.v);
+                                putAsm(fp, MCK.MCK_GOTO.v);
                             } else {
-                                putAsm(fp, enmMCK.MCK_REPEAT_END.v);
+                                putAsm(fp, MCK.MCK_REPEAT_END.v);
                                 putAsm(fp, cmd[cmdPtr].param[0] & 0x7f);
                             }
                             t = "bank(%s_%02d_lp_%04d)".formatted(songlabel, trk, repeat_index);
@@ -6940,9 +6951,9 @@ on_error:
                         break;
                     case _REPEAT_ESC2:
                         if ((repeat_depth - 1) < 0) {
-                            dispError(enmErrNum.DATA_ENDED_BY_LOOP_DEPTH_EXCEPT_0.ordinal(), cmd[cmdPtr].filename, cmd[cmdPtr].line);
+                            dispError(ErrNum.DATA_ENDED_BY_LOOP_DEPTH_EXCEPT_0, cmd[cmdPtr].filename, cmd[cmdPtr].line);
                         } else {
-                            putAsm(fp, enmMCK.MCK_REPEAT_ESC.v);
+                            putAsm(fp, MCK.MCK_REPEAT_ESC.v);
                             putAsm(fp, cmd[cmdPtr].param[0] & 0x7f);
                             t = "bank(%s_%02d_lp_exit_%04d)".formatted(songlabel, trk, repeat_index);
                             fp.add(new MmlDatum2("\n\tdb\t%s\n".formatted(t), -3, t));
@@ -6978,7 +6989,7 @@ on_error:
                         cmdPtr++;
                         break;
                     case _SHIFT_AMOUNT:
-                        putAsm(fp, enmMCK.MCK_SET_SHIFT_AMOUNT.v);
+                        putAsm(fp, MCK.MCK_SET_SHIFT_AMOUNT.v);
                         putAsm(fp, cmd[cmdPtr].param[0] & 0xff);
                         cmdPtr++;
                         break;
@@ -6987,37 +6998,37 @@ on_error:
                     case _KEY:
                     default: {
                         int note;
-                        int delta_time; // Number of frames from the sound to the next event
+                        int[] delta_time; // Number of frames from the sound to the next event
                         int gate_time; // Number of frames from onset to key-off
                         int left_time; // Number of frames remaining from key-off to the next event
-                        GATE_Q temp_gate = new GATE_Q();
+                        GateQ temp_gate = new GateQ();
 
-                        if (cmd[cmdtempPtr].cmd == enmMML._KEY.v) {
+                        if (cmd[cmdtempPtr].cmd == Mml._KEY.v) {
                             note = cmd[cmdPtr].param[0] & 0xffff;
                         } else {
                             note = cmd[cmdtempPtr].cmd;
                             if (note < MIN_NOTE || MAX_NOTE < note) {
-                                dispError(enmErrNum.COMMAND_NOT_DEFINED.ordinal(), cmd[cmdPtr].filename, cmd[cmdPtr].line);
+                                dispError(ErrNum.COMMAND_NOT_DEFINED, cmd[cmdPtr].filename, cmd[cmdPtr].line);
                                 cmdPtr++;
                                 break;
                             }
                         }
 
-                        delta_time = 0;
+                        delta_time = new int[] {0};
                         cmdPtr = getDeltaTime(cmd, cmdPtr, /* ref */ delta_time, 1);
 
                         // Ignore gate times for slurs
                         if (isNextSlar(cmd, cmdPtr) != 0) {
                             temp_gate.rate = 8;
                             temp_gate.adjust = 0;
-                            gate_time = calcGateTime(delta_time, /* ref */ temp_gate);
+                            gate_time = calcGateTime(delta_time[0], temp_gate);
                         } else
-                            gate_time = calcGateTime(delta_time, /* ref */ ps.gate_q);
+                            gate_time = calcGateTime(delta_time[0], ps.gate_q);
 
-                        left_time = delta_time - gate_time;
+                        left_time = delta_time[0] - gate_time;
 
-                        if (delta_time == 0) {
-                            dispWarning(enmSys.FRAME_LENGTH_IS_0.ordinal(), cmd[cmdtempPtr].filename, cmd[cmdtempPtr].line);
+                        if (delta_time[0] == 0) {
+                            dispWarning(Sys.FRAME_LENGTH_IS_0, cmd[cmdtempPtr].filename, cmd[cmdtempPtr].line);
                             break;
                         }
 
@@ -7028,14 +7039,14 @@ on_error:
 //                                putAsm(fp, (ps.env & 0xff));
 //                            } else
                             {
-                                putAsm(fp, enmMCK.MCK_SET_VOL.v); // Envelope Output
+                                putAsm(fp, MCK.MCK_SET_VOL.v); // Envelope Output
                                 putAsm(fp, ps.env);
                             }
                             ps.last_written_env = ps.env;
                         }
 
                         if (ps.last_written_tone != ps.tone) { // The last tone I wrote is different from the current default tone
-                            putAsm(fp, enmMCK.MCK_SET_TONE.v); // Tone Output
+                            putAsm(fp, MCK.MCK_SET_TONE.v); // Tone Output
                             putAsm(fp, ps.tone);
                             ps.last_written_tone = ps.tone;
                         }
@@ -7044,14 +7055,14 @@ on_error:
                                 ((trk == BTRACK(0)) || (trk == BTRACK(1)) ||
                                         (trk == BMMC5TRACK()) || (trk == BMMC5TRACK() + 1))) {
                             // Built-in square wave & MMC5 are @0 when no tone is specified
-                            putAsm(fp, enmMCK.MCK_SET_TONE.v);
+                            putAsm(fp, MCK.MCK_SET_TONE.v);
                             ps.tone = 0x80;
                             putAsm(fp, ps.tone);
                             ps.last_written_tone = ps.tone;
                         }
 
-                        if (cmd[cmdtempPtr].cmd == enmMML._KEY.v) {
-                            putAsm(fp, enmMCK.MCK_DIRECT_FREQ.v);
+                        if (cmd[cmdtempPtr].cmd == Mml._KEY.v) {
+                            putAsm(fp, MCK.MCK_DIRECT_FREQ.v);
                             putAsm(fp, note & 0xff);
                             if (((trk >= BVRC6TRACK()) && (trk <= BVRC6SAWTRACK())) ||
                                     ((trk >= BFME7TRACK()) && (trk <= BFME7TRACK() + 2))) {
@@ -7073,18 +7084,21 @@ on_error:
                             ps.last_note[0] = note;
                         }
 
-                        putLengthAndWait(fp, enmMCK.MCK_WAIT.v, gate_time, /* ref */ cmd[cmdtempPtr]);
+                        putLengthAndWait(fp, MCK.MCK_WAIT.v, gate_time, cmd[cmdtempPtr]);
                         ps.key_pressed = 1;
 
                         // Quantize Processing
                         if (left_time != 0) {
-                            putReleaseEffect(fp, left_time, /* ref */ cmd[cmdtempPtr], /* ref */ ps);
+                            putReleaseEffect(fp, left_time, cmd[cmdtempPtr], ps);
                             ps.key_pressed = 0;
                         }
 
                         drum_note_flag = 0;
                     }
                     break;
+//                case Undefined:
+//                    logger.log(Level.WARNING, "undefined cmd: " + cmd[cmdtempPtr].cmd);
+//                    break;
                 } // switch (cmdtemp.cmd)
 
                 if (drum_note_flag != 0)
@@ -7092,7 +7106,7 @@ on_error:
 
                 putAsmFlash(fp);
 
-            } while (cmd[cmdPtr].cmd != enmMML._TRACK_END.v);
+            } while (cmd[cmdPtr].cmd != Mml._TRACK_END.v);
 
             track_count[mml_idx][trk][0].cnt = cmd[cmdPtr].cnt;
             track_count[mml_idx][trk][0].frm = cmd[cmdPtr].frm;
@@ -7104,15 +7118,15 @@ on_error:
                 t = "%s:".formatted(loop_point_label);
                 fp.add(new MmlDatum2("\n%s\n".formatted(t), -2, t));
                 putAsm_pos = 0;
-                putAsm(fp, enmMCK.MCK_REST.v);
+                putAsm(fp, MCK.MCK_REST.v);
                 putAsm(fp, 0xff);
             } else {
                 track_count[mml_idx][trk][1].cnt = cmd[cmdPtr].lcnt;
                 track_count[mml_idx][trk][1].frm = cmd[cmdPtr].lfrm;
             }
 
-            // putAsm( fp, MCK_DATA_END );
-            putAsm(fp, enmMCK.MCK_GOTO.v);
+            //putAsm(fp, MCK_DATA_END);
+            putAsm(fp, MCK.MCK_GOTO.v);
             fp.add(new MmlDatum2("\n\tdb\tbank(%s)\n".formatted(loop_point_label), -3, String.format("bank(%s)", loop_point_label)));
             bank_usage[curr_bank]++;
             fp.add(new MmlDatum2("\tdw\t%s\n".formatted(loop_point_label), -3, loop_point_label));
@@ -7121,7 +7135,7 @@ on_error:
         }
     }
 
-    /**  */
+    /** */
     private void setSongLabel() {
         songlabel = "song_%03d".formatted(mml_idx);
     }
@@ -7132,8 +7146,7 @@ on_error:
      * trk: track symbol
      */
     private void display_counts_sub(int i, char trk) {
-        String msg = "";
-        msg = "   %s   |".formatted(trk);
+        String msg = "   %s   |".formatted(trk);
         if (track_count[mml_idx][i][0].cnt != 0) {
             msg += " %6d   %5d|".formatted(double2int(track_count[mml_idx][i][0].cnt), track_count[mml_idx][i][0].frm);
         } else {
@@ -7144,7 +7157,7 @@ on_error:
         } else {
             msg += "               |";
         }
-        logger.log(Level.INFO, msg);
+        System.err.println(msg);
     }
 
     /**
@@ -7170,7 +7183,7 @@ on_error:
         List<MmlDatum2> oufp = new ArrayList<>();
         List<MmlDatum2> infp = new ArrayList<>();
 
-        LINE[][] line_ptr = new LINE[Work.MML_MAX][];
+        Line[][] line_ptr = new Line[Work.MML_MAX][];
         CMD[] cmd_buf;
         int[] trk_flag = new int[_TRACK_MAX];
 
@@ -7321,7 +7334,7 @@ on_error:
         // Write title/composer/editor information as comments to output files
         writeSongInfo(oufp);
 
-        logger.log(Level.DEBUG, " test info:vrc7:%d vrc6:%d n106:%d".formatted(vrc7_track_num, vrc6_track_num, n106_track_num));
+        logger.log(Level.TRACE, " test info:vrc7:%d vrc6:%d n106:%d".formatted(vrc7_track_num, vrc6_track_num, n106_track_num));
 
         track_ptr = 0;
 
@@ -7405,7 +7418,7 @@ on_error:
                     if (trk_flag[i] == 0) {
                         logger.log(Level.WARNING, "#SETBANK for unused track (%c) ignored".formatted(str_track.charAt(i)));
                     } else if ((bank_sel[i] == 2 || bank_sel[i] == 3) && dpcm_bankswitch != 0) {
-                        dispError(enmErrNum.CANT_USE_BANK_2_OR_3_WITH_DPCMBANKSWITCH.ordinal(), null, 0);
+                        dispError(ErrNum.CANT_USE_BANK_2_OR_3_WITH_DPCMBANKSWITCH, null, 0);
                     } else {
                         curr_bank = bank_sel[i];
                         oufp.add(new MmlDatum2("\n\n", 0));
@@ -7416,7 +7429,7 @@ on_error:
                 }
 
                 if (trk_flag[i] != 0) {
-                    cmd_buf = new CMD[32 * 1024];// malloc(sizeof(CMD) * 32 * 1024);
+                    cmd_buf = new CMD[32 * 1024]; // malloc(sizeof(CMD) * 32 * 1024);
                     developeData(oufp, i, cmd_buf, line_ptr[mml_idx]);
                     cmd_buf = null;
                 }
@@ -7479,7 +7492,7 @@ on_error:
             // Write title/composer/editor information to output file as macro
             writeSongInfoMacro(infp);
 
-            infp.add(new MmlDatum2("\n\n", -1));
+            infp.add(new MmlDatum2("\n\n", 0xff));
             //fclose(fp);
         }
 
@@ -7550,14 +7563,14 @@ on_error:
 
         // All about MML
         for (mml_idx = 0; mml_idx < wk.mml_num; mml_idx++) {
-            logger.log(Level.INFO, "");
+            System.err.println();
             if (wk.mml_num > 1) {
-                logger.log(Level.INFO, "Song %d: %s".formatted(mml_idx + 1, wk.mml_names[mml_idx]));
+                System.err.printf("Song %d: %s%n", mml_idx + 1, wk.mml_names[mml_idx]);
             }
-            logger.log(Level.INFO, "-------+---------------+---------------+");
-            logger.log(Level.INFO, "Track  |    Total      |    Loop       |");
-            logger.log(Level.INFO, " Symbol|(count)|(frame)|(count)|(frame)|");
-            logger.log(Level.INFO, "-------+-------+-------+-------+-------+");
+            System.err.println("-------+---------------+---------------+");
+            System.err.println("Track  |    Total      |    Loop       |");
+            System.err.println(" Symbol|(count)|(frame)|(count)|(frame)|");
+            System.err.println("-------+-------+-------+-------+-------+");
             for (i = 0; i < _TRACK_MAX; i++) {
                 if (trk_flag[i] != 0) {
                     display_counts_sub(i, str_track.charAt(i));
@@ -7569,14 +7582,13 @@ on_error:
                     compilerInfo.loopCount.add(double2int(track_count[mml_idx][i][1].cnt));
                 }
             }
-            logger.log(Level.INFO, "-------+-------+-------+-------+-------+");
+            System.err.println("-------+-------+-------+-------+-------+");
         }
 
         return 0;
-
     }
 
-    public CompilerInfo GetCompilerInfo() {
+    public CompilerInfo getCompilerInfo() {
         return compilerInfo;
     }
 }

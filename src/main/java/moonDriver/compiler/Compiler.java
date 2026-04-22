@@ -51,6 +51,9 @@ public class Compiler implements ICompiler {
         this.args = null;
     }
 
+    /**
+     * @return null compile error
+     */
     public MmlDatum[] compile(Stream sourceMML, Function<String, Stream> appendFileReaderCallback) {
         try (var ms = readAllBytesToMemoryStream(sourceMML)) {
             ms.seek(0, SeekOrigin.Begin);
@@ -66,7 +69,12 @@ public class Compiler implements ICompiler {
             ms.seek(0, SeekOrigin.Begin);
 
             try (StreamReader sr = new StreamReader(ms, charset)) {
-                srcBuf = sr.readToEnd();
+                StringBuilder sb = new StringBuilder();
+                int ch;
+                while ((ch = sr.read()) != -1) {
+                    sb.append((char) ch);
+                }
+                srcBuf = sb.toString();
             } catch (IOException e) {
                 throw new dotnet4j.io.IOException(e);
             }
@@ -89,7 +97,7 @@ public class Compiler implements ICompiler {
         if (dest == null || dest.length < 1) return null;
         // What we want is mmlDatumn, so we cast(?) it and recreate it.
         for (MmlDatum2 md2 : dest) {
-            ret.add(md2 == null ? null : md2.ToMmlDatumn());
+            ret.add(md2 == null ? null : md2.toMmlDatumn());
         }
 
         return ret.toArray(MmlDatum[]::new);

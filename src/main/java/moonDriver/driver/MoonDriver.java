@@ -361,13 +361,13 @@ public class MoonDriver {
         //public int IDX_VOLOP = 29; // equ(seq_ch1_reverb  - seq_work); Volume Operator in connect
         //public int IDX_OLDAT1 = 17; // equ(seq_ch1_ar_d1r  - seq_work); Volume Data for 1stOP
 
-        //;
-        //; Note : IDX_SYNTH OxxFFFSS
-        //;
-        //; O : 4OP mode
-        //; F : FeedBack
-        //; S : SynthType(bit0 for 1st&2nd bit1 for 3rd&4th)
-        //;
+        //
+        // Note : IDX_SYNTH OxxFFFSS
+        //
+        // O : 4OP mode
+        // F : FeedBack
+        // S : SynthType(bit0 for 1st&2nd bit1 for 3rd&4th)
+        //
 
         //SEQ_WORKSIZE: equ(seq_work_end - seq_work)
 

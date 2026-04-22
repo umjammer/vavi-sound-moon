@@ -11,7 +11,7 @@ public class Strings {
      * @param buf Data Storage Pointer
      * @return Pointer after skip
      */
-    public int skipSpaceOld(String buf, int ptr) {
+    public static int skipSpaceOld(String buf, int ptr) {
         while (ptr < buf.length() && buf.charAt(ptr) != '\0') {
             if (buf.charAt(ptr) != ' ' && buf.charAt(ptr) != '\t') {
                 break;
@@ -24,7 +24,7 @@ public class Strings {
     /**
      * Skip a string
      */
-    public int skipQuote(String buf, int ptr) {
+    public static int skipQuote(String buf, int ptr) {
         if (buf.charAt(ptr) != 0 &&
                 buf.charAt(ptr) == '\"') {
             ptr++; // skip start charactor
@@ -45,10 +45,10 @@ public class Strings {
     /**
      * Check for comment characters
      */
-    public boolean isComment(String buf, int ptr) {
+    public static boolean isComment(String buf, int ptr) {
         if (buf.charAt(ptr) != 0 &&
                 (buf.charAt(ptr) == ';' ||
-                        //		 (*ptr == '/' && *(ptr+1) == '/')
+                        //(buf.charAt(ptr) == '/' && buf.charAt(ptr + 1) == '/')
                         buf.charAt(ptr) == '/'))
             return true;
 
@@ -58,11 +58,11 @@ public class Strings {
     /**
      * Skip comments
      */
-    public int skipComment(String buf, int ptr) {
+    public static int skipComment(String buf, int ptr) {
         if (isComment(buf, ptr)) {
             while (true) {
                 // '\0' = EOL or EOF , '\n' = EOL
-                if (ptr == buf.length() || buf.charAt(ptr) == '\0' || buf.charAt(ptr) == '\n')
+                if (ptr == buf.length() || buf.charAt(ptr) == '\0' || buf.charAt(ptr) == '\n' || buf.charAt(ptr) == '\r')
                     break;
                 ptr++;
             }
@@ -73,18 +73,18 @@ public class Strings {
     /**
      * Skip spaces/tabs (also skip line comments)
      */
-    public int skipSpace(String buf, int ptr) {
+    public static int skipSpace(String buf, int ptr) {
         while (true) {
             if (ptr == buf.length()) break; //EOL or EOF
             if (buf.charAt(ptr) == ' ' || buf.charAt(ptr) == '\t') {
-                //Skip Space
+                // Skip Space
                 ptr++;
                 continue;
             } else if (isComment(buf, ptr)) {
-                //Skip Comment(return EOL)
+                // Skip Comment(return EOL)
                 ptr = skipComment(buf, ptr);
             } else {
-                //Normal Chars
+                // Normal Chars
                 break;
             }
         }
@@ -98,7 +98,7 @@ public class Strings {
 //     * Return:
 //     * 0: Non-Kanji 1: Kanji code
 //     */
-//    int checkKanji(unsigned char c) {
+//    public static int checkKanji(unsigned char c) {
 //        if (0x81 <= c && c <= 0x9f) return 1;
 //        if (0xe0 <= c && c <= 0xef) return 1;
 //        return 0;
@@ -111,12 +111,12 @@ public class Strings {
 //     * Output:
 //     * none
 //     */
-//    void strupper(String[] ptr) {
+//    public static void strupper(String[] ptr) {
 //        while (ptr != '\0') {
-//            if (checkKanji((unsigned char) *ptr) ==0 ){
-//    					*ptr = toupper(( int)*ptr);
-//            ptr++;
-//        } else {
+//            if (checkKanji((unsigned char) *ptr) == 0) {
+//    			  *ptr = toupper((int) *ptr);
+//                ptr++;
+//            } else {
 //                // Processing when using Kanji
 //                ptr += 2;
 //            }
@@ -126,16 +126,16 @@ public class Strings {
     /**
      * Convert string to number
      */
-    public int asc2Int(String buf, int ptr, /* ref */ int[] cnt) {
+    public static int asc2Int(String buf, int ptr, /* ref */ int[] cnt) {
         int num;
         char c;
-        int minus_flag = 0;
+        int minusFlag = 0;
 
         num = 0;
-        cnt[1] = 0;
+        cnt[0] = 0;
 
         if (buf.charAt(ptr) == '-') {
-            minus_flag = 1;
+            minusFlag = 1;
             ptr++;
             cnt[0]++;
         }
@@ -185,7 +185,7 @@ public class Strings {
                 }
                 break;
         }
-        if (minus_flag != 0) {
+        if (minusFlag != 0) {
             num = -num;
         }
         return num;

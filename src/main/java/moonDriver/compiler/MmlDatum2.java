@@ -1,8 +1,4 @@
-
-
-
 package moonDriver.compiler;
-
 
 import java.io.Serializable;
 import java.util.List;
@@ -55,14 +51,14 @@ public class MmlDatum2 extends MmlDatum implements Serializable {
     public String toString() {
         String c = StringUtilities.isNullOrEmpty(code) ? "" : code;
         StringBuilder d = new StringBuilder();
-        while (!c.isEmpty() && c.charAt(c.length() - 1) == '\n') {
+        while (!c.isEmpty() && (c.charAt(c.length() - 1) == '\n' || c.charAt(c.length() - 1) == '\r')) {
             c = c.substring(0, c.length() - 1);
             d.append("\n");
         }
         return "%d : %s%s".formatted(c, super.toString(), d.toString());
     }
 
-    public musicDriverInterface.MmlDatum ToMmlDatumn() {
+    public musicDriverInterface.MmlDatum toMmlDatumn() {
         musicDriverInterface.MmlDatum md = new musicDriverInterface.MmlDatum();
         md.args = this.args;
         md.dat = this.dat;

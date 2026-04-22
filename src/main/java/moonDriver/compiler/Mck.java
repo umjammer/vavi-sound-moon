@@ -1,5 +1,7 @@
 package moonDriver.compiler;
 
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
 import java.util.ResourceBundle;
 
 import dotnet4j.io.Path;
@@ -8,7 +10,9 @@ import musicDriverInterface.CompilerInfo;
 
 public class Mck {
 
-    private static final ResourceBundle rb = ResourceBundle.getBundle("lang/message");
+    private static final Logger logger = System.getLogger(Mck.class.getName());
+
+    private static final ResourceBundle rb = ResourceBundle.getBundle("moonDriver/message");
 
     private Compiler compiler = null;
     private Work wk = null;
@@ -22,16 +26,20 @@ public class Mck {
         //exit(1);
     }
 
-    /** entry point */
+    /**
+     * entry point
+     * ¥
+     * @return null compile error
+     */
     public MmlDatum2[] main(Compiler compiler, String[] mckArgs, Work work, String[] env) {
         this.compiler = compiler;
         wk = work;
 
-        int i, _in, _out;
+        int i, in, out;
         String path, name, ext;// 256size
         int multiple_song_nsf = 0;
 
-        _in = _out = 0;
+        in = out = 0;
 
         // Title Display
         System.err.printf("MML to MCK Data Converter Ver %d.%02d by Manbow-J%n",
@@ -83,10 +91,10 @@ public class Mck {
                 }
                 // Storage of input/output files
             } else {
-                if (_in < Work.MML_MAX) {
-                    wk.mml_names[_in] = mckArgs[i];
-                    wk.mml_short_names[_in] = Path.getFileName(mckArgs[i]);
-                    _in++;
+                if (in < Work.MML_MAX) {
+                    wk.mml_names[in] = mckArgs[i];
+                    wk.mml_short_names[in] = Path.getFileName(mckArgs[i]);
+                    in++;
                 } else {
                     System.err.printf(rb.getString("message.1"));
                     dispHelpMessage();
@@ -95,7 +103,7 @@ public class Mck {
             }
         }
 
-        if (_in == 0) {
+        if (in == 0) {
             dispHelpMessage();
             return null;
         }
@@ -104,12 +112,12 @@ public class Mck {
             wk.out_name = Path.changeExtension(wk.mml_names[0], ".h");
             wk.mdr_name = Path.changeExtension(wk.mml_names[0], ".mdr");
         } else {
-            if (_in == 1) {
+            if (in == 1) {
                 wk.out_name = Path.changeExtension(wk.mml_names[0], ".h");
                 wk.mdr_name = Path.changeExtension(wk.mml_names[0], ".mdr");
-            } else if (_in == 2) {
+            } else if (in == 2) {
                 wk.out_name = wk.mml_names[1];
-                _in--;
+                in--;
             } else {
                 System.err.printf(rb.getString("message.1"));
                 dispHelpMessage();
@@ -117,18 +125,18 @@ public class Mck {
             }
         }
 
-        wk.mml_num = _in;
-        for (i = 0; i < _in - 1; i++) {
+        wk.mml_num = in;
+        for (i = 0; i < in - 1; i++) {
             System.err.printf("%s + ".formatted(wk.mml_names[i]));
         }
-        System.err.printf("%s -> %s".formatted(wk.mml_names[i], wk.out_name));
+        System.err.printf("%s -> %s%n".formatted(wk.mml_names[i], wk.out_name));
 
         // Convert
         datamake = new DataMaker(compiler, wk);
         int ret = datamake.data_make();
         // end
 
-        for (i = 0; i < _in; i++)
+        for (i = 0; i < in; i++)
             wk.mml_short_names[i] = "";
 
         if (ret == 0) {
@@ -137,6 +145,7 @@ public class Mck {
             return wk.destBuf;
         }
 
+logger.log(Level.ERROR , "compile result: " + ret);
         System.err.println();
         System.err.println(rb.getString("message.3"));
         //return work.EXIT_FAILURE;
@@ -145,7 +154,7 @@ public class Mck {
 
     public CompilerInfo getCompilerInfo() {
         if (datamake == null) return null;
-        CompilerInfo ci = datamake.GetCompilerInfo();
+        CompilerInfo ci = datamake.getCompilerInfo();
         return ci;
     }
 }
