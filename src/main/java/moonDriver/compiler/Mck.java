@@ -1,11 +1,14 @@
 package moonDriver.compiler;
 
+import java.io.IOException;
 import java.lang.System.Logger;
 import java.lang.System.Logger.Level;
+import java.nio.file.Path;
 import java.util.ResourceBundle;
 
-import dotnet4j.io.Path;
 import musicDriverInterface.CompilerInfo;
+
+import static vavi.util.compat.Util.changeExtension;
 
 
 public class Mck {
@@ -31,7 +34,7 @@ public class Mck {
      * ¥
      * @return null compile error
      */
-    public MmlDatum2[] main(Compiler compiler, String[] mckArgs, Work work, String[] env) {
+    public MmlDatum2[] main(Compiler compiler, String[] mckArgs, Work work, String[] env) throws IOException {
         this.compiler = compiler;
         wk = work;
 
@@ -93,7 +96,7 @@ public class Mck {
             } else {
                 if (in < Work.MML_MAX) {
                     wk.mml_names[in] = mckArgs[i];
-                    wk.mml_short_names[in] = Path.getFileName(mckArgs[i]);
+                    wk.mml_short_names[in] = Path.of(mckArgs[i]).getFileName().toString();
                     in++;
                 } else {
                     System.err.printf(rb.getString("message.1"));
@@ -109,12 +112,12 @@ public class Mck {
         }
 
         if (multiple_song_nsf != 0) {
-            wk.out_name = Path.changeExtension(wk.mml_names[0], ".h");
-            wk.mdr_name = Path.changeExtension(wk.mml_names[0], ".mdr");
+            wk.out_name = changeExtension(wk.mml_names[0], ".h");
+            wk.mdr_name = changeExtension(wk.mml_names[0], ".mdr");
         } else {
             if (in == 1) {
-                wk.out_name = Path.changeExtension(wk.mml_names[0], ".h");
-                wk.mdr_name = Path.changeExtension(wk.mml_names[0], ".mdr");
+                wk.out_name = changeExtension(wk.mml_names[0], ".h");
+                wk.mdr_name = changeExtension(wk.mml_names[0], ".mdr");
             } else if (in == 2) {
                 wk.out_name = wk.mml_names[1];
                 in--;

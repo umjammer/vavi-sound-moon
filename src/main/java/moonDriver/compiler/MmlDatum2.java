@@ -3,9 +3,10 @@ package moonDriver.compiler;
 import java.io.Serializable;
 import java.util.List;
 
-import dotnet4j.util.compat.StringUtilities;
 import musicDriverInterface.LinePos;
 import musicDriverInterface.MmlDatum;
+
+import static vavi.util.compat.Util.isNullOrEmpty;
 
 
 public class MmlDatum2 extends MmlDatum implements Serializable {
@@ -49,7 +50,7 @@ public class MmlDatum2 extends MmlDatum implements Serializable {
 
     @Override
     public String toString() {
-        String c = StringUtilities.isNullOrEmpty(code) ? "" : code;
+        String c = isNullOrEmpty(code) ? "" : code;
         StringBuilder d = new StringBuilder();
         while (!c.isEmpty() && (c.charAt(c.length() - 1) == '\n' || c.charAt(c.length() - 1) == '\r')) {
             c = c.substring(0, c.length() - 1);

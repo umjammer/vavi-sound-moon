@@ -1,21 +1,22 @@
 
 package moonDriver.compiler;
 
+import java.io.IOException;
 import java.lang.System.Logger;
 import java.lang.System.Logger.Level;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.function.Function;
 
-import dotnet4j.io.File;
-import dotnet4j.io.Path;
-import dotnet4j.util.compat.StringUtilities;
 import musicDriverInterface.CompilerInfo;
 
 import static java.lang.System.getLogger;
 import static moonDriver.common.Common.charset;
+import static vavi.util.compat.Util.isNullOrEmpty;
 
 
 public class DataMaker {
@@ -787,7 +788,7 @@ public class DataMaker {
      * Error display
      */
     private void dispError(ErrNum err, String file, int line) {
-        if (!StringUtilities.isNullOrEmpty(file)) {
+        if (!isNullOrEmpty(file)) {
             System.err.printf("%s %6d: %s%n".formatted(file, line, rb.getString("error." + err.ordinal())));
         } else {
             System.err.printf("%s%n".formatted(rb.getString("error." + err.ordinal())));
@@ -808,7 +809,7 @@ public class DataMaker {
      */
     private void dispWarning(int no, String file, int line) {
         if (wk.warning_flag != 0) {
-            if (!StringUtilities.isNullOrEmpty(file)) {
+            if (!isNullOrEmpty(file)) {
                 System.err.printf("%s %6d: %s%n".formatted(file, line, rb.getString("warn." + no)));
             } else {
                 System.err.printf("%s%n".formatted(rb.getString("warn." + no)));
@@ -887,7 +888,7 @@ public class DataMaker {
         String[] filestr = new String[1];
         filestr[0] = wk.srcBuf; // Files.readAllText(fname);
 
-        if (StringUtilities.isNullOrEmpty(filestr[0])) {
+        if (isNullOrEmpty(filestr[0])) {
             error_flag = 1;
             return null;
         }
@@ -7167,7 +7168,7 @@ on_error:
      * Return:
      * ==0: Normal !=0: Abnormal
      */
-    public int data_make() {
+    public int data_make() throws IOException {
         int i, j, track_ptr;
         int tone_max, envelope_max, pitch_env_max, pitch_mod_max;
         int arpeggio_max, fm_tone_max, dpcm_max, n106_tone_max, vrc7_tone_max;
@@ -7506,15 +7507,15 @@ on_error:
         if (compiler.isSrc) {
             StringBuilder sb = new StringBuilder();
             for (MmlDatum2 s : efFp) sb.append(s.code);
-            File.writeAllText(wk.ef_name, sb.toString());
+            Files.write(Path.of(wk.ef_name), sb.toString().getBytes(charset));
 
             sb = new StringBuilder();
             for (MmlDatum2 s : oufp) sb.append(s.code);
-            File.writeAllText(wk.out_name, sb.toString());
+            Files.write(Path.of(wk.out_name), sb.toString().getBytes(charset));
 
             sb = new StringBuilder();
             for (MmlDatum2 s : infp) sb.append(s.code);
-            File.writeAllText(wk.inc_name, sb.toString());
+            Files.write(Path.of(wk.inc_name), sb.toString().getBytes(charset));
         }
         //else
         {
@@ -7544,16 +7545,16 @@ on_error:
             wk.destBuf = pk.Pack(new ArrayList<>(List.of(wk.destBuf)), wk.in_name, compiler.pcmFileName).toArray(MmlDatum2[]::new);
         } else if (pcm_pack) {
             String pcmFn = pcm_name;
-            if (!File.exists(pcmFn)) {
-                if (compiler.origpath != null) pcmFn = Path.combine(compiler.origpath, pcm_name);
+            if (!Files.exists(Path.of(pcmFn))) {
+                if (compiler.origpath != null) pcmFn = Path.of(compiler.origpath, pcm_name).toString();
             }
-            if (!File.exists(pcmFn)) {
-                if (wk.in_name != null) pcmFn = Path.combine(Path.getDirectoryName(wk.in_name), pcm_name);
+            if (!Files.exists(Path.of(pcmFn))) {
+                if (wk.in_name != null) pcmFn = Path.of(wk.in_name).getParent().resolve(pcm_name).toString();
             }
-            if (!File.exists(pcmFn)) {
-                if (wk.mdr_name != null) pcmFn = Path.combine(Path.getDirectoryName(wk.mdr_name), pcm_name);
+            if (!Files.exists(Path.of(pcmFn))) {
+                if (wk.mdr_name != null) pcmFn = Path.of(wk.mdr_name).getParent().resolve(pcm_name).toString();
             }
-            if (File.exists(pcmFn)) {
+            if (Files.exists(Path.of(pcmFn))) {
                 PcmPack pk = new PcmPack();
                 wk.destBuf = pk.Pack(new ArrayList<>(List.of(wk.destBuf)), pcmFn, pcm_name).toArray(MmlDatum2[]::new);
             }

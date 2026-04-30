@@ -4,13 +4,13 @@ import java.lang.System.Logger;
 import java.lang.System.Logger.Level;
 import java.util.function.Consumer;
 
-import dotnet4j.util.compat.Tuple;
 import moonDriver.common.Common;
 import moonDriver.driver.MoonDriver.Work.Ch;
 import musicDriverInterface.ChipDatum;
 import musicDriverInterface.MetaData;
 import musicDriverInterface.MetaData.Tag;
 import musicDriverInterface.MmlDatum;
+import vavi.util.compat.Tuple;
 
 import static java.lang.System.getLogger;
 
@@ -58,7 +58,7 @@ public class MoonDriver {
 
     public boolean init(MmlDatum[] vgmBuf, Consumer<ChipDatum> WriteOPL4Register, double SampleRate) {
         logger.log(Level.INFO, "MoonDriver  Orig. %s Programed by BouKiCHi".formatted(version));
-        logger.log(Level.INFO, "MoonDriverDotNET  VER 20201226 Programed by Kuma");
+        logger.log(Level.INFO, "MoonDriverJava  VER 20201226 Programed by Kuma ported by umjammer");
 
         this.vgmBuf = vgmBuf;
         this.writeOpl4 = WriteOPL4Register;
@@ -92,7 +92,7 @@ public class MoonDriver {
         change_page3();
         a = (byte) readMemory(MDR_PACKED).dat;
         if (a == 0) {
-            if (ExtendFile != null) {
+            if (extendFile != null) {
                 d = 0x05;
                 e = 0x03;
                 moon_fm2_out();
@@ -110,7 +110,7 @@ public class MoonDriver {
                 e = 0x00;
                 moon_wave_out();
 
-                for (byte dat : ExtendFile.getItem2()) {
+                for (byte dat : extendFile.getItem2()) {
                     d = 0x06;
                     e = dat;
                     moon_wave_out();
@@ -185,7 +185,7 @@ public class MoonDriver {
     private double ntscStep = 0.0;
     private double ntscCounter = 0.0;
     private boolean nextFlg = false;
-    public Tuple<String, byte[]> ExtendFile = null;
+    public Tuple<String, byte[]> extendFile = null;
     private final int[] pcmKeyon = {
             -1, -1, -1, -1, -1, -1,
             -1, -1, -1, -1, -1, -1,
@@ -750,7 +750,7 @@ public class MoonDriver {
 //#endif
 
     /**
-     * Initialises all driver things
+     * Initializes all driver things
      */
     private void moon_init_all() {
         work = new Work();

@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
-import dotnet4j.util.compat.Tuple3;
+import vavi.util.compat.Tuple3;
 
 import static java.lang.System.getLogger;
 import static moonDriver.common.Common.charset;

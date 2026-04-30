@@ -2,14 +2,13 @@ package moonDriver.compiler;
 
 import java.lang.System.Logger;
 import java.lang.System.Logger.Level;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
-
-import dotnet4j.io.File;
-import dotnet4j.io.Path;
-import dotnet4j.util.compat.StringUtilities;
 
 import static java.lang.System.getLogger;
 import static moonDriver.common.Common.charset;
+import static vavi.util.compat.Util.isNullOrEmpty;
 
 
 //
@@ -90,8 +89,8 @@ public class PcmPack {
 
     /** MDR file reading */
     private static List<MmlDatum2> packPCMintoMDR(List<MmlDatum2> destBuf, String file, String pcm, Mdr m) {
-        if (StringUtilities.isNullOrEmpty(file)) return destBuf;
-        if (StringUtilities.isNullOrEmpty(pcm)) return destBuf;
+        if (isNullOrEmpty(file)) return destBuf;
+        if (isNullOrEmpty(pcm)) return destBuf;
 
         byte[] bank = new byte[BANK_SIZE];
         logger.log(Level.INFO, "packing...");
@@ -106,10 +105,11 @@ public class PcmPack {
         byte[] pcmBuf;
 
         try {
-            if (File.exists(pcm)) pcmBuf = File.readAllBytes(pcm);
+            Path p = Path.of(pcm);
+            if (Files.exists(p)) pcmBuf = Files.readAllBytes(p);
             else {
-                pcm = Path.combine(Path.getDirectoryName(file), pcm);
-                pcmBuf = File.readAllBytes(pcm);
+                p = Path.of(file).getParent().resolve(pcm);
+                pcmBuf = Files.readAllBytes(p);
             }
         } catch (Exception e) {
             logger.log(Level.ERROR, "File open error!:%s".formatted(pcm));
@@ -162,21 +162,20 @@ public class PcmPack {
 
         mdrfile = mdrFn;
         logger.log(Level.INFO, "File:%s".formatted(mdrfile));
-        if (!StringUtilities.isNullOrEmpty(pcmFn)) pcmfile = pcmFn;
+        if (!isNullOrEmpty(pcmFn)) pcmfile = pcmFn;
 
         Mdr m = new Mdr();
         readMDRHeader(destBuf, mdrfile, m);
 
         logger.log(Level.INFO, "Size:%d".formatted(m.size));
 
-        if (StringUtilities.isNullOrEmpty(pcmfile)) {
-            if (!StringUtilities.isNullOrEmpty(m.pcmName)) {
-                pcmfile = Path.getDirectoryName(mdrfile);
-                pcmfile = Path.combine(pcmfile, m.pcmName);
+        if (isNullOrEmpty(pcmfile)) {
+            if (!isNullOrEmpty(m.pcmName)) {
+                pcmfile = Path.of(mdrfile).getParent().resolve(m.pcmName).toString();
             }
         }
 
-        if (StringUtilities.isNullOrEmpty(pcmfile)) {
+        if (isNullOrEmpty(pcmfile)) {
             logger.log(Level.INFO, "PCM filename is not defined!");
             return destBuf;
         }
