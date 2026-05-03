@@ -6,7 +6,7 @@ import java.util.ResourceBundle;
 
 public class MoonDriverException extends Exception implements Serializable {
 
-    static final ResourceBundle rb = ResourceBundle.getBundle("lang/messages");
+    static final ResourceBundle rb = ResourceBundle.getBundle("moonDriver/messages");
 
     public MoonDriverException() {
     }

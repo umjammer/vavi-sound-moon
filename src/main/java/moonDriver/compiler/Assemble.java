@@ -3,12 +3,13 @@ package moonDriver.compiler;
 import java.lang.System.Logger;
 import java.lang.System.Logger.Level;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Stack;
 
-import dotnet4j.util.compat.Tuple3;
+import vavi.util.compat.Tuple3;
 
 import static java.lang.System.getLogger;
 import static moonDriver.common.Common.charset;
@@ -240,10 +241,10 @@ public class Assemble {
     // Step1
     private void append() {
         asm = new ArrayList<>();
-        Step1_start(asFp);
+        startStep1(asFp);
     }
 
-    private void Step1_start(List<MmlDatum2> crnt) {
+    private void startStep1(List<MmlDatum2> crnt) {
         for (MmlDatum2 md : crnt) {
             if (md == null || md.args == null || md.args.size() < 2 || !(md.args.get(0) instanceof Integer) || (int) md.args.get(0) != -4) {
                 asm.add(md);
@@ -264,11 +265,11 @@ public class Assemble {
             wd = wd.substring(".include".length()).toLowerCase().trim();
 
             if (wd.equals("\"define.inc\"")) {
-                Step1_start(inFp);
+                startStep1(inFp);
             } else if (wd.equals("\"effect.h\"")) {
-                Step1_start(efFp);
+                startStep1(efFp);
             } else {
-                Step1_start(ouFp);
+                startStep1(ouFp);
             }
         }
     }
@@ -409,8 +410,8 @@ public class Assemble {
             List<Object> args = asm.get(i).args;
 
             String code = asm.get(i).code;
-            while (code.indexOf("\n") == code.length() - 1) code = code.substring(0, code.length() - 1);
-            while (code.indexOf("\n") == 0) code = code.substring(1);
+            while (code.indexOf("\n") == code.length() - 1 || code.indexOf("\r") == code.length() - 1) code = code.substring(0, code.length() - 1);
+            while (code.indexOf("\n") == 0 || code.indexOf("\r") == 0) code = code.substring(1);
             logger.log(Level.TRACE, code);
 
             int[] ptr = new int[1];
@@ -457,21 +458,21 @@ public class Assemble {
 
         List<Object> args = asm.args;
         switch (args.get(ptr[0] + 1)) {
-            case Byte aByte -> {
+            case Byte b -> {
                 byte n = (byte) args.get(ptr[0] + 1);
                 ptr[0] += 2;
-                Poke(currentBank, currentAddress++, n, asm);
+                poke(currentBank, currentAddress++, n, asm);
             }
-            case Integer integer -> {
+            case Integer i -> {
                 byte n = (byte) (int) args.get(ptr[0] + 1);
                 ptr[0] += 2;
-                Poke(currentBank, currentAddress++, n, asm); // Even if it is an int, it is treated as a byte.
+                poke(currentBank, currentAddress++, n, asm); // Even if it is an int, it is treated as a byte.
 
             }
             case Character c -> {
                 byte n = (byte) (char) args.get(ptr[0] + 1);
                 ptr[0] += 2;
-                Poke(currentBank, currentAddress++, n, asm);
+                poke(currentBank, currentAddress++, n, asm);
             }
             case String sen -> {
                 // Composite type
@@ -486,7 +487,7 @@ public class Assemble {
                     StringBuilder x = new StringBuilder();
 
                     if (sen.charAt(i) == '"') {
-                        x = new StringBuilder();
+                        x.setLength(0);
                         j = i + 1;
                         for (; j < sen.length(); j++) {
                             if (sen.charAt(j) == '"') break;
@@ -499,7 +500,7 @@ public class Assemble {
                         continue;
                     }
 
-                    x = new StringBuilder();
+                    x.setLength(0);
                     j = i;
                     for (; j < sen.length(); j++) {
                         if (sen.charAt(i) == ' ' || sen.charAt(i) == '\t' || sen.charAt(i) == ',') break;
@@ -511,7 +512,7 @@ public class Assemble {
                 }
 
                 ptr[0] += 2;
-                for (byte b : wd) Poke(currentBank, currentAddress++, b, asm);
+                for (byte b : wd) poke(currentBank, currentAddress++, b, asm);
             }
             case null, default -> {
                 logger.log(Level.ERROR, "Db error.");
@@ -569,8 +570,8 @@ public class Assemble {
             }
 
             dicRefLabel.get(label).add(new Tuple3<>(currentBank, currentAddress, byteFlg));
-            Poke(currentBank, currentAddress++, (byte) 0, asm);
-            if (byteFlg instanceof Boolean && !(boolean) byteFlg) Poke(currentBank, currentAddress++, (byte) 0, asm);
+            poke(currentBank, currentAddress++, (byte) 0, asm);
+            if (byteFlg instanceof Boolean && !(boolean) byteFlg) poke(currentBank, currentAddress++, (byte) 0, asm);
 
             ptr[0] += 2;
         } else {
@@ -596,15 +597,15 @@ public class Assemble {
             int n = getInt(dicDefine.get(define).code);
 
             ptr[0] += 2;
-            Poke(currentBank, currentAddress++, (byte) n, asm);
-            if (!byteFlg) Poke(currentBank, currentAddress++, (byte) (n >> 8), asm);
+            poke(currentBank, currentAddress++, (byte) n, asm);
+            if (!byteFlg) poke(currentBank, currentAddress++, (byte) (n >> 8), asm);
         } else {
             logger.log(Level.ERROR, "Db ref define error.");
             ptr[0]++;
         }
     }
 
-    private void Poke(int bank, int adr, byte dat, MmlDatum2 src) {
+    private void poke(int bank, int adr, byte dat, MmlDatum2 src) {
         while (dest.size() < bank + 1) {
             dest.add(new ArrayList<>());
         }
@@ -625,7 +626,7 @@ public class Assemble {
 
     private void asmMacro(MmlDatum2 asm,/* ref */ int[] ptr) {
         String tmp = ((String) asm.args.get(ptr[0] + 1)).replace("\t", " ");
-        String[] macros = tmp.split(" ");
+        String[] macros = Arrays.stream(tmp.split(" ")).filter(s -> !s.isEmpty()).toArray(String[]::new);
         int n;
 
         switch (macros[ptr[0]]) {
@@ -749,7 +750,7 @@ public class Assemble {
 
     private static int getInt(String v) {
         if (v == null || v.isEmpty()) {
-            throw new IllegalArgumentException("integer parse error");
+            throw new IllegalArgumentException("integer parse error: " + v);
         }
         if (v.charAt(0) == '$') {
             // Hexadecimal

@@ -1,24 +1,21 @@
-
-
-
 package moonDriver.compiler;
 
 import java.awt.Point;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.UncheckedIOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 
-import dotnet4j.io.FileStream;
-import dotnet4j.io.MemoryStream;
-import dotnet4j.io.SeekOrigin;
-import dotnet4j.io.Stream;
-import dotnet4j.io.StreamReader;
-import dotnet4j.util.compat.Tuple;
 import musicDriverInterface.CompilerInfo;
-import musicDriverInterface.MetaData;
 import musicDriverInterface.ICompiler;
+import musicDriverInterface.MetaData;
 import musicDriverInterface.MmlDatum;
+import vavi.util.compat.Tuple;
 
 import static moonDriver.common.Common.charset;
 
@@ -38,7 +35,7 @@ public class Compiler implements ICompiler {
     public String origpath = null;
     private boolean isIDE = false;
     private Point skipPoint = new Point(0, 0);
-    private Function<String, Stream> appendFileReaderCallback;
+    private Function<String, InputStream> appendFileReaderCallback;
     public final Work work = new Work();
     public Mck mck = null;
 
@@ -51,60 +48,67 @@ public class Compiler implements ICompiler {
         this.args = null;
     }
 
-    public MmlDatum[] compile(Stream sourceMML, Function<String, Stream> appendFileReaderCallback) {
-        try (var ms = readAllBytesToMemoryStream(sourceMML)) {
-            ms.seek(0, SeekOrigin.Begin);
+    /**
+     * @return null compile error
+     */
+    public MmlDatum[] compile(InputStream sourceMML, Function<String, InputStream> appendFileReaderCallback) {
+        try {
+            byte[] b  = sourceMML.readAllBytes();
+            var ms = new ByteArrayInputStream(b);
             int c = 0;
             int offset = 0;
-            while ((c = ms.readByte()) >= 0) {
+            while ((c = ms.read()) >= 0) {
                 if (c == 0x1a) {
-                    ms.setLength(offset);
                     break;
                 }
                 offset++;
             }
-            ms.seek(0, SeekOrigin.Begin);
 
-            try (StreamReader sr = new StreamReader(ms, charset)) {
-                srcBuf = sr.readToEnd();
-            } catch (IOException e) {
-                throw new dotnet4j.io.IOException(e);
+            var sr = new InputStreamReader(new ByteArrayInputStream(b, 0, offset), charset);
+            StringBuilder sb = new StringBuilder();
+            int ch;
+            while ((ch = sr.read()) != -1) {
+                sb.append((char) ch);
             }
+            srcBuf = sb.toString();
+
+            //logger.log(Level.DEBUG, srcBuf);
+
+            this.appendFileReaderCallback = appendFileReaderCallback;
+
+            work.srcBuf = srcBuf;
+
+            mck = new Mck();
+            List<MmlDatum> ret = new ArrayList<>();
+
+    //        if (isIDE) {
+    //            args = new String[] {"-i", "dummy.mdl"};
+    //        }
+
+            MmlDatum2[] dest = mck.main(this, args, work, env);
+            if (dest == null || dest.length < 1) return null;
+            // What we want is mmlDatumn, so we cast(?) it and recreate it.
+            for (MmlDatum2 md2 : dest) {
+                ret.add(md2 == null ? null : md2.toMmlDatumn());
+            }
+
+            return ret.toArray(MmlDatum[]::new);
+
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
         }
-
-        //logger.log(Level.DEBUG, srcBuf);
-
-        this.appendFileReaderCallback = appendFileReaderCallback;
-
-        work.srcBuf = srcBuf;
-
-        mck = new Mck();
-        List<MmlDatum> ret = new ArrayList<>();
-
-//        if (isIDE) {
-//            args = new String[] {"-i", "dummy.mdl"};
-//        }
-
-        MmlDatum2[] dest = mck.main(this, args, work, env);
-        if (dest == null || dest.length < 1) return null;
-        // What we want is mmlDatumn, so we cast(?) it and recreate it.
-        for (MmlDatum2 md2 : dest) {
-            ret.add(md2 == null ? null : md2.ToMmlDatumn());
-        }
-
-        return ret.toArray(MmlDatum[]::new);
     }
 
-    public boolean compile(FileStream sourceMML, Stream destCompiledBin, Function<String, Stream> appendFileReaderCallback) {
+    public boolean compile(InputStream sourceMML, ByteArrayOutputStream destCompiledBin, Function<String, InputStream> appendFileReaderCallback) {
         var dat = compile(sourceMML, appendFileReaderCallback);
         if (dat == null) {
             return false;
         }
         for (MmlDatum md : dat) {
             if (md == null) {
-                destCompiledBin.writeByte((byte) 0);
+                destCompiledBin.write((byte) 0);
             } else {
-                destCompiledBin.writeByte((byte) md.dat);
+                destCompiledBin.write((byte) md.dat);
             }
         }
         return true;
@@ -124,7 +128,7 @@ public class Compiler implements ICompiler {
 
         for (Object prm : param) {
             if (prm instanceof Function) { // <String, Stream>
-                appendFileReaderCallback = (Function<String, Stream>) prm;
+                appendFileReaderCallback = (Function<String, InputStream>) prm;
                 continue;
             }
 
@@ -186,22 +190,7 @@ public class Compiler implements ICompiler {
         }
     }
 
-    public Tuple<String, String>[] getTags(String srcText, Function<String, Stream> appendFileReaderCallback) {
+    public Tuple<String, String>[] getTags(String srcText, Function<String, InputStream> appendFileReaderCallback) {
         return null;
-    }
-
-    private static MemoryStream readAllBytesToMemoryStream(Stream stream) {
-        if (stream == null) return null;
-
-        var buf = new byte[8192];
-        var ms = new MemoryStream();
-        while (true) {
-            var r = stream.read(buf, 0, buf.length);
-            if (r < 1) {
-                break;
-            }
-            ms.write(buf, 0, r);
-        }
-        return ms;
     }
 }
