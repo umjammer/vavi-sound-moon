@@ -25,10 +25,10 @@ currently this project has no good player, use [vavi-sound-mdplayer](https://git
 
 ### File Types
 
-| name | type | status | desxription |
-|------|------|:------:|-------------|
-|      | MML  |   ️?   |             |
-| MND  | SEQ  |   ✅️   |             |
+| name | type | status | description     |
+|------|------|:------:|-----------------|
+| MML  | MML  |   ✅️   | MDR in mdplayer |
+| MND  | SEQ  |   ✅️   |                 |
 
 ## TODO
 
