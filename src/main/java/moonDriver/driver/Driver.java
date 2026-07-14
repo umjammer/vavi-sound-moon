@@ -6,6 +6,7 @@ import java.io.UncheckedIOException;
 import java.lang.System.Logger;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -39,7 +40,7 @@ public class Driver implements IDriver {
         throw new UnsupportedOperationException();
     }
 
-    public MmlDatum[] getDATA() {
+    public MmlDatum[] getData() {
         throw new UnsupportedOperationException();
     }
 
@@ -90,8 +91,8 @@ public class Driver implements IDriver {
         return null;
     }
 
-    public Object getWork() {
-        return null;
+    public Map<String, Object> getWork() {
+        return null; // TODO for visualizer
     }
 
     /**
