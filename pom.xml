@@ -3,7 +3,7 @@
 
   <groupId>vavi</groupId>
   <artifactId>vavi-sound-moon</artifactId>
-  <version>0.0.8</version>
+  <version>0.0.9</version>
 
   <build>
     <plugins>
