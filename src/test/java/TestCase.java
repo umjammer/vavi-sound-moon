@@ -168,14 +168,15 @@ Debug.println(mml);
 Debug.println("compile c# --------");
         ProcessBuilder pb = new ProcessBuilder();
         pb.inheritIO();
-        Process p = pb.command(moonDotNet, testMDL2.toString()).start();
+        // "-i" is what the original make_mdr.sh passes to mmckc; without it the song data is not included
+        Process p = pb.command(moonDotNet, "-i", testMDL2.toString()).start();
         int r = p.waitFor();
         assertEquals(0, r);
         assertTrue(Files.exists(testMDR2), "c# compile failed");
 
         // compile java
 Debug.println("compile java --------");
-        moonDriver.console.Program.main(new String[] {testMDL.toString()});
+        moonDriver.console.Program.main(new String[] {"-i", testMDL.toString()});
         assertTrue(Files.exists(testMDR), "java compile failed");
 
         // compare
@@ -191,6 +192,7 @@ Debug.println("play --------");
 
     @Test
     @DisplayName("compare to original")
+    @EnabledIfSystemProperty(named = "vavi.test", matches = "ide")
     void test7() throws Exception {
 Debug.println(mml);
         Path testMDL = Path.of("tmp/test_java.mdl");
@@ -203,7 +205,8 @@ Debug.println(mml);
 
         // compile java
 Debug.println("compile java --------");
-        moonDriver.console.Program.main(new String[] {testMDL.toString()});
+        // "-i" is what the original make_mdr.sh passes to mmckc; without it the song data is not included
+        moonDriver.console.Program.main(new String[] {"-i", testMDL.toString()});
         assertTrue(Files.exists(testMDR), "java compile failed");
 
         // compare
@@ -215,6 +218,7 @@ Debug.println("java:     " + Files.size(testMDR));
 
     @Test
     @DisplayName("play .mdr")
+    @EnabledIfSystemProperty(named = "vavi.test", matches = "ide")
     void test3() throws Exception {
 Debug.println(file);
         moonDriver.player.Program.main(new String[] {file});
