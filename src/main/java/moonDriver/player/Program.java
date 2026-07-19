@@ -356,6 +356,11 @@ public class Program {
         }
 
         if (!Files.exists(fn)) {
+            // the original works on a case-insensitive filesystem (e.g. "TIMESUP.PCM" is found as "TIMESUP.pcm")
+            fn = resolveIgnoreCase(Path.of(arg));
+        }
+
+        if (!Files.exists(fn)) {
 logger.log(Level.INFO, "file not found: " + fn);
             return null;
         }
@@ -369,6 +374,18 @@ logger.log(Level.ERROR, e.getMessage(), e);
         }
 
         return strm;
+    }
+
+    /** finds an existing file whose name matches ignoring case, for case-sensitive filesystems */
+    private static Path resolveIgnoreCase(Path path) {
+        Path dir = path.getParent() != null ? path.getParent() : Path.of(".");
+        if (!Files.isDirectory(dir)) return path;
+        String name = path.getFileName().toString();
+        try (var files = Files.list(dir)) {
+            return files.filter(p -> p.getFileName().toString().equalsIgnoreCase(name)).findFirst().orElse(path);
+        } catch (IOException e) {
+            return path;
+        }
     }
 
     private int analyzeOption(String[] args) {

@@ -372,7 +372,7 @@ public class Assemble {
                 continue;
             }
 
-            String[] wd = ((String) md.args.get(1)).trim().toLowerCase().replace("\t", " ").split(" ");
+            String[] wd = Arrays.stream(((String) md.args.get(1)).trim().toLowerCase().replace("\t", " ").split(" ")).filter(s -> !s.isEmpty()).toArray(String[]::new);
             if (!wd[1].equals("equ")) {
                 continue;
             }
@@ -562,7 +562,7 @@ public class Assemble {
 
             if (label.contains("bank(")) {
                 byteFlg = -1;
-                label = label.substring(label.indexOf("bank(") + 5, label.lastIndexOf(")") - label.indexOf("bank(") - 5);
+                label = label.substring(label.indexOf("bank(") + 5, label.lastIndexOf(")"));
             }
 
             if (!dicRefLabel.containsKey(label)) {
@@ -725,7 +725,7 @@ public class Assemble {
         boolean flg = false;
         for (int i = 2; i < a.size(); i++) {
             if (a.get(i) instanceof String) {
-                String s = String.valueOf(a.add(i)).toLowerCase();
+                String s = ((String) a.get(i)).toLowerCase();
 
                 // Is it a constant?
                 if (dicDefine.containsKey(s)) {
