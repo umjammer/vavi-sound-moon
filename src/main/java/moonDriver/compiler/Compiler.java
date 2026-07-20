@@ -46,6 +46,12 @@ public class Compiler implements ICompiler {
         this.isIDE = false;
         this.skipPoint = new Point(0, 0);
         this.args = null;
+        // those are set by setCompileSwitch() per compilation, a compiler instance
+        // is often reused, so they must not survive into the next compilation.
+        this.isSrc = false;
+        this.doPackPCM = false;
+        this.pcmFileName = "";
+        this.origpath = null;
     }
 
     /**
