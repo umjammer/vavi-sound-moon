@@ -68,7 +68,7 @@ public class Driver implements IDriver {
     }
 
     public int getNowLoopCounter() {
-        return 0;
+        return md == null ? 0 : md.getCurLoop();
     }
 
     public byte[] getPCMFromSrcBuf() {
@@ -84,7 +84,8 @@ public class Driver implements IDriver {
     }
 
     public int getStatus() {
-        return 1;
+        if (md == null) return -1; // not initialized
+        return md.isStopped() ? 0 : 1;
     }
 
     public List<Tuple<String, String>> getTags() {

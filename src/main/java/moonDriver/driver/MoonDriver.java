@@ -32,6 +32,19 @@ public class MoonDriver {
     private double vgmSpeedCounter;
     private MmlDatum[] vgmBuf;
 
+    /** @return true when every track has reached its end mark */
+    public boolean isStopped() {
+        return stopped;
+    }
+
+    /**
+     * @return how many times the least-advanced active track has passed its loop point,
+     *         0 while no track is active yet
+     */
+    public int getCurLoop() {
+        return vgmCurLoop == Integer.MAX_VALUE ? 0 : Math.max(vgmCurLoop, 0);
+    }
+
     public MetaData getGD3Info(MmlDatum[] buf, int vgmGd3) {
 
         MetaData metaData = new MetaData();
