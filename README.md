@@ -35,13 +35,13 @@ currently this project has no good player, use [vavi-sound-mdplayer](https://git
  * ~~status~~
    * ~~loop ok~~
    * ~~sound starting only, silence continues~~ ... test.mdr is actually one note audio file...
- * compiler ... works similarly to the original c# version, but both are NG
-   * mdp NG ... compiler itself is NG
-   * con OK ... java & c# are both NG
- * player ... OK
-   * mdp OK
-   * con NG ... after compile NG (bec compiler is NG), solo play OK
- * pcm
+ * ~~compiler ... works similarly to the original c# version, but both are NG~~
+   * ~~mdp NG ... compiler itself is NG~~
+   * ~~con OK ... java & c# are both NG~~
+ * ~~player ... OK~~
+   * ~~mdp OK~~
+   * ~~con NG ... after compile NG (bec compiler is NG), solo play OK~~
+ * ~~pcm~~
 
 ---
 

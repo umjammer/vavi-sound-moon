@@ -7168,6 +7168,28 @@ on_error:
      * Return:
      * ==0: Normal !=0: Abnormal
      */
+    /**
+     * Resolves a source output file name ({@code effect.h}, {@code define.inc}, ...).
+     * The defaults are bare relative names, so when the compiler is embedded in an
+     * application they would be written into the process current directory. Put them
+     * beside the mml being compiled instead.
+     */
+    private Path srcOutPath(String name) {
+        Path p = Path.of(name);
+        if (p.isAbsolute()) return p;
+
+        Path base = null;
+        if (compiler.origpath != null) {
+            base = Path.of(compiler.origpath);
+        } else if (wk.in_name != null) {
+            base = Path.of(wk.in_name).toAbsolutePath().getParent();
+        } else if (wk.mml_names[0] != null) {
+            base = Path.of(wk.mml_names[0]).toAbsolutePath().getParent();
+        }
+
+        return base == null ? p : base.resolve(p);
+    }
+
     public int data_make() throws IOException {
         int i, j, track_ptr;
         int tone_max, envelope_max, pitch_env_max, pitch_mod_max;
@@ -7507,15 +7529,15 @@ on_error:
         if (compiler.isSrc) {
             StringBuilder sb = new StringBuilder();
             for (MmlDatum2 s : efFp) sb.append(s.code);
-            Files.write(Path.of(wk.ef_name), sb.toString().getBytes(charset));
+            Files.write(srcOutPath(wk.ef_name), sb.toString().getBytes(charset));
 
             sb = new StringBuilder();
             for (MmlDatum2 s : oufp) sb.append(s.code);
-            Files.write(Path.of(wk.out_name), sb.toString().getBytes(charset));
+            Files.write(srcOutPath(wk.out_name), sb.toString().getBytes(charset));
 
             sb = new StringBuilder();
             for (MmlDatum2 s : infp) sb.append(s.code);
-            Files.write(Path.of(wk.inc_name), sb.toString().getBytes(charset));
+            Files.write(srcOutPath(wk.inc_name), sb.toString().getBytes(charset));
         }
         //else
         {
