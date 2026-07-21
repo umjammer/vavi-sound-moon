@@ -3,7 +3,7 @@
 
   <groupId>vavi</groupId>
   <artifactId>vavi-sound-moon</artifactId>
-  <version>0.0.10</version>
+  <version>0.0.11</version>
 
   <build>
     <plugins>
@@ -61,13 +61,13 @@
     <dependency>
       <groupId>com.github.umjammer</groupId> <!-- vavi / com.github.umjammer -->
       <artifactId>vavi-sound-mdsound</artifactId>
-      <version>0.0.21</version>
+      <version>0.0.22</version>
     </dependency>
 
     <dependency>
       <groupId>com.github.umjammer</groupId> <!-- vavi / com.github.umjammer -->
       <artifactId>vavi-sound-mdi</artifactId>
-      <version>0.0.7b</version>
+      <version>0.0.8</version>
     </dependency>
 
     <dependency>

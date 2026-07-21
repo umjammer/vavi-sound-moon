@@ -56,7 +56,7 @@ public class MmlDatum2 extends MmlDatum implements Serializable {
             c = c.substring(0, c.length() - 1);
             d.append("\n");
         }
-        return "%d : %s%s".formatted(c, super.toString(), d.toString());
+        return "%s : %s%s".formatted(c, super.toString(), d.toString());
     }
 
     public musicDriverInterface.MmlDatum toMmlDatumn() {
