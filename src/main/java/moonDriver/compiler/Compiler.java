@@ -42,6 +42,7 @@ public class Compiler implements ICompiler {
     public Compiler() {
     }
 
+    @Override
     public void init() {
         this.isIDE = false;
         this.skipPoint = new Point(0, 0);
@@ -57,6 +58,7 @@ public class Compiler implements ICompiler {
     /**
      * @return null compile error
      */
+    @Override
     public MmlDatum[] compile(InputStream sourceMML, Function<String, InputStream> appendFileReaderCallback) {
         try {
             byte[] b  = sourceMML.readAllBytes();
@@ -120,15 +122,18 @@ public class Compiler implements ICompiler {
         return true;
     }
 
+    @Override
     public CompilerInfo getCompilerInfo() {
         if (mck == null) return null;
         return mck.getCompilerInfo();
     }
 
+    @Override
     public MetaData getMetaData(byte[] srcBuf) {
         return null;
     }
 
+    @Override
     public void setCompileSwitch(Object... param) {
         if (param == null) return;
 

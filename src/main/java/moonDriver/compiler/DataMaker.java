@@ -396,39 +396,39 @@ public class DataMaker {
         return a;
     }
 
-    private int BNOISETRACK() {
+    private static int BNOISETRACK() {
         return BTRACK(3);
     }
 
-    private int BDPCMTRACK() {
+    private static int BDPCMTRACK() {
         return BTRACK(4);
     }
 
-    private int BFMTRACK() {
+    private static int BFMTRACK() {
         return BTRACK(5);
     }
 
-    private int BVRC7TRACK() {
+    private static int BVRC7TRACK() {
         return BTRACK(6);
     }
 
-    private int BVRC6TRACK() {
+    private static int BVRC6TRACK() {
         return BTRACK(12);
     }
 
-    private int BVRC6SAWTRACK() {
+    private static int BVRC6SAWTRACK() {
         return BTRACK(14);
     }
 
-    private int BN106TRACK() {
+    private static int BN106TRACK() {
         return BTRACK(15);
     }
 
-    private int BFME7TRACK() {
+    private static int BFME7TRACK() {
         return BTRACK(23);
     }
 
-    private int BMMC5TRACK() {
+    private static int BMMC5TRACK() {
         return BTRACK(26);
     }
 
@@ -1025,7 +1025,7 @@ on_error:
         return 0;
     }
 
-    private int skipTrackHeader(String st, int ptr) {
+    private static int skipTrackHeader(String st, int ptr) {
         if (ptr >= st.length() || st.charAt(ptr) == '\0')
             return 0;
 
@@ -4270,7 +4270,7 @@ on_error:
 
         for (int i = 0; i < sDes.length; i++) {
 
-            fp.add(new MmlDatum2("\tdb\t%s\n".formatted(sDes[i]), aryInt.get(i)));
+            fp.add(new MmlDatum2("\tdb\t%s\n".formatted(sDes[i]), (Object) aryInt.get(i)));
         }
     }
 
@@ -4333,7 +4333,7 @@ on_error:
      * Output:
      * none
      */
-    private int setCommandBuf(int n, CMD[] cmd, int cmdPtr, int com_no, String buf, int ptr, int line, int enable) {
+    private static int setCommandBuf(int n, CMD[] cmd, int cmdPtr, int com_no, String buf, int ptr, int line, int enable) {
         int[] cnt = new int[] {0};
         int i;
         int[] param = new int[PARAM_MAX];
@@ -5890,7 +5890,7 @@ on_error:
         }
 
         if (putAsm_pos == 7) {
-            fp.add(new MmlDatum2("\t;Trk %d; %s: %d".formatted(str_track.charAt(mml_trk), fn, ln), 0));
+            fp.add(new MmlDatum2("\t;Trk %c; %s: %d".formatted(str_track.charAt(mml_trk), fn, ln), 0));
             fp.add(new MmlDatum2("\n", 0));
         }
         if (++putAsm_pos > 7) {
@@ -7529,15 +7529,15 @@ on_error:
         if (compiler.isSrc) {
             StringBuilder sb = new StringBuilder();
             for (MmlDatum2 s : efFp) sb.append(s.code);
-            Files.write(srcOutPath(wk.ef_name), sb.toString().getBytes(charset));
+            Files.writeString(srcOutPath(wk.ef_name), sb.toString(), charset);
 
             sb = new StringBuilder();
             for (MmlDatum2 s : oufp) sb.append(s.code);
-            Files.write(srcOutPath(wk.out_name), sb.toString().getBytes(charset));
+            Files.writeString(srcOutPath(wk.out_name), sb.toString(), charset);
 
             sb = new StringBuilder();
             for (MmlDatum2 s : infp) sb.append(s.code);
-            Files.write(srcOutPath(wk.inc_name), sb.toString().getBytes(charset));
+            Files.writeString(srcOutPath(wk.inc_name), sb.toString(), charset);
         }
         //else
         {

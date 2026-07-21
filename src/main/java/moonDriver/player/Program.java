@@ -395,15 +395,27 @@ logger.log(Level.ERROR, e.getMessage(), e);
         device = 0;
         loop = 0;
 
+label:
         while (i < args.length && args[i] != null && !args[i].isEmpty() && (args[i].charAt(0) == '-' || args[i].charAt(0) == '/')) {
             String op = args[i].substring(1).toUpperCase();
-            if (op.equals("D=EMU")) device = 0;
-            else if (op.equals("D=GIMIC")) device = 1;
-            else if (op.equals("D=SCCI")) device = 2;
-            else if (op.equals("D=WAVE")) device = 3;
+            switch (op) {
+                case "D=EMU":
+                    device = 0;
+                    break;
+                case "D=GIMIC":
+                    device = 1;
+                    break;
+                case "D=SCCI":
+                    device = 2;
+                    break;
+                case "D=WAVE":
+                    device = 3;
+                    break;
                 //else if (op.length > 2 && op.substring(0, 2) == "L=") OptionSetLoop(op);
                 //else if (op == "H" || op == "?") OptionDispHelp();
-            else break;
+                default:
+                    break label;
+            }
 
             i++;
         }

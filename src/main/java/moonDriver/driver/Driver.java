@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.lang.System.Logger;
-import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -21,7 +20,6 @@ import vavi.util.compat.Tuple;
 
 import static java.lang.System.getLogger;
 import static vavi.util.compat.Util.changeExtension;
-import static vavi.util.compat.Util.getFileNameWithoutExtension;
 
 
 public class Driver implements IDriver {
@@ -36,14 +34,17 @@ public class Driver implements IDriver {
     public Driver() {
     }
 
+    @Override
     public void fadeOut() {
         throw new UnsupportedOperationException();
     }
 
+    @Override
     public MmlDatum[] getData() {
         throw new UnsupportedOperationException();
     }
 
+    @Override
     public MetaData getMetaData(byte[] srcBuf) {
         MetaData metaData = new MetaData();
 
@@ -67,31 +68,38 @@ public class Driver implements IDriver {
         return metaData;
     }
 
+    @Override
     public int getNowLoopCounter() {
         return md == null ? 0 : md.getCurLoop();
     }
 
+    @Override
     public byte[] getPCMFromSrcBuf() {
         throw new UnsupportedOperationException();
     }
 
+    @Override
     public ChipDatum[] getPCMSendData() {
         throw new UnsupportedOperationException();
     }
 
+    @Override
     public Tuple[] getPCMTable() {
         throw new UnsupportedOperationException();
     }
 
+    @Override
     public int getStatus() {
         if (md == null) return -1; // not initialized
         return md.isStopped() ? 0 : 1;
     }
 
+    @Override
     public List<Tuple<String, String>> getTags() {
         return null;
     }
 
+    @Override
     public Map<String, Object> getWork() {
         return null; // TODO for visualizer
     }
@@ -124,34 +132,43 @@ public class Driver implements IDriver {
         md.init(srcBuf, this::writeRegister, sampleRate);
     }
 
+    @Override
     public void startMusic(int musicNumber) {
     }
 
+    @Override
     public void stopMusic() {
     }
 
+    @Override
     public void render() {
         md.oneFrameProc();
     }
 
+    @Override
     public void setDriverSwitch(Object... param) {
         throw new UnsupportedOperationException();
     }
 
+    @Override
     public int setLoopCount(int loopCounter) {
         throw new UnsupportedOperationException();
     }
 
+    @Override
     public void shotEffect() {
         throw new UnsupportedOperationException();
     }
 
+    @Override
     public void startRendering(int renderingFreq, Tuple<String, Integer>[] chipsMasterClock) {
     }
 
+    @Override
     public void stopRendering() {
     }
 
+    @Override
     public void writeRegister(ChipDatum reg) {
         writeOPL4.accept(reg);
     }
