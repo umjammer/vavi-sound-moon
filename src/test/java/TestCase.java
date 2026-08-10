@@ -19,6 +19,7 @@ import vavi.util.Debug;
 import vavi.util.properties.annotation.Property;
 import vavi.util.properties.annotation.PropsEntity;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
@@ -64,6 +65,12 @@ class TestCase {
 
     @Property
     String ext;
+
+    @BeforeAll
+    static void setupAll() throws Exception {
+        Path tmp = Path.of("tmp");
+        if (!Files.exists(tmp)) Files.createDirectory(tmp);
+    }
 
     @BeforeEach
     void setup() throws Exception {
@@ -151,7 +158,6 @@ Debug.println(e);
 
     @Test
     @DisplayName("compile & compare c# & play")
-    @EnabledIfSystemProperty(named = "vavi.test", matches = "ide")
     void test6() throws Exception {
 Debug.println(mml);
         Path testMDL = Path.of("tmp/test_java.mdl");
@@ -187,12 +193,12 @@ Debug.println("java: " + Files.size(testMDR));
 
         // play
 Debug.println("play --------");
-        moonDriver.player.Program.main(new String[] {testMDR.toString()});
+        if ("ide".equals(System.getProperty("vavi.test")))
+            moonDriver.player.Program.main(new String[] {testMDR.toString()});
     }
 
     @Test
     @DisplayName("compare to original")
-    @EnabledIfSystemProperty(named = "vavi.test", matches = "ide")
     void test7() throws Exception {
 Debug.println(mml);
         Path testMDL = Path.of("tmp/test_java.mdl");

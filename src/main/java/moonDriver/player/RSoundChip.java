@@ -2,16 +2,16 @@ package moonDriver.player;
 
 public class RSoundChip {
 
-    protected final int SoundLocation;
-    protected final int BusID;
-    protected final int SoundChip;
+    private final int soundLocation;
+    private final int busID;
+    private final int soundChip;
 
     public int dClock = 3579545;
 
-    public RSoundChip(int soundLocation, int busID, int soundChip) {
-        SoundLocation = soundLocation;
-        BusID = busID;
-        SoundChip = soundChip;
+    RSoundChip(int soundLocation, int busID, int soundChip) {
+        this.soundLocation = soundLocation;
+        this.busID = busID;
+        this.soundChip = soundChip;
     }
 
     public void init() {
@@ -49,8 +49,8 @@ public class RSoundChip {
 
         @Override
         public void init() {
-//            NSoundInterface nsif = Scci.NSoundInterfaceManager().getInterface(BusID);
-//            NSoundChip nsc = nsif.getSoundChip(SoundChip);
+//            NSoundInterface nsif = Scci.NSoundInterfaceManager().getInterface(busID);
+//            NSoundChip nsc = nsif.getSoundChip(soundChip);
 //            realChip = nsc;
 //            dClock = (int) nsc.getSoundChipClock();
 
@@ -113,7 +113,7 @@ public class RSoundChip {
 
         @Override
         public void init() {
-//            NIRealChip rc = c86ctl.getChipInterface(BusID);
+//            NIRealChip rc = c86ctl.getChipInterface(busID);
 //            rc.reset();
 //            realChip = rc;
 //            NIGimic2 gm = rc.QueryInterface();

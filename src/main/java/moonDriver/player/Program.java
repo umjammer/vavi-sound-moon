@@ -75,7 +75,7 @@ public class Program {
     private SourceDataLine audioOutput = null;
 
     private Thread trdMain = null;
-    public boolean trdClosed = false;
+    private boolean trdClosed = false;
 
     private static final int SamplingRate = 55467; // 44100;
     private static final int samplingBuffer = 1024;
@@ -126,7 +126,7 @@ public class Program {
     }
 
     /** */
-    void play(String[] args, int mIndex, int fnIndex) {
+    private void play(String[] args, int mIndex, int fnIndex) {
 //        rsc = checkDevice();
 
         try {
@@ -337,7 +337,7 @@ public class Program {
         };
     }
 
-    public static String getApplicationFolder() {
+    private static String getApplicationFolder() {
         String path = System.getProperty("user.dir");
         if (!isNullOrEmpty(path)) {
             path += path.charAt(path.length() - 1) == '/' ? "" : "/";
