@@ -11,7 +11,7 @@ import musicDriverInterface.CompilerInfo;
 import static vavi.util.compat.Util.changeExtension;
 
 
-public class Mck {
+class Mck {
 
     private static final Logger logger = System.getLogger(Mck.class.getName());
 

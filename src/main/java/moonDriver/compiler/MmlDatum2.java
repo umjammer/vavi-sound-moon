@@ -9,15 +9,15 @@ import musicDriverInterface.MmlDatum;
 import static vavi.util.compat.Util.isNullOrEmpty;
 
 
-public class MmlDatum2 extends MmlDatum implements Serializable {
+class MmlDatum2 extends MmlDatum implements Serializable {
 
     public String code;
 
-    public MmlDatum2() {
+    MmlDatum2() {
         code = "";
     }
 
-    public MmlDatum2(String code, int dat) {
+    MmlDatum2(String code, int dat) {
         super(dat);
         this.code = code;
     }
@@ -43,7 +43,7 @@ public class MmlDatum2 extends MmlDatum implements Serializable {
      *             -6:db [ref] define <br/>
      *             -7: [ref] macro <br/>
      */
-    public MmlDatum2(String code, Object... args) {
+    MmlDatum2(String code, Object... args) {
         super(0xff, MMLType.Unknown, null, args);
         this.code = code;
     }
@@ -59,7 +59,7 @@ public class MmlDatum2 extends MmlDatum implements Serializable {
         return "%s : %s%s".formatted(c, super.toString(), d.toString());
     }
 
-    public musicDriverInterface.MmlDatum toMmlDatumn() {
+    musicDriverInterface.MmlDatum toMmlDatumn() {
         musicDriverInterface.MmlDatum md = new musicDriverInterface.MmlDatum();
         md.args = this.args;
         md.dat = this.dat;

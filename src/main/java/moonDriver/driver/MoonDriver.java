@@ -15,12 +15,12 @@ import vavi.util.compat.Tuple;
 import static java.lang.System.getLogger;
 
 
-public class MoonDriver {
+class MoonDriver {
 
     private static final Logger logger = getLogger(MoonDriver.class.getName());
 
-    public Consumer<ChipDatum> writeOpl4 = null;
-    public MetaData gd3 = null;
+    private Consumer<ChipDatum> writeOpl4 = null;
+    private MetaData gd3 = null;
     private double sampleRate;
     private boolean stopped;
     private int vgmCurLoop;
@@ -45,7 +45,7 @@ public class MoonDriver {
         return vgmCurLoop == Integer.MAX_VALUE ? 0 : Math.max(vgmCurLoop, 0);
     }
 
-    public MetaData getGD3Info(MmlDatum[] buf, int vgmGd3) {
+    private MetaData getGD3Info(MmlDatum[] buf, int vgmGd3) {
 
         MetaData metaData = new MetaData();
 
@@ -70,8 +70,8 @@ public class MoonDriver {
     }
 
     public boolean init(MmlDatum[] vgmBuf, Consumer<ChipDatum> WriteOPL4Register, double SampleRate) {
-        logger.log(Level.INFO, "MoonDriver  Orig. %s Programed by BouKiCHi".formatted(version));
-        logger.log(Level.INFO, "MoonDriverJava  VER 20201226 Programed by Kuma ported by umjammer");
+        System.out.printf("MoonDriver  Orig. %s Programed by BouKiCHi\n", version);
+        System.out.println("MoonDriverJava  VER 20201226 Programed by Kuma ported by umjammer");
 
         this.vgmBuf = vgmBuf;
         this.writeOpl4 = WriteOPL4Register;
@@ -145,7 +145,7 @@ public class MoonDriver {
         return true;
     }
 
-    public void oneFrameProc() {
+    void oneFrameProc() {
 
         vgmSpeedCounter += vgmSpeed;
         while (vgmSpeedCounter >= 1.0) {
@@ -158,7 +158,7 @@ public class MoonDriver {
         }
     }
 
-    public MoonDriver() {
+    MoonDriver() {
         seq_jmptable = new dlgSeqFunc[] {
                 this::seq_drumnote,   // $e0 : Set drum note
                 this::seq_drumbit,    // $e1 : Set drum bits
@@ -272,70 +272,70 @@ public class MoonDriver {
     private static final short S_INST_TABLE = S_TRACK_TABLE + 22;
     private static final short S_OPL3_TABLE = S_TRACK_TABLE + 24;
 
-    public static class Work {
+    static class Work {
 
-        public byte seq_cur_ch = 0x00;
-        public byte seq_use_ch = 0x00;
-        public byte seq_start_fm = 0x00;
+        byte seq_cur_ch = 0x00;
+        byte seq_use_ch = 0x00;
+        byte seq_start_fm = 0x00;
         public byte seq_cur_bank = 0x00;
-        public byte seq_opsel = 0x00;
-        public byte seq_reg_bd = 0x00;
-        public byte seq_jump_flag = 0x00;
-        public byte seq_tmp_note = 0x00;
-        public byte seq_tmp_ch = 0x00;
-        public byte seq_tmp_oct = 0x00;
-        public short seq_tmp_fnum = 0x0000;
+        byte seq_opsel = 0x00;
+        byte seq_reg_bd = 0x00;
+        byte seq_jump_flag = 0x00;
+        byte seq_tmp_note = 0x00;
+        byte seq_tmp_ch = 0x00;
+        byte seq_tmp_oct = 0x00;
+        short seq_tmp_fnum = 0x0000;
 
         //
         // Workarea for channels in the driver
         //
 
 //seq_work:
-        public static class Ch {
+        static class Ch {
 
-            public byte dsel = 0x00;
-            public byte opsel = 0x00;
-            public byte synth = 0x00;
-            public byte efx1 = 0x00;
-            public byte cnt = 0x00;
-            public byte loop = 0x00;
-            public int loopCnt = 0x00;
-            public byte bank = 0x00;
-            public short addr = 0x0000;
-            public byte stBank = 0x00;
-            public short stAddr = 0x0000;
-            public boolean endFlg = false;
-            public short tadr = 0x0000;
-            public short tone = 0x0000;
-            public byte key = 0x00;
-            public byte damp = 0x00;
-            public byte lfo = 0x00;
-            public byte lfo_vib = 0x00;
-            public final byte[] ol = new byte[4];
+            byte dsel = 0x00;
+            byte opsel = 0x00;
+            byte synth = 0x00;
+            byte efx1 = 0x00;
+            byte cnt = 0x00;
+            byte loop = 0x00;
+            int loopCnt = 0x00;
+            byte bank = 0x00;
+            short addr = 0x0000;
+            byte stBank = 0x00;
+            short stAddr = 0x0000;
+            boolean endFlg = false;
+            short tadr = 0x0000;
+            short tone = 0x0000;
+            byte key = 0x00;
+            byte damp = 0x00;
+            byte lfo = 0x00;
+            byte lfo_vib = 0x00;
+            final byte[] ol = new byte[4];
             //public byte ar_d1r = 0x00;
             //public byte dl_d2r = 0x00;
             //public byte rc_rr = 0x00;
             //public byte am = 0x00;
-            public byte note = 0x00;
-            public short pitch = 0x0000;
-            public short p_ofs = 0x0000;
-            public byte oct = 0x00;
-            public short fnum = 0x0000;
-            public byte reverb = 0x00;
-            public byte vol = 0x00;
-            public byte pan = 0x00;
-            public byte detune = 0x00;
-            public byte venv = 0x00;
-            public byte nenv = 0x00;
-            public byte penv = 0x00;
-            public short nenv_adr = 0x0000;
-            public short penv_adr = 0x0000;
-            public short venv_adr = 0x0000;
+            byte note = 0x00;
+            short pitch = 0x0000;
+            short p_ofs = 0x0000;
+            byte oct = 0x00;
+            short fnum = 0x0000;
+            byte reverb = 0x00;
+            byte vol = 0x00;
+            byte pan = 0x00;
+            byte detune = 0x00;
+            byte venv = 0x00;
+            byte nenv = 0x00;
+            byte penv = 0x00;
+            short nenv_adr = 0x0000;
+            short penv_adr = 0x0000;
+            short venv_adr = 0x0000;
         }
 
 //seq_work_end:
 
-        public Ch[] ch;
+        Ch[] ch;
 
         //public int IDX_DSEL = 0; // equ(seq_ch1_dsel    - seq_work); Device Select
         //public int IDX_OPSEL = 1; // equ(seq_ch1_opsel   - seq_work); Operator Select
@@ -701,7 +701,7 @@ public class MoonDriver {
     /**
      * Entry points
      */
-    public void entryPoints(short adr) {
+    private void entryPoints(short adr) {
         switch (adr) {
             //	; $4000 Initialize
             case 0x4000:

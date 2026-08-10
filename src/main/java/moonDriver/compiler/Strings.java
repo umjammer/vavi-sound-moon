@@ -3,7 +3,7 @@ package moonDriver.compiler;
 /**
  *
  */
-public class Strings {
+class Strings {
 
     /**
      * Skip spaces/tabs
@@ -11,7 +11,7 @@ public class Strings {
      * @param buf Data Storage Pointer
      * @return Pointer after skip
      */
-    public static int skipSpaceOld(String buf, int ptr) {
+    static int skipSpaceOld(String buf, int ptr) {
         while (ptr < buf.length() && buf.charAt(ptr) != '\0') {
             if (buf.charAt(ptr) != ' ' && buf.charAt(ptr) != '\t') {
                 break;
@@ -24,7 +24,7 @@ public class Strings {
     /**
      * Skip a string
      */
-    public static int skipQuote(String buf, int ptr) {
+    static int skipQuote(String buf, int ptr) {
         if (buf.charAt(ptr) != 0 &&
                 buf.charAt(ptr) == '\"') {
             ptr++; // skip start charactor
@@ -45,7 +45,7 @@ public class Strings {
     /**
      * Check for comment characters
      */
-    public static boolean isComment(String buf, int ptr) {
+    static boolean isComment(String buf, int ptr) {
         if (buf.charAt(ptr) != 0 &&
                 (buf.charAt(ptr) == ';' ||
                         //(buf.charAt(ptr) == '/' && buf.charAt(ptr + 1) == '/')
@@ -58,7 +58,7 @@ public class Strings {
     /**
      * Skip comments
      */
-    public static int skipComment(String buf, int ptr) {
+    static int skipComment(String buf, int ptr) {
         if (isComment(buf, ptr)) {
             while (true) {
                 // '\0' = EOL or EOF , '\n' = EOL
@@ -73,7 +73,7 @@ public class Strings {
     /**
      * Skip spaces/tabs (also skip line comments)
      */
-    public static int skipSpace(String buf, int ptr) {
+    static int skipSpace(String buf, int ptr) {
         while (true) {
             if (ptr == buf.length()) break; //EOL or EOF
             if (buf.charAt(ptr) == ' ' || buf.charAt(ptr) == '\t') {
@@ -126,7 +126,7 @@ public class Strings {
     /**
      * Convert string to number
      */
-    public static int asc2Int(String buf, int ptr, /* ref */ int[] cnt) {
+    static int asc2Int(String buf, int ptr, /* ref */ int[] cnt) {
         int num;
         char c;
         int minusFlag = 0;

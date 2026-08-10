@@ -1,6 +1,7 @@
 package moonDriver.console;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -37,7 +38,7 @@ public class Program {
 
     private static final Logger logger = getLogger(Program.class.getName());
 
-    static final ResourceBundle rb = ResourceBundle.getBundle("moonDriver/message");
+    private static final ResourceBundle rb = ResourceBundle.getBundle("moonDriver/message");
     private String srcFile;
     //private String ffFile;
     private String desFile;
@@ -45,7 +46,7 @@ public class Program {
     private boolean isSrc = false;
     private boolean doPackPcm = false;
     private String pcmFileName = "";
-    public static boolean isTest = false;
+    private static boolean isTest = false;
 
     public static void main(String[] args) throws Exception {
         Program app = new Program();
@@ -161,7 +162,7 @@ public class Program {
                 if (isSuccess) {
                     destCompiledBin.flush();
                     byte[] destbuf = destCompiledBin.toByteArray();
-                    destFileName = destFileName.replace('\\', java.io.File.separatorChar).replace("//", java.io.File.separator);
+                    destFileName = destFileName.replace('\\', File.separatorChar).replace("//", File.separator);
 logger.log(Level.TRACE, destFileName);
                     Files.write(Path.of(destFileName), destbuf);
 //                            if (compiler.outFFFileBuf != null) {

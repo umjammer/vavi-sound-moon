@@ -19,16 +19,16 @@ import static moonDriver.common.Common.charset;
 import static vavi.util.compat.Util.isNullOrEmpty;
 
 
-public class DataMaker {
+class DataMaker {
 
     private static final Logger logger = getLogger(DataMaker.class.getName());
 
-    final ResourceBundle rb = ResourceBundle.getBundle("moonDriver/message");
+    private static final ResourceBundle rb = ResourceBundle.getBundle("moonDriver/message");
 
     private final Compiler compiler;
     private final Work wk;
 
-    public DataMaker(Compiler compiler, Work wk) {
+    DataMaker(Compiler compiler, Work wk) {
         this.compiler = compiler;
         this.wk = wk;
 
@@ -186,10 +186,10 @@ public class DataMaker {
     private int opl3_track_num = 0;
 
     /** DPCM Buffer */
-    public static class DPCMTBL {
+    static class DPCMTBL {
 
-        public int flag;                       // Tone use/unuse flag
-        public int index;                      // The index number that is actually written to the file.
+        int flag;                       // Tone use/unuse flag
+        int index;                      // The index number that is actually written to the file.
         // If this is not -1, the filename is ignored and the DPCM of the index number is used (when sorting).
         public String fname;
         public int freq;
@@ -317,25 +317,25 @@ public class DataMaker {
     private static final double _BASE = 192.0;
     private static final int _BASETEMPO = 75;
 
-    public static class Len {
+    static class Len {
 
-        public double cnt;
-        public int frm;
+        double cnt;
+        int frm;
     }
 
-    public static class GateQ {
+    static class GateQ {
 
-        public int rate;
-        public int adjust;
+        int rate;
+        int adjust;
         // gate length = delta * rate/gate_denom + adjust
     }
 
-    public static class Head {
+    static class Head {
 
-        public final String str;
-        public final int status;
+        final String str;
+        final int status;
 
-        public Head(String str, int status) {
+        Head(String str, int status) {
             this.str = str;
             this.status = status;
         }
@@ -453,17 +453,17 @@ public class DataMaker {
     /* Command Status */
     private static final int PARAM_MAX = 8;
 
-    public static class CMD {
+    static class CMD {
 
-        public String filename;
-        public int line;
-        public double cnt;    // The count is the number of times the track has elapsed since the beginning of the track.
-        public int frm;    // ↑ in frame units
-        public double lcnt;   // The loop point of the track (L command) is set as 0, and the number of counts that have elapsed since then (however, before L is 0)
-        public int lfrm;   // ↑ in frame units
-        public int cmd;
-        public double len;    // Unit: count
-        public final int[] param = new int[PARAM_MAX];
+        String filename;
+        int line;
+        double cnt;    // The count is the number of times the track has elapsed since the beginning of the track.
+        int frm;    // ↑ in frame units
+        double lcnt;   // The loop point of the track (L command) is set as 0, and the number of counts that have elapsed since then (however, before L is 0)
+        int lfrm;   // ↑ in frame units
+        int cmd;
+        double len;    // Unit: count
+        final int[] param = new int[PARAM_MAX];
     }
 
     private static final long PARAM_OMITTED = 0x8000_0000L;
@@ -617,7 +617,7 @@ public class DataMaker {
             this.v = v;
         }
 
-        public static Mml valueOf(int v) {
+        static Mml valueOf(int v) {
             return Arrays.stream(Mml.values()).filter(e -> e.v == v).findFirst().orElse(Undefined);
         }
     }
@@ -671,14 +671,14 @@ public class DataMaker {
             new Head("", -1),
     };
 
-    public static class MML {
+    static class MML {
 
-        public final String cmd;
-        public final int num;
-        public final Function<Integer, Integer> check; // (int trk);
+        final String cmd;
+        final int num;
+        final Function<Integer, Integer> check; // (int trk);
 
         //unsigned long	enable;
-        public MML(String cmd, int num, Function<Integer, Integer> check) {
+        MML(String cmd, int num, Function<Integer, Integer> check) {
             this.cmd = cmd;
             this.num = num;
             this.check = check;
@@ -927,25 +927,25 @@ public class DataMaker {
     }
 
     /** struct st_line */
-    public static class Line {
+    static class Line {
 
         /** File name */
-        public String filename;
+        String filename;
         /** Short file name */
-        public String shortname;
+        String shortname;
         /** Line number */
-        public int line;
+        int line;
         /** Line status (see define below) */
-        public int status;
+        int status;
         /** Parameter (tone/track number etc.) */
-        public int param;
+        int param;
         /** Line String */
-        public String str;
+        String str;
         /** Include File Data Pointer */
-        public Line[] inc_ptr;
+        Line[] inc_ptr;
 
         /** Original line string */
-        public String ostr;
+        String ostr;
     }
 
     /**
@@ -977,7 +977,7 @@ public class DataMaker {
      */
     private int setEffectSub(Line[] lptr, int line, /* ref */ boolean[] ptr_status_end_flag, int min, int max, ErrNum error) {
         int param;
-        int[] cnt = new int[] {0};
+        int[] cnt = {0};
         String temp;
         int tempPtr = 0;
         temp = lptr[line].str;
@@ -1058,7 +1058,7 @@ on_error:
 
         int line, i, param, track_flag, bank, bank_ch;
         boolean[] status_end_flag;
-        int[] cnt = new int[] {0};
+        int[] cnt = {0};
         String temp, temp2;
         int tempPtr;
         int temp2Ptr;
@@ -1656,7 +1656,7 @@ on_error:
      *
      * @param lptr
      */
-    void getEnvelope(Line[] lptr) {
+    private void getEnvelope(Line[] lptr) {
         int line, i, no, end_flag, offset, num;
         int[] cnt = new int[1];
         String buf;
@@ -2600,7 +2600,7 @@ on_error:
      * Output:
      * none
      */
-    void getToneTable(Line[] lptr) {
+    private void getToneTable(Line[] lptr) {
         int line, i, no, end_flag, offset, num;
         int[] cnt = new int[1];
         String buf;
@@ -2697,7 +2697,7 @@ on_error:
      * Output:
      * none
      */
-    void getOPL3tbl(Line[] lptr) {
+    private void getOPL3tbl(Line[] lptr) {
         int line, i, no, end_flag, offset, num;
         int[] cnt = new int[1];
         String buf;
@@ -3044,11 +3044,9 @@ on_error:
      */
     private void getHardEffect(Line[] lptr) {
         int line, i, no, end_flag, offset, num;
-        int[] cnt = new int[1];
+        int[] cnt = {0};
         String buf;
         int ptr;
-
-        cnt[0] = 0;
 
         for (line = 1; line < lptr.length; line++) {
             // Tone data found?
@@ -3181,11 +3179,9 @@ on_error:
      */
     private void getEffectWave(Line[] lptr) {
         int line, i, no, end_flag, offset, num;
-        int[] cnt = new int[1];
+        int[] cnt = {0};
         String buf;
         int ptr;
-
-        cnt[0] = 0;
 
         for (line = 1; line < lptr.length; line++) {
             // Tone data found?
@@ -3796,7 +3792,7 @@ on_error:
 
                     if (opl3op_flag[i] != 0) {
                         // 4OP mode
-                        int[] opf_table = new int[] {0, 2, 1, 3};
+                        int[] opf_table = {0, 2, 1, 3};
                         cnt_val = opf_table[cnt_val];
                     }
 
@@ -4270,7 +4266,7 @@ on_error:
 
         for (int i = 0; i < sDes.length; i++) {
 
-            fp.add(new MmlDatum2("\tdb\t%s\n".formatted(sDes[i]), (Object) aryInt.get(i)));
+            fp.add(new MmlDatum2("\tdb\t%s\n".formatted(sDes[i]), aryInt.get(i)));
         }
     }
 
@@ -4334,7 +4330,7 @@ on_error:
      * none
      */
     private static int setCommandBuf(int n, CMD[] cmd, int cmdPtr, int com_no, String buf, int ptr, int line, int enable) {
-        int[] cnt = new int[] {0};
+        int[] cnt = {0};
         int i;
         int[] param = new int[PARAM_MAX];
 
@@ -4387,7 +4383,7 @@ on_error:
      * none
      */
     private int getLengthSub(String buf, int ptr, /* ref */ double[] len, double def) {
-        int[] cnt = new int[] {0};
+        int[] cnt = {0};
         double temp;
 
         // Frame specification
@@ -4442,7 +4438,7 @@ on_error:
         ptr = getLengthSub(buf, ptr, /* ref */ len, def);
         // Note length subtraction (only possible once)
         if (buf.charAt(ptr) == '-' || buf.charAt(ptr) == '~') {
-            double[] len_adjust = new double[] {0};
+            double[] len_adjust = {0};
             ptr++;
             ptr = getLengthSub(buf, ptr, /* ref */ len_adjust, def);
             if (len[0] - len_adjust[0] > 0) {
@@ -4482,7 +4478,7 @@ on_error:
      */
     private int setCommandBufN(CMD[] cmd, int cmdPtr, int com_no, String buf, int ptr, int line, int enable) {
         int oct_ofs, note;
-        double[] len = new double[] {0};
+        double[] len = {0};
         com_no += transpose;
 
         // Take measures to allow things like c+-++-++-- (not something that's usually done)
@@ -4538,7 +4534,7 @@ on_error:
 
     // Processing Drum Flag Commands
     private int setCommandBufD(CMD[] cmd, int cmdPtr, int com_no, String buf, int ptr, int line, int enable) {
-        double[] len = new double[] {0};
+        double[] len = {0};
         int bit = 0x00;
 
         int loop_end = 0;
@@ -4590,11 +4586,10 @@ on_error:
      * Processing commands with one parameter (scale (direct specification)/note length)
      */
     private int setCommandBufN0(CMD[] cmd, int cmdPtr, String buf, int ptr, int line, int enable) {
-        int[] cnt = new int[1];
+        int[] cnt = {0};
         int note;
-        double[] len = new double[] {0};
+        double[] len = {0};
 
-        cnt[0] = 0;
         note = Strings.asc2Int(buf, ptr, /* ref */ cnt);
         if (cnt[0] == 0) {
             dispError(ErrNum.ABNORMAL_PITCH_VALUE, cmd[cmdPtr].filename, line);
@@ -4639,12 +4634,10 @@ on_error:
      * Processing commands with one parameter (frequency (direct specification)/tone length)
      */
     private int setCommandBufN1(CMD[] cmd, int cmdPtr, int com_no, String buf, int ptr, int line, int enable) {
-        int[] cnt = new int[1];
-        int freq;
-        double[] len = new double[] {0};
+        int[] cnt = {0};
+        double[] len = {0};
 
-        cnt[0] = 0;
-        freq = Strings.asc2Int(buf, ptr, /* ref */ cnt);
+        int freq = Strings.asc2Int(buf, ptr, /* ref */ cnt);
         // Character count check
         if (cnt[0] == 0) {
             dispError(ErrNum.ABNORMAL_PITCH_VALUE, cmd[cmdPtr].filename, line);
@@ -4690,7 +4683,7 @@ on_error:
      * none
      */
     private int setCommandBufR(CMD[] cmd, int cmdPtr, int com_no, String buf, int ptr, int line, int enable) {
-        double[] len = new double[] {0};
+        double[] len = {0};
 
         ptr = getLength(buf, ptr, /* ref */ len, length);
         if (len[0] <= 0) {
@@ -4716,7 +4709,7 @@ on_error:
      * none
      */
     private int setCommandBufK(CMD[] cmd, int cmdPtr, int com_no, String buf, int ptr, int line, int enable) {
-        double[] len = new double[] {0};
+        double[] len = {0};
 
         ptr = getLength(buf, ptr, /* ref */ len, length);
         if (len[0] < 0) { // With sound length 0
@@ -4742,11 +4735,9 @@ on_error:
      */
     private CMD[] analyzeData(int trk, CMD[] cmd, /* ref */ int[] cmdPtr, Line[] lptr) {
         int i, line, com;
-        int[] cnt = new int[1];
+        int[] cnt = {0};
         String buf;
         int ptr;
-
-        cnt[0] = 0;
 
         transpose = 0;
 
@@ -5872,8 +5863,8 @@ on_error:
      * Output:
      * none
      */
-    String fn = "";
-    int ln = 0;
+    private String fn = "";
+    private int ln = 0;
 
     private void putAsm(List<MmlDatum2> fp, int data) {
         String t;
@@ -5910,19 +5901,19 @@ on_error:
     /**
      *
      */
-    private final int[] bank_org_written_flag = new int[128];// = { 1 };
+    private final int[] bank_org_written_flag = new int[128]; // = { 1 };
     private CompilerInfo compilerInfo;
 
     private void putBankOrigin(List<MmlDatum2> fp, int bank) {
         int org;
         if (bank > 127) {
-            //assert(0);
+            //assert false;
             return;
         }
         if (bank_org_written_flag[bank] == 0) {
             org = switch (bank) {
                 case 0 -> 0x8000;
-                //assert(0);
+                //assert false;
                 case 1 -> 0xa000;
                 case 2 -> 0xc000;
                 case 3 -> 0xe000;
@@ -6065,29 +6056,29 @@ on_error:
         }
     }
 
-    public static class PlayState {
+    static class PlayState {
 
-        public GateQ gate_q;
+        GateQ gate_q;
         /** Current normal (key-on) envelope number or volume */
-        public int env;
+        int env;
         /** Current release envelope number (-1: unused) */
-        public int rel_env;
+        int rel_env;
         /** Last written envelope number or volume */
-        public int last_written_env;
+        int last_written_env;
         /** */
-        public int tone;
+        int tone;
         /** */
-        public int rel_tone;
+        int rel_tone;
         /** */
-        public int last_written_tone;
+        int last_written_tone;
         /** Key on/off status */
-        public int key_pressed;
+        int key_pressed;
         /** Last note I wrote (ignore @n) */
-        public final int[] last_note = new int[SELF_DELAY_MAX + 1];
+        final int[] last_note = new int[SELF_DELAY_MAX + 1];
         /** last_note state when using '¥' command */
-        public final int[] last_note_keep = new int[SELF_DELAY_MAX + 1];
+        final int[] last_note_keep = new int[SELF_DELAY_MAX + 1];
         /** How many previous notes to use? (no self-delay if negative) */
-        public int self_delay;
+        int self_delay;
     }
 
     private void defaultPlayState(PlayState[] ps, int psPtr) {
@@ -7167,8 +7158,7 @@ on_error:
      * none
      * Return:
      * ==0: Normal !=0: Abnormal
-     */
-    /**
+     *
      * Resolves a source output file name ({@code effect.h}, {@code define.inc}, ...).
      * The defaults are bare relative names, so when the compiler is embedded in an
      * application they would be written into the process current directory. Put them
@@ -7190,7 +7180,7 @@ on_error:
         return base == null ? p : base.resolve(p);
     }
 
-    public int data_make() throws IOException {
+    int data_make() throws IOException {
         int i, j, track_ptr;
         int tone_max, envelope_max, pitch_env_max, pitch_mod_max;
         int arpeggio_max, fm_tone_max, dpcm_max, n106_tone_max, vrc7_tone_max;
@@ -7252,32 +7242,31 @@ on_error:
         pitch_env_max = checkLoop(pitch_env_tbl, _PITCH_ENV_MAX);
         pitch_mod_max = getMaxLFO(pitch_mod_tbl, _PITCH_MOD_MAX);
         arpeggio_max = checkLoop(arpeggio_tbl, _ARPEGGIO_MAX);
-        //    dpcm_max = getMaxDPCM(dpcm_tbl);
-        //    fm_tone_max = getMaxTone(fm_tone_tbl, _FM_TONE_MAX);
-        //    n106_tone_max = getMaxTone(n106_tone_tbl, _N106_TONE_MAX);
-        //    vrc7_tone_max = getMaxTone(vrc7_tone_tbl, _VRC7_TONE_MAX);
+//        dpcm_max = getMaxDPCM(dpcm_tbl);
+//        fm_tone_max = getMaxTone(fm_tone_tbl, _FM_TONE_MAX);
+//        n106_tone_max = getMaxTone(n106_tone_tbl, _N106_TONE_MAX);
+//        vrc7_tone_max = getMaxTone(vrc7_tone_tbl, _VRC7_TONE_MAX);
         hard_effect_max = getMaxHardEffect(hard_effect_tbl, _HARD_EFFECT_MAX);
         effect_wave_max = getMaxEffectWave(effect_wave_tbl, _EFFECT_WAVE_MAX);
 
-        //    xpcm_max = getMaxDPCM(xpcm_tbl);
-        //    wtb_tone_max = getMaxTone(wtb_tone_tbl, _WTB_TONE_MAX);
+//        xpcm_max = getMaxDPCM(xpcm_tbl);
+//        wtb_tone_max = getMaxTone(wtb_tone_tbl, _WTB_TONE_MAX);
 
         tonetbl_max = getMaxToneTable(tonetbl_tbl, _TONETBL_MAX);
         opl3tbl_max = getMaxOpl3tbl(opl3op_tbl, _OPL3TBL_MAX);
 
-        //    xpcm_size = checkXPCMSize(xpcm_tbl);
+//        xpcm_size = checkXPCMSize(xpcm_tbl);
 
-
-        //    sortDPCM(dpcm_tbl); // Remove duplicate tones
-        //    dpcm_size = checkDPCMSize(dpcm_tbl);
-        //    //printf("dpcmsize $%x\n",dpcm_size);
-        //    if (!allow_bankswitching && (dpcm_size > _DPCM_TOTAL_SIZE)) {	// Check size
-        //        dispError(DPCM_FILE_TOTAL_SIZE_OVER, NULL, 0);
-        //        dpcm_size = 0;
-        //    } else {
-        //        dpcm_data = malloc(dpcm_size);
-        //        readDPCM(dpcm_tbl);
-        //    }
+//        sortDPCM(dpcm_tbl); // Remove duplicate tones
+//        dpcm_size = checkDPCMSize(dpcm_tbl);
+//        //logger.log(Level.DEBUG, "dpcmsize $%x".formatted(dpcm_size));
+//        if (!allow_bankswitching && (dpcm_size > _DPCM_TOTAL_SIZE)) {	// Check size
+//            dispError(DPCM_FILE_TOTAL_SIZE_OVER, NULL, 0);
+//            dpcm_size = 0;
+//        } else {
+//            dpcm_data = malloc(dpcm_size);
+//            readDPCM(dpcm_tbl);
+//        }
 
         // Modifying pitch envelope parameters
         for (i = 0; i < pitch_env_max; i++) {
@@ -7318,32 +7307,31 @@ on_error:
                 }
                 efFp.add(new MmlDatum2("\n", 0));
             }
-            //// FM tone writing
+            // FM tone writing
             //writeToneFM(fp, fm_tone_tbl, "fds", fm_tone_max);
             writeHardEffect(efFp, hard_effect_tbl, "fds", hard_effect_max);
             writeEffectWave(efFp, effect_wave_tbl, "fds", effect_wave_max);
-            //// Namco106 tone writing
+            // Namco106 tone writing
             //writeToneN106(fp, n106_tone_tbl, "n106", n106_tone_max);
             efFp.add(new MmlDatum2("db 0;dummy N106_channel\n", -1, 0));
-            //// VRC7 tone writing
+            // VRC7 tone writing
             //writeToneVRC7(fp, vrc7_tone_tbl, "vrc7", vrc7_tone_max);
-            //// DPCM writing
+            // DPCM writing
             //writeDPCM(fp, dpcm_tbl, "dpcm_data", dpcm_max);
             //writeDPCMSample(fp);
 
-            //// HuSIC
-            //// WTB tone writing
+            // HuSIC
+            // WTB tone writing
             //writeToneWTB(fp, wtb_tone_tbl, "pce", wtb_tone_max);
 
-            //// ToneTable
+            // ToneTable
             writeToneTable(efFp, tonetbl_tbl, "ttbl", tonetbl_max);
 
             // OPL3 FM Tone
             writeOPL3tbl(efFp, "opl3tbl", opl3tbl_max);
 
-            //// XPCM writing
+            // XPCM writing
             //writeXPCM(fp, xpcm_tbl, "xpcm_data", xpcm_max);
-
 
             // Write MML file
             if (wk.include_flag != 0) {
@@ -7400,7 +7388,6 @@ on_error:
             setSongLabel();
             oufp.add(new MmlDatum2("sound_data_table:\n", -2, "sound_data_table:"));
 
-
             for (i = 0; i < _TRACK_MAX; i++) {
                 t = "%s_%02d".formatted(songlabel, i);
                 if (trk_flag[i] != 0) oufp.add(new MmlDatum2("\tdw\t%s\n".formatted(t), -3, t));
@@ -7408,7 +7395,7 @@ on_error:
 
             oufp.add(new MmlDatum2("\t.if (ALLOW_BANK_SWITCH)\n", -4, ".if (ALLOW_BANK_SWITCH)"));
             oufp.add(new MmlDatum2("sound_data_bank:\n", -2, "sound_data_bank:"));
-            //fp.add("{0}_bank_table:\n".formatted(songlabel));
+            //logger.log(Level.TRACE, "%s_bank_table:".formatted(songlabel));
             for (i = 0; i < _TRACK_MAX; i++) {
                 t = "bank(%s_%02d)".formatted(songlabel, i);
                 if (trk_flag[i] != 0) oufp.add(new MmlDatum2("\tdb\t%s\n".formatted(t), -3, t));
@@ -7472,7 +7459,7 @@ on_error:
             t = "OPL3_BASETRACK\t\tequ\t%2d".formatted(BOPL3TRACK());
             infp.add(new MmlDatum2("%s\n".formatted(t), -5, t));
 
-            //flogger.log(Level.TRACE, fp, "INITIAL_WAIT_FRM\t\tequ\t%2d\n", 0x26);
+            //logger.log(Level.TRACE, fp, "INITIAL_WAIT_FRM\t\tequ\t%2d\n".formatted(0x26));
             t = "PITCH_CORRECTION\t\tequ\t%d".formatted(pitch_correction);
             infp.add(new MmlDatum2("%s\n".formatted(t), -5, t));
             t = "DPCM_RESTSTOP\t\tequ\t%d".formatted(dpcm_reststop);
@@ -7564,7 +7551,7 @@ on_error:
         // PCM Pack
         if (compiler.doPackPCM) {
             PcmPack pk = new PcmPack();
-            wk.destBuf = pk.Pack(new ArrayList<>(List.of(wk.destBuf)), wk.in_name, compiler.pcmFileName).toArray(MmlDatum2[]::new);
+            wk.destBuf = pk.pack(new ArrayList<>(List.of(wk.destBuf)), wk.in_name, compiler.pcmFileName).toArray(MmlDatum2[]::new);
         } else if (pcm_pack) {
             String pcmFn = pcm_name;
             if (!Files.exists(Path.of(pcmFn))) {
@@ -7578,7 +7565,7 @@ on_error:
             }
             if (Files.exists(Path.of(pcmFn))) {
                 PcmPack pk = new PcmPack();
-                wk.destBuf = pk.Pack(new ArrayList<>(List.of(wk.destBuf)), pcmFn, pcm_name).toArray(MmlDatum2[]::new);
+                wk.destBuf = pk.pack(new ArrayList<>(List.of(wk.destBuf)), pcmFn, pcm_name).toArray(MmlDatum2[]::new);
             }
         }
 
@@ -7611,7 +7598,7 @@ on_error:
         return 0;
     }
 
-    public CompilerInfo getCompilerInfo() {
+    CompilerInfo getCompilerInfo() {
         return compilerInfo;
     }
 }

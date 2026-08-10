@@ -14,7 +14,7 @@ import static vavi.util.compat.Util.isNullOrEmpty;
 //
 // pcmpack.c
 //
-public class PcmPack {
+class PcmPack {
 
     private static final Logger logger = getLogger(PcmPack.class.getName());
 
@@ -25,21 +25,21 @@ public class PcmPack {
     /** MDR File Definition */
     private static class Mdr {
 
-        public int fp;
-        public int size;
-        public int header = 0;
+        int fp;
+        int size;
+        int header = 0;
         /** pos:0x40 pcmName */
-        public String pcmName;
+        String pcmName;
         /** pos: 0x2a 1:pcm is packed */
-        public int pcmPacked;
+        int pcmPacked;
         /** pos:0x30 start address of PCM RAM(* 0x10000) */
-        public int pcmStartAdrs;
+        int pcmStartAdrs;
         /** pos:0x31 start bank (* 8192) */
-        public int pcmStartBank;
+        int pcmStartBank;
         /** pos:0x32 number of PCM banks (* 8192) */
-        public int pcmBanks;
+        int pcmBanks;
         /** pos:0x32 size of last bank (* 0x100) */
-        public int pcmLastSize;
+        int pcmLastSize;
 
         // actual size = (pcmBanks * 0x2000) + (pcmLastSize * 0x100)
     }
@@ -153,7 +153,7 @@ public class PcmPack {
         return destBuf;
     }
 
-    public List<MmlDatum2> Pack(List<MmlDatum2> destBuf, String mdrFn, String pcmFn /* = "" */) {
+    public List<MmlDatum2> pack(List<MmlDatum2> destBuf, String mdrFn, String pcmFn /* = "" */) {
         String pcmfile = null;
         String mdrfile;
 

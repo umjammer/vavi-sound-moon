@@ -15,7 +15,7 @@ import static java.lang.System.getLogger;
 import static moonDriver.common.Common.charset;
 
 
-public class Assemble {
+class Assemble {
 
     private static final Logger logger = getLogger(Assemble.class.getName());
 

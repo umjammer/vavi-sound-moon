@@ -37,7 +37,7 @@ public class Compiler implements ICompiler {
     private Point skipPoint = new Point(0, 0);
     private Function<String, InputStream> appendFileReaderCallback;
     public final Work work = new Work();
-    public Mck mck = null;
+    private Mck mck = null;
 
     public Compiler() {
     }
